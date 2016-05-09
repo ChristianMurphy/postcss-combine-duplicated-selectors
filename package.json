@@ -1,0 +1,14 @@
+{
+  "name": "css-codemods",
+  "version": "1.0.0",
+  "description": "upgrade your css quickly and effectively",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "keywords": [
+    "css"
+  ],
+  "author": "Christian Murphy",
+  "license": "MIT"
+}
