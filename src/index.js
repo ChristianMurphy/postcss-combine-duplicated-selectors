@@ -2,18 +2,19 @@ import postcss from 'postcss';
 
 export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
   return css => {
-    const selectorSet = new Set();
+    const selectors = new Map();
 
     // selector set
     css.walkRules(rule => {
-      selectorSet.add(rule.selector);
+      if (!selectors.has(rule.selector)) {
+        selectors.set(rule.selector, rule);
+      }
     });
 
     // remove duplicates
     css.walkRules(rule => {
-      if (selectorSet.has(rule.selector)) {
-        selectorSet.delete(rule.selector);
-      } else {
+      if (selectors.get(rule.selector) !== rule) {
+        rule.nodes.forEach(decl => decl.moveTo(selectors.get(rule.selector)));
         rule.remove();
       }
     });

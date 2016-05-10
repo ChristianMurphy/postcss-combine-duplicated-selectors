@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src -d dist",
-    "test": "npm run build; ava; eslint ."
+    "test": "npm run build; ava -T 15s; eslint ."
   },
   "keywords": [
     "css"

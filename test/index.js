@@ -13,3 +13,10 @@ test('duplicated class', t => {
   const expected = '.module {}';
   t.is(actual, expected);
 });
+
+test('duplicated class with declarations', t => {
+  const actual = postcss([plugin])
+    .process('.module {color: green} .module {background: red}').css;
+  const expected = '.module {color: green;background: red}';
+  t.is(actual, expected);
+});
