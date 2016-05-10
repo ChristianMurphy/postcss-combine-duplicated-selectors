@@ -2,9 +2,27 @@ import test from 'ava';
 import postcss from 'postcss';
 import plugin from '../dist';
 
-test('non duplicated css', t => {
+test('non duplicated class', t => {
   const actual = postcss([plugin]).process('.module {}').css;
   const expected = '.module {}';
+  t.is(actual, expected);
+});
+
+test('non duplicated id', t => {
+  const actual = postcss([plugin]).process('#one {}').css;
+  const expected = '#one {}';
+  t.is(actual, expected);
+});
+
+test('non duplicated tag', t => {
+  const actual = postcss([plugin]).process('a {}').css;
+  const expected = 'a {}';
+  t.is(actual, expected);
+});
+
+test('non duplicated universal', t => {
+  const actual = postcss([plugin]).process('* {}').css;
+  const expected = '* {}';
   t.is(actual, expected);
 });
 
@@ -14,9 +32,48 @@ test('duplicated class', t => {
   t.is(actual, expected);
 });
 
+test('duplicated id', t => {
+  const actual = postcss([plugin]).process('#one {} #one {}').css;
+  const expected = '#one {}';
+  t.is(actual, expected);
+});
+
+test('duplicated tag', t => {
+  const actual = postcss([plugin]).process('a {} a {}').css;
+  const expected = 'a {}';
+  t.is(actual, expected);
+});
+
+test('duplicated universal', t => {
+  const actual = postcss([plugin]).process('* {} * {}').css;
+  const expected = '* {}';
+  t.is(actual, expected);
+});
+
 test('duplicated class with declarations', t => {
   const actual = postcss([plugin])
     .process('.module {color: green} .module {background: red}').css;
   const expected = '.module {color: green;background: red}';
+  t.is(actual, expected);
+});
+
+test('duplicated id with declarations', t => {
+  const actual = postcss([plugin])
+    .process('#one {color: green} #one {background: red}').css;
+  const expected = '#one {color: green;background: red}';
+  t.is(actual, expected);
+});
+
+test('duplicated tag with declarations', t => {
+  const actual = postcss([plugin])
+    .process('a {color: green} a {background: red}').css;
+  const expected = 'a {color: green;background: red}';
+  t.is(actual, expected);
+});
+
+test('duplicated universal with declarations', t => {
+  const actual = postcss([plugin])
+    .process('* {color: green} * {background: red}').css;
+  const expected = '* {color: green;background: red}';
   t.is(actual, expected);
 });
