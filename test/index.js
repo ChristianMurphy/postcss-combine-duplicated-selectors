@@ -1,3 +1,9 @@
 import test from 'ava';
+import postcss from 'postcss';
+import plugin from '../dist';
 
-test('initial test', t => t.fail());
+test('non duplicated css', t => {
+  const actual = postcss([plugin]).process('.module {}').css;
+  const expected = '.module {}';
+  t.is(actual, expected);
+});

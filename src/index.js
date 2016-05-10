@@ -1,10 +1,15 @@
-import * as postcss from 'postcss';
+import postcss from 'postcss';
+import parser from 'postcss-selector-parser';
 
-export default postcss.plugin('create-nested-groups', (options = {}) => {
+export default postcss.plugin('postcss-combine-duplicated-selectors', (options = {}) => {
   return css => {
     // generate symbol table
     css.walkRules(rule => {
-      // TODO generate table
+      parser(selectorSet).process(rule.selector);
     });
   };
 });
+
+function selectorSet (selector) {
+  console.dir(selector.nodes);
+}
