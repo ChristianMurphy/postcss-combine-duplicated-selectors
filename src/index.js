@@ -1,15 +1,21 @@
 import postcss from 'postcss';
-import parser from 'postcss-selector-parser';
 
-export default postcss.plugin('postcss-combine-duplicated-selectors', (options = {}) => {
+export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
   return css => {
-    // generate symbol table
+    const selectorSet = new Set();
+
+    // selector set
     css.walkRules(rule => {
-      parser(selectorSet).process(rule.selector);
+      selectorSet.add(rule.selector);
+    });
+
+    // remove duplicates
+    css.walkRules(rule => {
+      if (selectorSet.has(rule.selector)) {
+        selectorSet.delete(rule.selector);
+      } else {
+        rule.remove();
+      }
     });
   };
 });
-
-function selectorSet (selector) {
-  console.dir(selector.nodes);
-}
