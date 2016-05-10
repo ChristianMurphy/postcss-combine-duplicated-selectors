@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src -d dist",
-    "test": "npm run build; ava -T 15s; eslint ."
+    "test": "npm run build; ava -T 15s; eslint .; remark *.md -u remark-lint -q --no-stdout"
   },
   "keywords": [
     "postcss-plugin",
@@ -36,7 +36,9 @@
     "babel-preset-stage-2": "^6.5.0",
     "eslint": "^2.9.0",
     "eslint-config-google": "^0.5.0",
-    "eslint-plugin-ava": "^2.3.1"
+    "eslint-plugin-ava": "^2.3.1",
+    "remark": "^4.2.2",
+    "remark-lint": "^3.2.1"
   },
   "engines": {
     "node": ">=0.12"
