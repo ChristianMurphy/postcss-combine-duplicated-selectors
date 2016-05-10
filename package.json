@@ -17,6 +17,13 @@
     "email": "Christian.Murphy.42@gmail.com",
     "url": "https://github.com/ChristianMurphy"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChristianMurphy/postcss-combine-duplicated-selectors.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ChristianMurphy/postcss-combine-duplicated-selectors/issues"
+  },
   "license": "MIT",
   "dependencies": {
     "postcss": "^5.0.21"
@@ -30,5 +37,8 @@
     "eslint": "^2.9.0",
     "eslint-config-google": "^0.5.0",
     "eslint-plugin-ava": "^2.3.1"
+  },
+  "engines": {
+    "node": ">=0.12"
   }
 }
