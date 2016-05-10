@@ -1,20 +1,25 @@
 {
-  "name": "css-codemods",
+  "name": "postcss-combine-duplicated-selectors",
   "version": "1.0.0",
-  "description": "upgrade your css quickly and effectively",
+  "description": "automatically keep css selectors unique",
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src -d dist",
     "test": "npm run build; ava -T 15s; eslint ."
   },
   "keywords": [
-    "css"
+    "postcss-plugin",
+    "css",
+    "selector"
   ],
-  "author": "Christian Murphy",
+  "author": {
+    "name": "Christian Murphy",
+    "email": "Christian.Murphy.42@gmail.com",
+    "url": "https://github.com/ChristianMurphy"
+  },
   "license": "MIT",
   "dependencies": {
-    "postcss": "^5.0.21",
-    "postcss-selector-parser": "^2.0.0"
+    "postcss": "^5.0.21"
   },
   "devDependencies": {
     "ava": "^0.14.0",
