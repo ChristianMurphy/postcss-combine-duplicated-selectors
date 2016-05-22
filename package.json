@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "build": "babel src -d dist --no-comments",
-    "test": "npm run build; ava -T 15s; eslint .; remark *.md -u remark-lint -q --no-stdout"
+    "pretest": "npm run build",
+    "test": "ava -T 15s",
+    "posttest": "eslint . && remark *.md -u remark-lint -q --no-stdout"
   },
   "keywords": [
     "postcss-plugin",
