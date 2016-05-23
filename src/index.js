@@ -2,11 +2,9 @@ import postcss from 'postcss';
 import parser from 'postcss-selector-parser';
 
 const uniformStyle = parser(selector => {
-  selector.walk(node => {
-    if (node.type === 'combinator') {
-      node.value = node.value.trim().concat(' ');
-      node.spaces = {};
-    }
+  selector.walkCombinators(node => {
+    node.value = node.value.trim().concat(' ');
+    node.spaces = {};
   });
 });
 
