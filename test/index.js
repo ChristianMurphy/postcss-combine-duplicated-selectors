@@ -2,210 +2,245 @@ import test from 'ava';
 import postcss from 'postcss';
 import plugin from '../dist';
 
-test('unique class', t => {
-  const actual = postcss([plugin]).process('.module {}').css;
-  const expected = '.module {}';
+function processCSS(t, input, expected) {
+  const actual = postcss([plugin]).process(input).css;
   t.is(actual, expected);
-});
+}
 
-test('unique id', t => {
-  const actual = postcss([plugin]).process('#one {}').css;
-  const expected = '#one {}';
-  t.is(actual, expected);
-});
+test(
+  'unique class',
+  processCSS,
+  '.module {}',
+  '.module {}'
+);
 
-test('unique tag', t => {
-  const actual = postcss([plugin]).process('a {}').css;
-  const expected = 'a {}';
-  t.is(actual, expected);
-});
+test(
+  'unique id',
+  processCSS,
+  '#one {}',
+  '#one {}'
+);
 
-test('unique universal', t => {
-  const actual = postcss([plugin]).process('* {}').css;
-  const expected = '* {}';
-  t.is(actual, expected);
-});
+test(
+  'unique tag',
+  processCSS,
+  'a {}',
+  'a {}'
+);
 
-test('unique classes', t => {
-  const actual = postcss([plugin]).process('.one {} .two {}').css;
-  const expected = '.one {} .two {}';
-  t.is(actual, expected);
-});
+test(
+  'unique universal',
+  processCSS,
+  '* {}',
+  '* {}'
+);
 
-test('unique ids', t => {
-  const actual = postcss([plugin]).process('#one {} #two {}').css;
-  const expected = '#one {} #two {}';
-  t.is(actual, expected);
-});
+test(
+  'unique classes',
+  processCSS,
+  '.one {} .two {}',
+  '.one {} .two {}'
+);
 
-test('unique tags', t => {
-  const actual = postcss([plugin]).process('a {} b {}').css;
-  const expected = 'a {} b {}';
-  t.is(actual, expected);
-});
+test(
+  'unique ids',
+  processCSS,
+  '#one {} #two {}',
+  '#one {} #two {}'
+);
 
-test('unique universals', t => {
-  const actual = postcss([plugin]).process('* a {} * b {}').css;
-  const expected = '* a {} * b {}';
-  t.is(actual, expected);
-});
+test(
+  'unique tags',
+  processCSS,
+  'a {} b {}',
+  'a {} b {}'
+);
 
-test('unique combinations of classes', t => {
-  const actual = postcss([plugin]).process('.one.two {} .one .two {}').css;
-  const expected = '.one.two {} .one .two {}';
-  t.is(actual, expected);
-});
+test(
+  'unique universals',
+  processCSS,
+  '* a {} * b {}',
+  '* a {} * b {}'
+);
 
-test('unique combinations of ids', t => {
-  const actual = postcss([plugin]).process('#one#two {} #one #two {}').css;
-  const expected = '#one#two {} #one #two {}';
-  t.is(actual, expected);
-});
+test(
+  'unique combinations of classes',
+  processCSS,
+  '.one.two {} .one .two {}',
+  '.one.two {} .one .two {}'
+);
 
-test('duplicated class', t => {
-  const actual = postcss([plugin]).process('.module {} .module {}').css;
-  const expected = '.module {}';
-  t.is(actual, expected);
-});
+test(
+  'unique combinations of ids',
+  processCSS,
+  '#one#two {} #one #two {}',
+  '#one#two {} #one #two {}'
+);
 
-test('duplicated id', t => {
-  const actual = postcss([plugin]).process('#one {} #one {}').css;
-  const expected = '#one {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated class',
+  processCSS,
+  '.module {} .module {}',
+  '.module {}'
+);
 
-test('duplicated tag', t => {
-  const actual = postcss([plugin]).process('a {} a {}').css;
-  const expected = 'a {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated id',
+  processCSS,
+  '#one {} #one {}',
+  '#one {}'
+);
 
-test('duplicated universal', t => {
-  const actual = postcss([plugin]).process('* {} * {}').css;
-  const expected = '* {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated tag',
+  processCSS,
+  'a {} a {}',
+  'a {}'
+);
 
-test('duplicated classes with " " combinator', t => {
-  const actual = postcss([plugin]).process('.one .two {} .one .two {}').css;
-  const expected = '.one .two {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated universal',
+  processCSS,
+  '* {} * {}',
+  '* {}'
+);
 
-test('duplicated classes with ">" combinator', t => {
-  const actual = postcss([plugin]).process('.one>.two {} .one > .two {}').css;
-  const expected = '.one>.two {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated classes with " " combinator',
+  processCSS,
+  '.one .two {} .one .two {}',
+  '.one .two {}'
+);
 
-test('duplicated classes with "+" combinator', t => {
-  const actual = postcss([plugin]).process('.one+.two {} .one + .two {}').css;
-  const expected = '.one+.two {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated classes with ">" combinator',
+  processCSS,
+  '.one>.two {} .one > .two {}',
+  '.one>.two {}'
+);
 
-test('duplicated ids with " " combinator', t => {
-  const actual = postcss([plugin]).process('#one #two {} #one #two {}').css;
-  const expected = '#one #two {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated classes with "+" combinator',
+  processCSS,
+  '.one+.two {} .one + .two {}',
+  '.one+.two {}'
+);
 
-test('duplicated ids with ">" combinator', t => {
-  const actual = postcss([plugin]).process('#one>#two {} #one > #two {}').css;
-  const expected = '#one>#two {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated ids with " " combinator',
+  processCSS,
+  '#one #two {} #one #two {}',
+  '#one #two {}'
+);
 
-test('duplicated ids with "+" combinator', t => {
-  const actual = postcss([plugin]).process('#one+#two {} #one + #two {}').css;
-  const expected = '#one+#two {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated ids with ">" combinator',
+  processCSS,
+  '#one>#two {} #one > #two {}',
+  '#one>#two {}'
+);
 
-test('duplicated tags with " " combinator', t => {
-  const actual = postcss([plugin]).process('a b {} a  b {}').css;
-  const expected = 'a b {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated ids with "+" combinator',
+  processCSS,
+  '#one+#two {} #one + #two {}',
+  '#one+#two {}'
+);
 
-test('duplicated tags with ">" combinator', t => {
-  const actual = postcss([plugin]).process('a>b {} a > b {}').css;
-  const expected = 'a>b {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated tags with " " combinator',
+  processCSS,
+  'a b {} a  b {}',
+  'a b {}'
+);
 
-test('duplicated tags with "+" combinator', t => {
-  const actual = postcss([plugin]).process('a+b {} a + b {}').css;
-  const expected = 'a+b {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated tags with ">" combinator',
+  processCSS,
+  'a>b {} a > b {}',
+  'a>b {}'
+);
 
-test('duplicated universals with " " combinator', t => {
-  const actual = postcss([plugin]).process('* * {} *  * {}').css;
-  const expected = '* * {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated tags with "+" combinator',
+  processCSS,
+  'a+b {} a + b {}',
+  'a+b {}'
+);
 
-test('duplicated universals with ">" combinator', t => {
-  const actual = postcss([plugin]).process('*>* {} * > * {}').css;
-  const expected = '*>* {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated universals with " " combinator',
+  processCSS,
+  '* * {} *  * {}',
+  '* * {}'
+);
 
-test('duplicated universals with "+" combinator', t => {
-  const actual = postcss([plugin]).process('*+* {} * + * {}').css;
-  const expected = '*+* {}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated universals with ">" combinator',
+  processCSS,
+  '*>* {} * > * {}',
+  '*>* {}'
+);
 
-test('duplicated class with declarations', t => {
-  const actual = postcss([plugin])
-    .process('.module {color: green} .module {background: red}').css;
-  const expected = '.module {color: green;background: red}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated universals with "+" combinator',
+  processCSS,
+  '*+* {} * + * {}',
+  '*+* {}'
+);
 
-test('duplicated id with declarations', t => {
-  const actual = postcss([plugin])
-    .process('#one {color: green} #one {background: red}').css;
-  const expected = '#one {color: green;background: red}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated class with declarations',
+  processCSS,
+  '.module {color: green} .module {background: red}',
+  '.module {color: green;background: red}'
+);
 
-test('duplicated tag with declarations', t => {
-  const actual = postcss([plugin])
-    .process('a {color: green} a {background: red}').css;
-  const expected = 'a {color: green;background: red}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated id with declarations',
+  processCSS,
+  '#one {color: green} #one {background: red}',
+  '#one {color: green;background: red}'
+);
 
-test('duplicated universal with declarations', t => {
-  const actual = postcss([plugin])
-    .process('* {color: green} * {background: red}').css;
-  const expected = '* {color: green;background: red}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated tag with declarations',
+  processCSS,
+  'a {color: green} a {background: red}',
+  'a {color: green;background: red}'
+);
 
-test('duplicated classes with different spacing and declarations', t => {
-  const actual = postcss([plugin]).process('.one .two {color: green} .one  .two {background: red}').css;
-  const expected = '.one .two {color: green;background: red}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated universal with declarations',
+  processCSS,
+  '* {color: green} * {background: red}',
+  '* {color: green;background: red}'
+);
 
-test('duplicated ids with different spacing and declarations', t => {
-  const actual = postcss([plugin]).process('#one #two {color: green} #one  #two {background: red}').css;
-  const expected = '#one #two {color: green;background: red}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated classes with different spacing and declarations',
+  processCSS,
+  '.one .two {color: green} .one  .two {background: red}',
+  '.one .two {color: green;background: red}'
+);
 
-test('duplicated tags with different spacing and declarations', t => {
-  const actual = postcss([plugin]).process('a b {color: green} a  b {background: red}').css;
-  const expected = 'a b {color: green;background: red}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated ids with different spacing and declarations',
+  processCSS,
+  '#one #two {color: green} #one  #two {background: red}',
+  '#one #two {color: green;background: red}'
+);
 
-test('duplicated universals with different spacing and declarations', t => {
-  const actual = postcss([plugin]).process('* * {color: green} *  * {background: red}').css;
-  const expected = '* * {color: green;background: red}';
-  t.is(actual, expected);
-});
+test(
+  'duplicated tags with different spacing and declarations',
+  processCSS,
+  'a b {color: green} a  b {background: red}',
+  'a b {color: green;background: red}'
+);
+
+test(
+  'duplicated universals with different spacing and declarations',
+  processCSS,
+  '* * {color: green} *  * {background: red}',
+  '* * {color: green;background: red}'
+);

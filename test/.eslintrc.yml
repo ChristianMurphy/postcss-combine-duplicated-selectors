@@ -1,3 +1,6 @@
 extends: plugin:ava/recommended
 plugins:
   - ava
+# TODO enable test title when macro issue is resolved
+rules:
+  ava/test-title: warn
