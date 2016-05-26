@@ -40,6 +40,7 @@
     "eslint": "^2.10.2",
     "eslint-config-google": "^0.5.0",
     "eslint-plugin-ava": "^2.4.0",
+    "postcss-nested": "^1.0.0",
     "remark": "^4.2.2",
     "remark-lint": "^3.2.1"
   },
