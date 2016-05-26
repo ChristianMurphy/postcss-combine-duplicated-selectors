@@ -3,15 +3,24 @@ import postcss from 'postcss';
 import postcssNested from 'postcss-nested';
 import plugin from '../dist';
 
-function processCSS(t, input, expected) {
-  const actual = postcss([plugin]).process(input).css;
-  t.is(actual, expected);
+function processFactory(...plugins) {
+  return (t, input, expected) => {
+    const actual = postcss(plugins).process(input).css;
+    t.is(actual, expected);
+  };
 }
 
-function processNestedCSS(t, input, expected) {
-  const actual = postcss([postcssNested, plugin]).process(input).css;
-  t.is(actual, expected);
+function titleFactory(version) {
+  return (providedTitle, input, expected) => providedTitle ?
+    `${providedTitle} in ${version}` :
+    `"${input}" becomes "${expected}" in ${version}`;
 }
+
+const processCSS = processFactory(plugin);
+const processNestedCSS = processFactory(postcssNested, plugin);
+
+processCSS.title = titleFactory('css');
+processNestedCSS.title = titleFactory('nested css');
 
 test(
   'unique class',
@@ -281,14 +290,28 @@ test(
 
 test(
   'nested class selectors',
-  [processNestedCSS],
+  processNestedCSS,
   '.one.two {color: green} .one {&.two {background: red}}',
   '.one.two {color: green;background: red}'
 );
 
 test(
   'nested class selectors with  " " combinator',
-  [processNestedCSS],
+  processNestedCSS,
   '.one .two {color: green} .one {.two {background: red}}',
   '.one .two {color: green;background: red}'
+);
+
+test(
+  'reordered nested selectors',
+  processNestedCSS,
+  '.one.two {} .two { .one& {} }',
+  '.one.two {}'
+);
+
+test(
+  'multi-level nested selectors',
+  processNestedCSS,
+  '.one .two .three {} .one { .two { .three {} } }',
+  '.one .two .three {}'
 );
