@@ -127,6 +127,13 @@ test(
 );
 
 test(
+  'duplicated classes with "~" combinator',
+  processCSS,
+  '.one~.two {} .one ~ .two {}',
+  '.one~.two {}'
+);
+
+test(
   'duplicated ids with " " combinator',
   processCSS,
   '#one #two {} #one #two {}',
@@ -145,6 +152,13 @@ test(
   processCSS,
   '#one+#two {} #one + #two {}',
   '#one+#two {}'
+);
+
+test(
+  'duplicated ids with "~" combinator',
+  processCSS,
+  '#one~#two {} #one ~ #two {}',
+  '#one~#two {}'
 );
 
 test(
@@ -169,6 +183,13 @@ test(
 );
 
 test(
+  'duplicated tags with "~" combinator',
+  processCSS,
+  'a~b {} a ~ b {}',
+  'a~b {}'
+);
+
+test(
   'duplicated universals with " " combinator',
   processCSS,
   '* * {} *  * {}',
@@ -187,6 +208,13 @@ test(
   processCSS,
   '*+* {} * + * {}',
   '*+* {}'
+);
+
+test(
+  'duplicated universals with "~" combinator',
+  processCSS,
+  '*~* {} * ~ * {}',
+  '*~* {}'
 );
 
 test(
