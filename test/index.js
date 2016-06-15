@@ -315,3 +315,10 @@ test(
   '.one .two .three {} .one { .two { .three {} } }',
   '.one .two .three {}'
 );
+
+test(
+  'multiple properties',
+  processCSS,
+  '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
+  '.a {color: black; height: 10px; background-color: red; width: 20px}'
+);
