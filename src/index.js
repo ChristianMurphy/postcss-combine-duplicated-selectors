@@ -15,8 +15,12 @@ export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
     css.walkRules(rule => {
       const selector = uniformStyle.process(rule.selector).result;
       if (symbolTable.has(selector)) {
+        // store original rule as destination
+        const destination = symbolTable.get(selector);
         // move declarations to original rule
-        rule.nodes.forEach(decl => decl.moveTo(symbolTable.get(selector)));
+        while (rule.nodes.length > 0) {
+          rule.nodes[0].moveTo(destination);
+        }
         // remove duplicated rule
         rule.remove();
       } else {
