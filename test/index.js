@@ -318,7 +318,7 @@ test(
 
 test(
   'multiple properties',
-  processCSS,
+  [processCSS, processNestedCSS],
   '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
   '.a {color: black; height: 10px; background-color: red; width: 20px}'
 );
