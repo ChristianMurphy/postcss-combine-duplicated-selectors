@@ -1,1 +1,6 @@
-extends: google
+extends:
+  - google
+  - plugin:import/errors
+  - plugin:import/warnings
+plugins:
+  - import
