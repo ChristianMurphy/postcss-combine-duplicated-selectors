@@ -7,6 +7,28 @@
 Automatically detects and combines duplicated css selectors so you don't have to
 :smile:
 
+## Usage
+
+### Using PostCSS JS API
+
+``` js
+var postcss = require('postcss');
+postcss([ require('postcss-combine-duplicated-selectors')])
+    .process(css, { from: 'src/app.css', to: 'app.css' })
+    .then(function (result) {
+        fs.writeFileSync('app.css', result.css);
+        if ( result.map ) fs.writeFileSync('app.css.map', result.map);
+    });
+```
+
+### Using PostCSS CLI (Broken)
+
+*Note:* PostCSS CLI does not support ES6 modules yet, here is how it will be able to be used once `postcss-cli` has resolved the issue.
+
+``` sh
+postcss --use postcss-combine-duplicated-selectors *.css
+```
+
 ## Example
 
 Input
