@@ -8,6 +8,7 @@ const uniformStyle = parser(selector => {
   });
   selector.walkAttributes(node => {
     if (node.value) {
+      // remove padding whitespace, and wrap in double quotes
       node.value = node.value.trim().replace(/^'?([^"']+)'?$/, '"$1"');
     }
     node.attribute = node.attribute.trim();
