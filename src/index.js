@@ -6,6 +6,12 @@ const uniformStyle = parser(selector => {
     node.value = node.value.trim().concat(' ');
     node.spaces = {};
   });
+  selector.walkAttributes(node => {
+    if (node.value) {
+      node.value = node.value.trim().replace(/^'?([^"']+)'?$/, '"$1"');
+    }
+    node.attribute = node.attribute.trim();
+  });
 });
 
 export default postcss.plugin('postcss-combine-duplicated-selectors', () => {

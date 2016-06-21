@@ -322,3 +322,52 @@ test(
   '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
   '.a {color: black; height: 10px; background-color: red; width: 20px}'
 );
+
+test(
+  'attribute selectors',
+  [processCSS, processNestedCSS],
+  '.a[href] {} .a[href] {}',
+  '.a[href] {}'
+);
+
+test(
+  'attribute selectors with different spacing',
+  [processCSS, processNestedCSS],
+  '.a[href] {} .a[ href ] {}',
+  '.a[href] {}'
+);
+
+test(
+  'unique attribute selectors',
+  [processCSS, processNestedCSS],
+  '.a[href] {} .a[title] {}',
+  '.a[href] {} .a[title] {}'
+);
+
+test(
+  'attribute property selectors with different spacing',
+  [processCSS, processNestedCSS],
+  '.a[href="a"] {} .a[href = "a"] {}',
+  '.a[href="a"] {}'
+);
+
+test(
+  'attribute property selectors with different quoting',
+  [processCSS, processNestedCSS],
+  '.a[href="a"] {} .a[href=a] {}',
+  '.a[href="a"] {}'
+);
+
+test(
+  'attribute property selectors with different quote marks',
+  [processCSS, processNestedCSS],
+  '.a[href="a"] {} .a[href=\'a\'] {}',
+  '.a[href="a"] {}'
+);
+
+test(
+  'attribute property selectors with unique values',
+  [processCSS, processNestedCSS],
+  '.a[href="a"] {} .a[href="b"] {}',
+  '.a[href="a"] {} .a[href="b"] {}'
+);
