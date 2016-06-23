@@ -371,3 +371,38 @@ test(
   '.a[href="a"] {} .a[href="b"] {}',
   '.a[href="a"] {} .a[href="b"] {}'
 );
+
+test(
+  'unique selectors with same attribute',
+  [processCSS, processNestedCSS],
+  '.a [href] {} .a[href] {}',
+  '.a [href] {} .a[href] {}'
+);
+
+test(
+  'unique pseudo classes',
+  [processCSS, processNestedCSS],
+  'a:link {} a:visited {}',
+  'a:link {} a:visited {}'
+);
+
+test(
+  'pseudo classes',
+  [processCSS, processNestedCSS],
+  'a:link {} a:link {}',
+  'a:link {}'
+);
+
+test(
+  'unique pseudo elements',
+  [processCSS, processNestedCSS],
+  'p::first-line {} p::last-line {}',
+  'p::first-line {} p::last-line {}'
+);
+
+test(
+  'pseudo elements',
+  [processCSS, processNestedCSS],
+  'p::first-line {} p::first-line {}',
+  'p::first-line {}'
+);
