@@ -4,11 +4,18 @@ import postcssNested from 'postcss-nested';
 import plugin from '../dist';
 
 /**
- * These tests check css selectors that the plugin CAN combine together
+ * These tests check css selectors that the plugin CAN combine together.
  * Meaning selectors provided are logically the same.
+ * These tests check only standard css syntax.
  */
 
-function processFactory(...plugins) {
+function testFactory(plugins, syntax) {
+  if (syntax) {
+    return (t, input, expected) => {
+      const actual = postcss(plugins).process(input, {syntax}).css;
+      t.is(actual, expected);
+    };
+  }
   return (t, input, expected) => {
     const actual = postcss(plugins).process(input).css;
     t.is(actual, expected);
@@ -21,309 +28,267 @@ function titleFactory(version) {
     `"${input}" becomes "${expected}" in ${version}`;
 }
 
-const processCSS = processFactory(plugin);
-const processNestedCSS = processFactory(postcssNested, plugin);
+const css = testFactory([plugin]);
+const nestedCSS = testFactory([postcssNested, plugin]);
 
-processCSS.title = titleFactory('css');
-processNestedCSS.title = titleFactory('nested css');
+css.title = titleFactory('css');
+nestedCSS.title = titleFactory('nested css');
 
 test(
   'class',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.module {} .module {}',
   '.module {}'
 );
 
 test(
   'id',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '#one {} #one {}',
   '#one {}'
 );
 
 test(
   'tag',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'a {} a {}',
   'a {}'
 );
 
 test(
   'universal',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '* {} * {}',
   '* {}'
 );
 
 test(
   'classes with " " combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.one .two {} .one .two {}',
   '.one .two {}'
 );
 
 test(
   'classes with ">" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.one>.two {} .one > .two {}',
   '.one>.two {}'
 );
 
 test(
   'classes with "+" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.one+.two {} .one + .two {}',
   '.one+.two {}'
 );
 
 test(
   'classes with "~" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.one~.two {} .one ~ .two {}',
   '.one~.two {}'
 );
 
 test(
   'ids with " " combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '#one #two {} #one #two {}',
   '#one #two {}'
 );
 
 test(
   'ids with ">" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '#one>#two {} #one > #two {}',
   '#one>#two {}'
 );
 
 test(
   'ids with "+" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '#one+#two {} #one + #two {}',
   '#one+#two {}'
 );
 
 test(
   'ids with "~" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '#one~#two {} #one ~ #two {}',
   '#one~#two {}'
 );
 
 test(
   'tags with " " combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'a b {} a  b {}',
   'a b {}'
 );
 
 test(
   'tags with ">" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'a>b {} a > b {}',
   'a>b {}'
 );
 
 test(
   'tags with "+" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'a+b {} a + b {}',
   'a+b {}'
 );
 
 test(
   'tags with "~" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'a~b {} a ~ b {}',
   'a~b {}'
 );
 
 test(
   'universals with " " combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '* * {} *  * {}',
   '* * {}'
 );
 
 test(
   'universals with ">" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '*>* {} * > * {}',
   '*>* {}'
 );
 
 test(
   'universals with "+" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '*+* {} * + * {}',
   '*+* {}'
 );
 
 test(
   'universals with "~" combinator',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '*~* {} * ~ * {}',
   '*~* {}'
 );
 
 test(
   'class with declarations',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.module {color: green} .module {background: red}',
   '.module {color: green;background: red}'
 );
 
 test(
   'id with declarations',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '#one {color: green} #one {background: red}',
   '#one {color: green;background: red}'
 );
 
 test(
   'tag with declarations',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'a {color: green} a {background: red}',
   'a {color: green;background: red}'
 );
 
 test(
   'universal with declarations',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '* {color: green} * {background: red}',
   '* {color: green;background: red}'
 );
 
 test(
   'classes with different spacing and declarations',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.one .two {color: green} .one  .two {background: red}',
   '.one .two {color: green;background: red}'
 );
 
 test(
   'ids with different spacing and declarations',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '#one #two {color: green} #one  #two {background: red}',
   '#one #two {color: green;background: red}'
 );
 
 test(
   'tags with different spacing and declarations',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'a b {color: green} a  b {background: red}',
   'a b {color: green;background: red}'
 );
 
 test(
   'universals with different spacing and declarations',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '* * {color: green} *  * {background: red}',
   '* * {color: green;background: red}'
 );
 
 test(
-  'nested class selectors',
-  processNestedCSS,
-  '.one.two {color: green} .one {&.two {background: red}}',
-  '.one.two {color: green;background: red}'
-);
-
-test(
-  'nested class selectors with  " " combinator',
-  processNestedCSS,
-  '.one .two {color: green} .one {.two {background: red}}',
-  '.one .two {color: green;background: red}'
-);
-
-test(
-  'reordered nested selectors',
-  processNestedCSS,
-  '.one.two {} .two { .one& {} }',
-  '.one.two {}'
-);
-
-test(
-  'multi-level nested selectors',
-  processNestedCSS,
-  '.one .two .three {} .one { .two { .three {} } }',
-  '.one .two .three {}'
-);
-
-test(
   'selectors with multiple properties',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
   '.a {color: black; height: 10px; background-color: red; width: 20px}'
 );
 
 test(
   'attribute selectors',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.a[href] {} .a[href] {}',
   '.a[href] {}'
 );
 
 test(
   'attribute property selectors with different spacing',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.a[href="a"] {} .a[href = "a"] {}',
   '.a[href="a"] {}'
 );
 
 test(
   'attribute property selectors with different quoting',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.a[href="a"] {} .a[href=a] {}',
   '.a[href="a"] {}'
 );
 
 test(
   'attribute property selectors with different quote marks',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.a[href="a"] {} .a[href=\'a\'] {}',
   '.a[href="a"] {}'
 );
 
 test(
   'attribute selectors with different spacing',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.a[href] {} .a[ href ] {}',
   '.a[href] {}'
 );
 
 test(
   'pseudo classes',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'a:link {} a:link {}',
   'a:link {}'
 );
 
 test(
   'pseudo elements',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   'p::first-line {} p::first-line {}',
   'p::first-line {}'
 );
 
 test(
   'selectors with different order',
-  [processCSS, processNestedCSS],
+  [css, nestedCSS],
   '.one.two {} .two.one {}',
-  '.one.two {}'
-);
-
-test(
-  'nested selectors with different order',
-  processNestedCSS,
-  '.one {&.two {}} .two{&.one {}}',
-  '.one.two {}'
-);
-
-test(
-  'nested and un-nested selectors with different order',
-  processNestedCSS,
-  '.one.two {} .two{&.one {}}',
   '.one.two {}'
 );
