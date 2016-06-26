@@ -23,76 +23,6 @@ processCSS.title = titleFactory('css');
 processNestedCSS.title = titleFactory('nested css');
 
 test(
-  'unique class',
-  [processCSS, processNestedCSS],
-  '.module {}',
-  '.module {}'
-);
-
-test(
-  'unique id',
-  [processCSS, processNestedCSS],
-  '#one {}',
-  '#one {}'
-);
-
-test(
-  'unique tag',
-  [processCSS, processNestedCSS],
-  'a {}',
-  'a {}'
-);
-
-test(
-  'unique universal',
-  [processCSS, processNestedCSS],
-  '* {}',
-  '* {}'
-);
-
-test(
-  'unique classes',
-  [processCSS, processNestedCSS],
-  '.one {} .two {}',
-  '.one {} .two {}'
-);
-
-test(
-  'unique ids',
-  [processCSS, processNestedCSS],
-  '#one {} #two {}',
-  '#one {} #two {}'
-);
-
-test(
-  'unique tags',
-  [processCSS, processNestedCSS],
-  'a {} b {}',
-  'a {} b {}'
-);
-
-test(
-  'unique universals',
-  [processCSS, processNestedCSS],
-  '* a {} * b {}',
-  '* a {} * b {}'
-);
-
-test(
-  'unique combinations of classes',
-  [processCSS, processNestedCSS],
-  '.one.two {} .one .two {}',
-  '.one.two {} .one .two {}'
-);
-
-test(
-  'unique combinations of ids',
-  [processCSS, processNestedCSS],
-  '#one#two {} #one #two {}',
-  '#one#two {} #one #two {}'
-);
-
-test(
   'duplicated class',
   [processCSS, processNestedCSS],
   '.module {} .module {}',
@@ -331,20 +261,6 @@ test(
 );
 
 test(
-  'attribute selectors with different spacing',
-  [processCSS, processNestedCSS],
-  '.a[href] {} .a[ href ] {}',
-  '.a[href] {}'
-);
-
-test(
-  'unique attribute selectors',
-  [processCSS, processNestedCSS],
-  '.a[href] {} .a[title] {}',
-  '.a[href] {} .a[title] {}'
-);
-
-test(
   'attribute property selectors with different spacing',
   [processCSS, processNestedCSS],
   '.a[href="a"] {} .a[href = "a"] {}',
@@ -366,24 +282,10 @@ test(
 );
 
 test(
-  'attribute property selectors with unique values',
+  'attribute selectors with different spacing',
   [processCSS, processNestedCSS],
-  '.a[href="a"] {} .a[href="b"] {}',
-  '.a[href="a"] {} .a[href="b"] {}'
-);
-
-test(
-  'unique selectors with same attribute',
-  [processCSS, processNestedCSS],
-  '.a [href] {} .a[href] {}',
-  '.a [href] {} .a[href] {}'
-);
-
-test(
-  'unique pseudo classes',
-  [processCSS, processNestedCSS],
-  'a:link {} a:visited {}',
-  'a:link {} a:visited {}'
+  '.a[href] {} .a[ href ] {}',
+  '.a[href] {}'
 );
 
 test(
@@ -394,15 +296,29 @@ test(
 );
 
 test(
-  'unique pseudo elements',
-  [processCSS, processNestedCSS],
-  'p::first-line {} p::last-line {}',
-  'p::first-line {} p::last-line {}'
-);
-
-test(
   'pseudo elements',
   [processCSS, processNestedCSS],
   'p::first-line {} p::first-line {}',
   'p::first-line {}'
+);
+
+test(
+  'duplicated selectors with different order',
+  [processCSS, processNestedCSS],
+  '.one.two {} .two.one {}',
+  '.one.two {}'
+);
+
+test(
+  'duplicated nested selectors with different order',
+  processNestedCSS,
+  '.one {&.two {}} .two{&.one {}}',
+  '.one.two {}'
+);
+
+test(
+  'duplicated nested and un-nested selectors with different order',
+  processNestedCSS,
+  '.one.two {} .two{&.one {}}',
+  '.one.two {}'
 );
