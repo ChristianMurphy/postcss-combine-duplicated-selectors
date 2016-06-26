@@ -23,7 +23,8 @@ postcss([ require('postcss-combine-duplicated-selectors')])
 
 ### Using PostCSS CLI (Broken)
 
-*Note:* PostCSS CLI does not support ES6 modules yet, here is how it will be able to be used once `postcss-cli` has resolved the issue.
+*Note:* PostCSS CLI does not support ES6 modules yet, here is how it will be
+able to be used once `postcss-cli` has resolved the issue.
 
 ``` sh
 postcss --use postcss-combine-duplicated-selectors *.css

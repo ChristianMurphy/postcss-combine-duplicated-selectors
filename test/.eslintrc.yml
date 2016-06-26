@@ -6,3 +6,4 @@ settings:
   import/ignore:
     - node_modules
     - dist
+    - _test-factory
