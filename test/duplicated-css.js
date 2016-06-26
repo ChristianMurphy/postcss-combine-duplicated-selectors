@@ -1,8 +1,5 @@
 import test from 'ava';
 import testFactory from './_test-factory';
-import postcssNested from 'postcss-nested';
-import postcssLess from 'postcss-less';
-import postcssScss from 'postcss-scss';
 import plugin from '../dist';
 
 /**
@@ -12,265 +9,262 @@ import plugin from '../dist';
  */
 
 const css = testFactory('css', [plugin]);
-const nestedCSS = testFactory('nested css', [postcssNested, plugin]);
-const less = testFactory('less', [plugin], postcssLess);
-const scss = testFactory('scss', [plugin], postcssScss);
 
 test(
   'class',
-  [css, nestedCSS, less, scss],
+  css,
   '.module {} .module {}',
   '.module {}'
 );
 
 test(
   'id',
-  [css, nestedCSS, less, scss],
+  css,
   '#one {} #one {}',
   '#one {}'
 );
 
 test(
   'tag',
-  [css, nestedCSS, less, scss],
+  css,
   'a {} a {}',
   'a {}'
 );
 
 test(
   'universal',
-  [css, nestedCSS, less, scss],
+  css,
   '* {} * {}',
   '* {}'
 );
 
 test(
   'classes with " " combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '.one .two {} .one .two {}',
   '.one .two {}'
 );
 
 test(
   'classes with ">" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '.one>.two {} .one > .two {}',
   '.one>.two {}'
 );
 
 test(
   'classes with "+" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '.one+.two {} .one + .two {}',
   '.one+.two {}'
 );
 
 test(
   'classes with "~" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '.one~.two {} .one ~ .two {}',
   '.one~.two {}'
 );
 
 test(
   'ids with " " combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '#one #two {} #one #two {}',
   '#one #two {}'
 );
 
 test(
   'ids with ">" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '#one>#two {} #one > #two {}',
   '#one>#two {}'
 );
 
 test(
   'ids with "+" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '#one+#two {} #one + #two {}',
   '#one+#two {}'
 );
 
 test(
   'ids with "~" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '#one~#two {} #one ~ #two {}',
   '#one~#two {}'
 );
 
 test(
   'tags with " " combinator',
-  [css, nestedCSS, less, scss],
+  css,
   'a b {} a  b {}',
   'a b {}'
 );
 
 test(
   'tags with ">" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   'a>b {} a > b {}',
   'a>b {}'
 );
 
 test(
   'tags with "+" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   'a+b {} a + b {}',
   'a+b {}'
 );
 
 test(
   'tags with "~" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   'a~b {} a ~ b {}',
   'a~b {}'
 );
 
 test(
   'universals with " " combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '* * {} *  * {}',
   '* * {}'
 );
 
 test(
   'universals with ">" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '*>* {} * > * {}',
   '*>* {}'
 );
 
 test(
   'universals with "+" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '*+* {} * + * {}',
   '*+* {}'
 );
 
 test(
   'universals with "~" combinator',
-  [css, nestedCSS, less, scss],
+  css,
   '*~* {} * ~ * {}',
   '*~* {}'
 );
 
 test(
   'class with declarations',
-  [css, nestedCSS, less, scss],
+  css,
   '.module {color: green} .module {background: red}',
   '.module {color: green;background: red}'
 );
 
 test(
   'id with declarations',
-  [css, nestedCSS, less, scss],
+  css,
   '#one {color: green} #one {background: red}',
   '#one {color: green;background: red}'
 );
 
 test(
   'tag with declarations',
-  [css, nestedCSS, less, scss],
+  css,
   'a {color: green} a {background: red}',
   'a {color: green;background: red}'
 );
 
 test(
   'universal with declarations',
-  [css, nestedCSS, less, scss],
+  css,
   '* {color: green} * {background: red}',
   '* {color: green;background: red}'
 );
 
 test(
   'classes with different spacing and declarations',
-  [css, nestedCSS, less, scss],
+  css,
   '.one .two {color: green} .one  .two {background: red}',
   '.one .two {color: green;background: red}'
 );
 
 test(
   'ids with different spacing and declarations',
-  [css, nestedCSS, less, scss],
+  css,
   '#one #two {color: green} #one  #two {background: red}',
   '#one #two {color: green;background: red}'
 );
 
 test(
   'tags with different spacing and declarations',
-  [css, nestedCSS, less, scss],
+  css,
   'a b {color: green} a  b {background: red}',
   'a b {color: green;background: red}'
 );
 
 test(
   'universals with different spacing and declarations',
-  [css, nestedCSS, less, scss],
+  css,
   '* * {color: green} *  * {background: red}',
   '* * {color: green;background: red}'
 );
 
 test(
   'selectors with multiple properties',
-  [css, nestedCSS, less, scss],
+  css,
   '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
   '.a {color: black; height: 10px; background-color: red; width: 20px}'
 );
 
 test(
   'attribute selectors',
-  [css, nestedCSS, less, scss],
+  css,
   '.a[href] {} .a[href] {}',
   '.a[href] {}'
 );
 
 test(
   'attribute property selectors with different spacing',
-  [css, nestedCSS, less, scss],
+  css,
   '.a[href="a"] {} .a[href = "a"] {}',
   '.a[href="a"] {}'
 );
 
 test(
   'attribute property selectors with different quoting',
-  [css, nestedCSS, less, scss],
+  css,
   '.a[href="a"] {} .a[href=a] {}',
   '.a[href="a"] {}'
 );
 
 test(
   'attribute property selectors with different quote marks',
-  [css, nestedCSS, less, scss],
+  css,
   '.a[href="a"] {} .a[href=\'a\'] {}',
   '.a[href="a"] {}'
 );
 
 test(
   'attribute selectors with different spacing',
-  [css, nestedCSS, less, scss],
+  css,
   '.a[href] {} .a[ href ] {}',
   '.a[href] {}'
 );
 
 test(
   'pseudo classes',
-  [css, nestedCSS, less, scss],
+  css,
   'a:link {} a:link {}',
   'a:link {}'
 );
 
 test(
   'pseudo elements',
-  [css, nestedCSS, less, scss],
+  css,
   'p::first-line {} p::first-line {}',
   'p::first-line {}'
 );
 
 test(
   'selectors with different order',
-  [css, nestedCSS, less, scss],
+  css,
   '.one.two {} .two.one {}',
   '.one.two {}'
 );
