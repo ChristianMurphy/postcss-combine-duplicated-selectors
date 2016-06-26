@@ -1,6 +1,8 @@
 import test from 'ava';
 import postcss from 'postcss';
 import postcssNested from 'postcss-nested';
+import postcssLess from 'postcss-less';
+import postcssScss from 'postcss-scss';
 import plugin from '../dist';
 
 /**
@@ -29,47 +31,51 @@ function titleFactory(version) {
 }
 
 const nestedCSS = testFactory([postcssNested, plugin]);
+const less = testFactory([postcssNested, plugin], postcssLess);
+const scss = testFactory([postcssNested, plugin], postcssScss);
 
 nestedCSS.title = titleFactory('nested css');
+less.title = titleFactory('less');
+scss.title = titleFactory('scss');
 
 test(
   'nested class selectors',
-  nestedCSS,
+  [nestedCSS, less, scss],
   '.one.two {color: green} .one {&.two {background: red}}',
   '.one.two {color: green;background: red}'
 );
 
 test(
   'nested class selectors with  " " combinator',
-  nestedCSS,
+  [nestedCSS, less, scss],
   '.one .two {color: green} .one {.two {background: red}}',
   '.one .two {color: green;background: red}'
 );
 
 test(
   'reordered nested selectors',
-  nestedCSS,
+  [nestedCSS, less, scss],
   '.one.two {} .two { .one& {} }',
   '.one.two {}'
 );
 
 test(
   'multi-level nested selectors',
-  nestedCSS,
+  [nestedCSS, less, scss],
   '.one .two .three {} .one { .two { .three {} } }',
   '.one .two .three {}'
 );
 
 test(
   'nested selectors with different order',
-  nestedCSS,
+  [nestedCSS, less, scss],
   '.one {&.two {}} .two{&.one {}}',
   '.one.two {}'
 );
 
 test(
   'nested and un-nested selectors with different order',
-  nestedCSS,
+  [nestedCSS, less, scss],
   '.one.two {} .two{&.one {}}',
   '.one.two {}'
 );

@@ -41,7 +41,9 @@
     "eslint-config-google": "^0.6.0",
     "eslint-plugin-ava": "^2.5.0",
     "eslint-plugin-import": "^1.9.2",
+    "postcss-less": "^0.13.0",
     "postcss-nested": "^1.0.0",
+    "postcss-scss": "^0.1.8",
     "remark-cli": "^1.0.0",
     "remark-lint": "^4.0.1"
   },

@@ -1,6 +1,8 @@
 import test from 'ava';
 import postcss from 'postcss';
 import postcssNested from 'postcss-nested';
+import postcssLess from 'postcss-less';
+import postcssScss from 'postcss-scss';
 import plugin from '../dist';
 
 /**
@@ -29,12 +31,16 @@ function titleFactory(version) {
 }
 
 const nestedCSS = testFactory([postcssNested, plugin]);
+const less = testFactory([postcssNested, plugin], postcssLess);
+const scss = testFactory([postcssNested, plugin], postcssScss);
 
 nestedCSS.title = titleFactory('nested css');
+less.title = titleFactory('less');
+scss.title = titleFactory('scss');
 
 test(
   'nested selectors same with classes',
-  nestedCSS,
+  [nestedCSS, less, scss],
   '.one {.two {}} .one{&.two {}}',
   '.one .two {} .one.two {}'
 );

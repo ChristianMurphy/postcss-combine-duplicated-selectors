@@ -1,6 +1,8 @@
 import test from 'ava';
 import postcss from 'postcss';
 import postcssNested from 'postcss-nested';
+import postcssLess from 'postcss-less';
+import postcssScss from 'postcss-scss';
 import plugin from '../dist';
 
 /**
@@ -30,125 +32,129 @@ function titleFactory(version) {
 
 const css = testFactory([plugin]);
 const nestedCSS = testFactory([postcssNested, plugin]);
+const less = testFactory([plugin], postcssLess);
+const scss = testFactory([plugin], postcssScss);
 
 css.title = titleFactory('css');
 nestedCSS.title = titleFactory('nested css');
+less.title = titleFactory('less');
+scss.title = titleFactory('scss');
 
 test(
   'class',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '.module {}',
   '.module {}'
 );
 
 test(
   'id',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '#one {}',
   '#one {}'
 );
 
 test(
   'tag',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   'a {}',
   'a {}'
 );
 
 test(
   'universal',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '* {}',
   '* {}'
 );
 
 test(
   'classes',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '.one {} .two {}',
   '.one {} .two {}'
 );
 
 test(
   'ids',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '#one {} #two {}',
   '#one {} #two {}'
 );
 
 test(
   'tags',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   'a {} b {}',
   'a {} b {}'
 );
 
 test(
   'universals',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '* a {} * b {}',
   '* a {} * b {}'
 );
 
 test(
   'combinations of classes',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '.one.two {} .one .two {}',
   '.one.two {} .one .two {}'
 );
 
 test(
   'combinations of ids',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '#one#two {} #one #two {}',
   '#one#two {} #one #two {}'
 );
 
 test(
   'attribute selectors',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '.a[href] {} .a[title] {}',
   '.a[href] {} .a[title] {}'
 );
 
 test(
   'selectors with same attribute property and unique values',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '.a[href="a"] {} .a[href="b"] {}',
   '.a[href="a"] {} .a[href="b"] {}'
 );
 
 test(
   'selectors with same attribute',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '.a [href] {} .a[href] {}',
   '.a [href] {} .a[href] {}'
 );
 
 test(
   'pseudo classes',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   'a:link {} a:visited {}',
   'a:link {} a:visited {}'
 );
 
 test(
   'pseudo elements',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   'p::first-line {} p::last-line {}',
   'p::first-line {} p::last-line {}'
 );
 
 test(
   'selectors same classes',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '.one .two {} .one.two {}',
   '.one .two {} .one.two {}'
 );
 
 test(
   'selectors with partial class selector match',
-  [css, nestedCSS],
+  [css, nestedCSS, less, scss],
   '.one.two {} .one.two.three {}',
   '.one.two {} .one.two.three {}'
 );
