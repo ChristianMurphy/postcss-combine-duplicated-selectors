@@ -21,3 +21,10 @@ test(
   '.one {.two {}} .one{&.two {}}',
   '.one .two {} .one.two {}'
 );
+
+test(
+  'selectors with different specifity',
+  [nestedCSS, less, scss],
+  '.one {.two {}} .one {.two {.three {}}}',
+  '.one .two {} .one .two .three {}'
+);

@@ -109,10 +109,31 @@ test(
 );
 
 test(
+  'pseudo class and non pseudo class',
+  css,
+  'a:link {} a {}',
+  'a:link {} a {}'
+);
+
+test(
   'pseudo elements',
   css,
   'p::first-line {} p::last-line {}',
   'p::first-line {} p::last-line {}'
+);
+
+test(
+  'pseudo element and non pseudo element',
+  css,
+  'p::first-line {} p {}',
+  'p::first-line {} p {}'
+);
+
+test(
+  'pseudo class and pseudo element',
+  css,
+  'p::first-line {} p:hover {}',
+  'p::first-line {} p:hover {}'
 );
 
 test(
