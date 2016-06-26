@@ -1,11 +1,14 @@
 import postcss from 'postcss';
 import parser from 'postcss-selector-parser';
 
-const uniformStyle = parser(selector => {
+function normalizeCombinator(selector) {
   selector.walkCombinators(node => {
     node.value = node.value.trim().concat(' ');
     node.spaces = {};
   });
+}
+
+function normalizeAttributes(selector) {
   selector.walkAttributes(node => {
     if (node.value) {
       // remove padding whitespace, and wrap in double quotes
@@ -13,6 +16,26 @@ const uniformStyle = parser(selector => {
     }
     node.attribute = node.attribute.trim();
   });
+}
+
+function sortGroups(selector) {
+  selector.each(subSelector => {
+    subSelector.nodes.sort((a, b) => {
+      // different types cannot be sorted
+      if (a.type !== b.type) {
+        return 0;
+      }
+
+      // sort alphabetically
+      return a.value < b.value ? -1 : 1;
+    });
+  });
+}
+
+const uniformStyle = parser(selector => {
+  normalizeCombinator(selector);
+  normalizeAttributes(selector);
+  sortGroups(selector);
 });
 
 export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
