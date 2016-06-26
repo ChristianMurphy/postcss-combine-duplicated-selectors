@@ -1,5 +1,5 @@
 import test from 'ava';
-import postcss from 'postcss';
+import testFactory from './_test-factory';
 import postcssNested from 'postcss-nested';
 import postcssLess from 'postcss-less';
 import postcssScss from 'postcss-scss';
@@ -11,32 +11,9 @@ import plugin from '../dist';
  * These tests check against css super set languages: less, sass, and postcss-nested.
  */
 
-function testFactory(plugins, syntax) {
-  if (syntax) {
-    return (t, input, expected) => {
-      const actual = postcss(plugins).process(input, {syntax}).css;
-      t.is(actual, expected);
-    };
-  }
-  return (t, input, expected) => {
-    const actual = postcss(plugins).process(input).css;
-    t.is(actual, expected);
-  };
-}
-
-function titleFactory(version) {
-  return (providedTitle, input, expected) => providedTitle ?
-    `${providedTitle} in ${version}` :
-    `"${input}" becomes "${expected}" in ${version}`;
-}
-
-const nestedCSS = testFactory([postcssNested, plugin]);
-const less = testFactory([postcssNested, plugin], postcssLess);
-const scss = testFactory([postcssNested, plugin], postcssScss);
-
-nestedCSS.title = titleFactory('nested css');
-less.title = titleFactory('less');
-scss.title = titleFactory('scss');
+const nestedCSS = testFactory('nested css', [postcssNested, plugin]);
+const less = testFactory('less', [postcssNested, plugin], postcssLess);
+const scss = testFactory('scss', [postcssNested, plugin], postcssScss);
 
 test(
   'nested selectors same with classes',

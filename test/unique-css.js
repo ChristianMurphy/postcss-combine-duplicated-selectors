@@ -1,5 +1,5 @@
 import test from 'ava';
-import postcss from 'postcss';
+import testFactory from './_test-factory';
 import postcssNested from 'postcss-nested';
 import postcssLess from 'postcss-less';
 import postcssScss from 'postcss-scss';
@@ -11,34 +11,10 @@ import plugin from '../dist';
  * These tests check only standard css syntax.
  */
 
-function testFactory(plugins, syntax) {
-  if (syntax) {
-    return (t, input, expected) => {
-      const actual = postcss(plugins).process(input, {syntax}).css;
-      t.is(actual, expected);
-    };
-  }
-  return (t, input, expected) => {
-    const actual = postcss(plugins).process(input).css;
-    t.is(actual, expected);
-  };
-}
-
-function titleFactory(version) {
-  return (providedTitle, input, expected) => providedTitle ?
-    `${providedTitle} in ${version}` :
-    `"${input}" becomes "${expected}" in ${version}`;
-}
-
-const css = testFactory([plugin]);
-const nestedCSS = testFactory([postcssNested, plugin]);
-const less = testFactory([plugin], postcssLess);
-const scss = testFactory([plugin], postcssScss);
-
-css.title = titleFactory('css');
-nestedCSS.title = titleFactory('nested css');
-less.title = titleFactory('less');
-scss.title = titleFactory('scss');
+const css = testFactory('css', [plugin]);
+const nestedCSS = testFactory('nested css', [postcssNested, plugin]);
+const less = testFactory('less', [plugin], postcssLess);
+const scss = testFactory('scss', [plugin], postcssScss);
 
 test(
   'class',
