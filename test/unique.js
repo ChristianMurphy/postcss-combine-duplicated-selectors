@@ -3,6 +3,11 @@ import postcss from 'postcss';
 import postcssNested from 'postcss-nested';
 import plugin from '../dist';
 
+/**
+ * These tests check css selectors that the plugin CANNOT combined together.
+ * Meaning that the selectors provided are unique.
+ */
+
 function processFactory(...plugins) {
   return (t, input, expected) => {
     const actual = postcss(plugins).process(input).css;
@@ -23,126 +28,126 @@ processCSS.title = titleFactory('css');
 processNestedCSS.title = titleFactory('nested css');
 
 test(
-  'unique class',
+  'class',
   [processCSS, processNestedCSS],
   '.module {}',
   '.module {}'
 );
 
 test(
-  'unique id',
+  'id',
   [processCSS, processNestedCSS],
   '#one {}',
   '#one {}'
 );
 
 test(
-  'unique tag',
+  'tag',
   [processCSS, processNestedCSS],
   'a {}',
   'a {}'
 );
 
 test(
-  'unique universal',
+  'universal',
   [processCSS, processNestedCSS],
   '* {}',
   '* {}'
 );
 
 test(
-  'unique classes',
+  'classes',
   [processCSS, processNestedCSS],
   '.one {} .two {}',
   '.one {} .two {}'
 );
 
 test(
-  'unique ids',
+  'ids',
   [processCSS, processNestedCSS],
   '#one {} #two {}',
   '#one {} #two {}'
 );
 
 test(
-  'unique tags',
+  'tags',
   [processCSS, processNestedCSS],
   'a {} b {}',
   'a {} b {}'
 );
 
 test(
-  'unique universals',
+  'universals',
   [processCSS, processNestedCSS],
   '* a {} * b {}',
   '* a {} * b {}'
 );
 
 test(
-  'unique combinations of classes',
+  'combinations of classes',
   [processCSS, processNestedCSS],
   '.one.two {} .one .two {}',
   '.one.two {} .one .two {}'
 );
 
 test(
-  'unique combinations of ids',
+  'combinations of ids',
   [processCSS, processNestedCSS],
   '#one#two {} #one #two {}',
   '#one#two {} #one #two {}'
 );
 
 test(
-  'unique attribute selectors',
+  'attribute selectors',
   [processCSS, processNestedCSS],
   '.a[href] {} .a[title] {}',
   '.a[href] {} .a[title] {}'
 );
 
 test(
-  'attribute property selectors with unique values',
+  'selectors with same attribute property and unique values',
   [processCSS, processNestedCSS],
   '.a[href="a"] {} .a[href="b"] {}',
   '.a[href="a"] {} .a[href="b"] {}'
 );
 
 test(
-  'unique selectors with same attribute',
+  'selectors with same attribute',
   [processCSS, processNestedCSS],
   '.a [href] {} .a[href] {}',
   '.a [href] {} .a[href] {}'
 );
 
 test(
-  'unique pseudo classes',
+  'pseudo classes',
   [processCSS, processNestedCSS],
   'a:link {} a:visited {}',
   'a:link {} a:visited {}'
 );
 
 test(
-  'unique pseudo elements',
+  'pseudo elements',
   [processCSS, processNestedCSS],
   'p::first-line {} p::last-line {}',
   'p::first-line {} p::last-line {}'
 );
 
 test(
-  'unique selectors same classes',
+  'selectors same classes',
   [processCSS, processNestedCSS],
   '.one .two {} .one.two {}',
   '.one .two {} .one.two {}'
 );
 
 test(
-  'unique nested selectors same classes',
+  'nested selectors same with classes',
   processNestedCSS,
   '.one {.two {}} .one{&.two {}}',
   '.one .two {} .one.two {}'
 );
 
 test(
-  'unique selectors with duplicated subselectors',
+  'selectors with partial class selector match',
   [processCSS, processNestedCSS],
   '.one.two {} .one.two.three {}',
   '.one.two {} .one.two.three {}'
