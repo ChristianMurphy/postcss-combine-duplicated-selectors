@@ -5,6 +5,7 @@ extends:
   - plugin:node/recommended
 plugins:
   - import
+  - markdown
   - node
 rules:
   node/no-unsupported-features:
@@ -12,3 +13,7 @@ rules:
     - version: 4
       ignores:
         - modules
+  node/no-unpublished-require:
+    - error
+    - allowModules:
+      - postcss-combine-duplicated-selectors
