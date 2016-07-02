@@ -2,5 +2,13 @@ extends:
   - google
   - plugin:import/errors
   - plugin:import/warnings
+  - plugin:node/recommended
 plugins:
   - import
+  - node
+rules:
+  node/no-unsupported-features:
+    - error
+    - version: 4
+      ignores:
+        - modules
