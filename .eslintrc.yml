@@ -5,8 +5,17 @@ extends:
   - plugin:node/recommended
 plugins:
   - import
+  - markdown
   - node
 rules:
+  node/no-missing-require:
+    - error
+    - allowModules:
+      - postcss-combine-duplicated-selectors
+  node/no-unpublished-require:
+    - error
+    - allowModules:
+      - postcss-combine-duplicated-selectors
   node/no-unsupported-features:
     - error
     - version: 4
