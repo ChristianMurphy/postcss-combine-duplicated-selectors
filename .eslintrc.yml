@@ -8,6 +8,13 @@ plugins:
   - markdown
   - node
 rules:
+  # Javascript feature preference
+  no-var: error
+  prefer-arrow-callback: error
+  prefer-const: error
+  prefer-template: error
+
+  # Node.js feature configuration
   node/no-missing-require:
     - error
     - allowModules:
