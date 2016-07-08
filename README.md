@@ -18,7 +18,7 @@ const css = fs.readFileSync('src/app.css');
 
 postcss([require('postcss-combine-duplicated-selectors')])
   .process(css, {from: 'src/app.css', to: 'app.css'})
-  .then(function(result) {
+  .then(result => {
     fs.writeFileSync('app.css', result.css);
     if (result.map) fs.writeFileSync('app.css.map', result.map);
   });
