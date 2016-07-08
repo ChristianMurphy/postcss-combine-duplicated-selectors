@@ -1,9 +1,6 @@
 {
   "comments": false,
   "compact": true,
-  "presets": [
-    "stage-2"
-  ],
   "plugins": [
     ["transform-es2015-modules-commonjs-simple", {
         "addExports": true
