@@ -1,20 +1,12 @@
 import postcss from 'postcss';
 import parser from 'postcss-selector-parser';
 
-function normalizeCombinator(selector) {
-  selector.walkCombinators(node => {
-    node.value = node.value.trim().concat(' ');
-    node.spaces = {};
-  });
-}
-
 function normalizeAttributes(selector) {
   selector.walkAttributes(node => {
     if (node.value) {
-      // remove padding whitespace, and wrap in double quotes
-      node.value = node.value.trim().replace(/^'?([^"']+)'?$/, '"$1"');
+      // remove quotes
+      node.value = node.value.replace(/'|\\'|"|\\"/g, '');
     }
-    node.attribute = node.attribute.trim();
   });
 }
 
@@ -32,18 +24,19 @@ function sortGroups(selector) {
   });
 }
 
-const uniformStyle = parser(selector => {
-  normalizeCombinator(selector);
-  normalizeAttributes(selector);
-  sortGroups(selector);
-});
+const uniformStyle = parser(
+  selector => {
+    normalizeAttributes(selector);
+    sortGroups(selector);
+  }
+);
 
 export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
   return css => {
     const symbolTable = new Map();
 
     css.walkRules(rule => {
-      const selector = uniformStyle.process(rule.selector).result;
+      const selector = uniformStyle.process(rule.selector, {lossless: false}).result;
       if (symbolTable.has(selector)) {
         // store original rule as destination
         const destination = symbolTable.get(selector);

@@ -30,14 +30,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "postcss": "^5.1.1",
-    "postcss-selector-parser": "^2.1.1"
+    "postcss": "^5.1.2",
+    "postcss-selector-parser": "^2.2.0"
   },
   "devDependencies": {
-    "ava": "^0.15.2",
+    "ava": "^0.16.0",
     "babel-cli": "^6.11.4",
     "babel-plugin-transform-es2015-modules-commonjs-simple": "^6.7.4",
-    "eslint": "^3.1.1",
+    "eslint": "^3.2.2",
     "eslint-config-google": "^0.6.0",
     "eslint-plugin-ava": "^2.5.0",
     "eslint-plugin-import": "^1.12.0",
@@ -47,7 +47,7 @@
     "postcss-nested": "^1.0.0",
     "postcss-scss": "^0.1.9",
     "remark-cli": "^1.0.0",
-    "remark-lint": "^4.0.2",
+    "remark-lint": "^4.1.0",
     "rimraf": "^2.5.4"
   },
   "engines": {
