@@ -10,7 +10,7 @@
     "build": "babel src -d dist --no-comments",
     "prepublish": "rimraf dist && npm run build",
     "pretest": "babel test/_test-factory.es -o test/_test-factory.js --no-comments",
-    "test": "npm run build && ava && eslint --ext md,js,es . && remark *.md -u remark-lint -q --no-stdout"
+    "test": "npm run build && ava && eslint --ext md,js,es . && remark *.md -q --no-stdout"
   },
   "keywords": [
     "postcss-plugin",
