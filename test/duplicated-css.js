@@ -268,3 +268,11 @@ test(
   '.one.two {} .two.one {}',
   '.one.two {}'
 );
+
+test(
+  'selectors across media queries',
+  css,
+  '.one{} .one{} .two{} .two {} @media screen only and (min-width(48em)) { .one{} .one{} .two{} .two{} }',
+  '.one{} .two{} @media screen only and (min-width(48em)) { .one{} .two{} }'
+);
+

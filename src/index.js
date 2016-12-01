@@ -33,13 +33,30 @@ const uniformStyle = parser(
 
 export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
   return css => {
-    const symbolTable = new Map();
+    const mapTable = new Map();
+    const rootMap = new Map();
+    mapTable.set('root', rootMap);
 
     css.walkRules(rule => {
-      const selector = uniformStyle.process(rule.selector, {lossless: false}).result;
-      if (symbolTable.has(selector)) {
+      let map;
+      if (rule.parent.type === 'atrule' &&
+          rule.parent.name === 'media') {
+        const query = rule.parent.params;
+        map = mapTable.has(query) ?
+          mapTable.get(query) :
+          mapTable.set(query, new Map()).get(query);
+      } else {
+        map = mapTable.get('root');
+      }
+
+      const selector = uniformStyle.process(
+        rule.selector,
+        {lossless: false}
+      ).result;
+
+      if (map.has(selector)) {
         // store original rule as destination
-        const destination = symbolTable.get(selector);
+        const destination = map.get(selector);
         // move declarations to original rule
         while (rule.nodes.length > 0) {
           rule.nodes[0].moveTo(destination);
@@ -48,7 +65,7 @@ export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
         rule.remove();
       } else {
         // add new selector to symbol table
-        symbolTable.set(selector, rule);
+        map.set(selector, rule);
       }
     });
   };
