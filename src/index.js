@@ -33,19 +33,26 @@ const uniformStyle = parser(
 
 export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
   return css => {
+    // Create a map to store maps
     const mapTable = new Map();
-    const rootMap = new Map();
-    mapTable.set('root', rootMap);
+    // root map to store root selectors
+    mapTable.set('root', new Map());
 
+    // Walk at rules to look for media queries
     css.walkRules(rule => {
       let map;
       if (rule.parent.type === 'atrule' &&
           rule.parent.name === 'media') {
-        const query = rule.parent.params;
+        // Use the query params as the key
+        const query = rule.parent.params.replace(/\s+/g, '');
+        // See if this query key is already in the map table
         map = mapTable.has(query) ?
+          // If it is use it
           mapTable.get(query) :
+          // if not set it and get it
           mapTable.set(query, new Map()).get(query);
       } else {
+        // Otherwise we are dealing with a selector in the root
         map = mapTable.get('root');
       }
 
