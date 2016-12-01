@@ -64,7 +64,7 @@ Output
 
 ## Limitations
 
-Currently the plugin does not differentiate media blocks.
+Currently the plugin does not merge media blocks.
 
 so this code
 
@@ -79,8 +79,16 @@ so this code
   .module {
     background: red
   }
+  .module {
+    color: white
+  }
+}
+@media (max-width: 600px) {
   .another-module {
     background: yellow
+  }
+  .another-module {
+    color: red
   }
 }
 ```
@@ -90,12 +98,21 @@ produces this output
 ``` css
 .module {
   color: green;
-  background: red
 }
 .another-module {
   color: blue;
-  background: yellow
 }
 @media (max-width: 600px) {
+  .module {
+    background: red
+    color: white
+  }
 }
-```
+@media (max-width: 600px) {
+  .another-module {
+    background: yellow
+    color: red
+  }
+ ```
+## Recommendation
+[mq-packer is an excellent plugin for combining media queries.](https://github.com/hail2u/node-css-mqpacker)
