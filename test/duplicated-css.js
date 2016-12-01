@@ -276,3 +276,16 @@ test(
   '.one{} .two{} @media screen only and (min-width(48em)) { .one{} .two{} }'
 );
 
+test(
+  'selectors across similar media queries',
+  css,
+  '.one{} .one{} .two{} .two {} @media screen only and (min-width(48em)) { .one{} .one{} } @media screen only and ( min-width( 48em ) ) { .two{} .two{} }',
+  '.one{} .two{} @media screen only and (min-width(48em)) { .one{} } @media screen only and ( min-width( 48em ) ) { .two{} }'
+);
+
+test(
+  'selectors across different media queries',
+  css,
+  '.one{} .one{} .two{} .two {} @media screen only and (min-width(48em)) { .one{} .one{} } @media screen only and (min-width(64em)) { .two{} .two{} }',
+  '.one{} .two{} @media screen only and (min-width(48em)) { .one{} } @media screen only and (min-width(64em)) { .two{} }'
+);
