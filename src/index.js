@@ -41,6 +41,7 @@ export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
     // Walk at rules to look for media queries
     css.walkRules(rule => {
       let map;
+      // Check selector parent for a media query
       if (rule.parent.type === 'atrule' &&
           rule.parent.name === 'media') {
         // Use the query params as the key
