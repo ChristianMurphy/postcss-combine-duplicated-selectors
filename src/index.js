@@ -38,7 +38,6 @@ export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
     // root map to store root selectors
     mapTable.set('root', new Map());
 
-    // Walk at rules to look for media queries
     css.walkRules(rule => {
       let map;
       // Check selector parent for a media query
