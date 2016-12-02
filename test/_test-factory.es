@@ -3,10 +3,14 @@ import postcss from 'postcss';
 /**
  * Generates test functions and test titles
  *
+ * @param {string} version - string description of parser version
+ * @param {Array<Object>} plugins - postcss plugins to use with tests
+ * @param {Object} [syntax] - optional alternative syntax parser
+ * @return {function} test function
+ *
  * NOTE: this is an ".es" file because ava does not compile helpers,
  * instead "_factories.js" is built in the "pretest" step in "package.json"
  */
-
 export default function testFactory(version, plugins, syntax) {
   let tester = null;
 

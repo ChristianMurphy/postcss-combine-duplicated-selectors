@@ -8,7 +8,8 @@ import plugin from '../dist';
 /**
  * These tests check css selectors that the plugin CANNOT combined together.
  * Meaning that the selectors provided are unique.
- * These tests check against css super set languages: less, sass, and postcss-nested.
+ * These tests check against css super set languages:
+ * less, sass, and postcss-nested.
  */
 
 const nestedCSS = testFactory('nested css', [postcssNested, plugin]);

@@ -12,13 +12,15 @@ Automatically detects and combines duplicated css selectors so you don't have to
 ### Using PostCSS JS API
 
 ``` js
+'use strict';
+
 const fs = require('fs');
 const postcss = require('postcss');
 const css = fs.readFileSync('src/app.css');
 
 postcss([require('postcss-combine-duplicated-selectors')])
   .process(css, {from: 'src/app.css', to: 'app.css'})
-  .then(result => {
+  .then((result) => {
     fs.writeFileSync('app.css', result.css);
     if (result.map) fs.writeFileSync('app.css.map', result.map);
   });
