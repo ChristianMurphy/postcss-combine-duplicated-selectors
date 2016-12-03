@@ -149,10 +149,3 @@ test(
   '.one.two {} .one.two.three {}',
   '.one.two {} .one.two.three {}'
 );
-
-test(
-  'selectors within media queries',
-  css,
-  '@media print { .one{} } @media print { .one{} }',
-  '@media print { .one{} } @media print { .one{} }'
-);

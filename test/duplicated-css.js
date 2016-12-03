@@ -272,6 +272,13 @@ test(
 test(
   'selectors and seperately selectors within media query',
   css,
-  '.one{} .one{} @media screen only { .one{} .one{} }',
-  '.one{} @media screen only { .one{} }'
+  '.one{} .one{} @media print { .one{} .one{} }',
+  '.one{} @media print { .one{} }'
+);
+
+test(
+  'multiple print media queries',
+  css,
+  '@media print { a{ color: blue; } } @media print { a{ background: green; } }',
+  '@media print { a{ color: blue; background: green; } } @media print { }'
 );
