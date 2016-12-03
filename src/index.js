@@ -1,8 +1,12 @@
 import postcss from 'postcss';
 import parser from 'postcss-selector-parser';
 
+/**
+ * Ensure that attributes with different quotes match.
+ * @param {Object} selector - postcss selector node
+ */
 function normalizeAttributes(selector) {
-  selector.walkAttributes(node => {
+  selector.walkAttributes((node) => {
     if (node.value) {
       // remove quotes
       node.value = node.value.replace(/'|\\'|"|\\"/g, '');
@@ -10,8 +14,12 @@ function normalizeAttributes(selector) {
   });
 }
 
+/**
+ * Sort class and id groups alphabetically
+ * @param {Object} selector - postcss selector node
+ */
 function sortGroups(selector) {
-  selector.each(subSelector => {
+  selector.each((subSelector) => {
     subSelector.nodes.sort((a, b) => {
       // different types cannot be sorted
       if (a.type !== b.type) {
@@ -25,20 +33,20 @@ function sortGroups(selector) {
 }
 
 const uniformStyle = parser(
-  selector => {
+  (selector) => {
     normalizeAttributes(selector);
     sortGroups(selector);
   }
 );
 
 export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
-  return css => {
+  return (css) => {
     // Create a map to store maps
     const mapTable = new Map();
     // root map to store root selectors
     mapTable.set('root', new Map());
 
-    css.walkRules(rule => {
+    css.walkRules((rule) => {
       let map;
       // Check selector parent for a media query
       if (rule.parent.type === 'atrule' &&

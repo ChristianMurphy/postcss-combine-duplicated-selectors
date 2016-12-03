@@ -12,13 +12,15 @@ Automatically detects and combines duplicated css selectors so you don't have to
 ### Using PostCSS JS API
 
 ``` js
+'use strict';
+
 const fs = require('fs');
 const postcss = require('postcss');
 const css = fs.readFileSync('src/app.css');
 
 postcss([require('postcss-combine-duplicated-selectors')])
   .process(css, {from: 'src/app.css', to: 'app.css'})
-  .then(result => {
+  .then((result) => {
     fs.writeFileSync('app.css', result.css);
     if (result.map) fs.writeFileSync('app.css.map', result.map);
   });
@@ -62,57 +64,6 @@ Output
 }
 ```
 
-## Limitations
+### Media Queries
 
-Currently the plugin does not merge media blocks.
-
-so this code
-
-``` css
-.module {
-  color: green
-}
-.another-module {
-  color: blue
-}
-@media (max-width: 600px) {
-  .module {
-    background: red
-  }
-  .module {
-    color: white
-  }
-}
-@media (max-width: 600px) {
-  .another-module {
-    background: yellow
-  }
-  .another-module {
-    color: red
-  }
-}
-```
-
-produces this output
-
-``` css
-.module {
-  color: green;
-}
-.another-module {
-  color: blue;
-}
-@media (max-width: 600px) {
-  .module {
-    background: red
-    color: white
-  }
-}
-@media (max-width: 600px) {
-  .another-module {
-    background: yellow
-    color: red
-  }
- ```
-## Recommendation
-[mq-packer is an excellent plugin for combining media queries.](https://github.com/hail2u/node-css-mqpacker)
+If you have code with media queries, pass code through [*mq-packer*](https://github.com/hail2u/node-css-mqpacker) before *postcss-combine-duplicated-selectors* to ensure optimal results.

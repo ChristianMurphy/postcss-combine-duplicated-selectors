@@ -270,22 +270,15 @@ test(
 );
 
 test(
-  'selectors across media queries',
+  'selectors and seperately selectors within media query',
   css,
-  '.one{} .one{} .two{} .two {} @media screen only and (min-width(48em)) { .one{} .one{} .two{} .two{} }',
-  '.one{} .two{} @media screen only and (min-width(48em)) { .one{} .two{} }'
+  '.one{} .one{} @media print { .one{} .one{} }',
+  '.one{} @media print { .one{} }'
 );
 
 test(
-  'selectors across similar media queries',
+  'multiple print media queries',
   css,
-  '.one{} .one{} .two{} .two {} @media screen only and (min-width(48em)) { .one{} .one{} } @media screen only and ( min-width( 48em ) ) { .two{} .two{} }',
-  '.one{} .two{} @media screen only and (min-width(48em)) { .one{} } @media screen only and ( min-width( 48em ) ) { .two{} }'
-);
-
-test(
-  'selectors across different media queries',
-  css,
-  '.one{} .one{} .two{} .two {} @media screen only and (min-width(48em)) { .one{} .one{} } @media screen only and (min-width(64em)) { .two{} .two{} }',
-  '.one{} .two{} @media screen only and (min-width(48em)) { .one{} } @media screen only and (min-width(64em)) { .two{} }'
+  '@media print { a{ color: blue; } } @media print { a{ background: green; } }',
+  '@media print { a{ color: blue; background: green; } } @media print { }'
 );
