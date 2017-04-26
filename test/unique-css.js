@@ -151,7 +151,7 @@ test(
 );
 
 test(
-  'keyframe selectors',
+  'keyframe selectors with different names',
   css,
   '@keyframes a {0% {} 100% {}} @keyframes b {0% {} 100% {}}',
   '@keyframes a {0% {} 100% {}} @keyframes b {0% {} 100% {}}'
