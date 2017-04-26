@@ -48,9 +48,8 @@ export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
 
     css.walkRules((rule) => {
       let map;
-      // Check selector parent for a media query
-      if (rule.parent.type === 'atrule' &&
-          rule.parent.name === 'media') {
+      // Check selector parent for any at rule
+      if (rule.parent.type === 'atrule') {
         // Use the query params as the key
         const query = rule.parent.params.replace(/\s+/g, '');
         // See if this query key is already in the map table
