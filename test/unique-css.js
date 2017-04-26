@@ -149,3 +149,10 @@ test(
   '.one.two {} .one.two.three {}',
   '.one.two {} .one.two.three {}'
 );
+
+test(
+  'keyframe selectors',
+  css,
+  '@keyframes a {0% {} 100% {}} @keyframes b {0% {} 100% {}}',
+  '@keyframes a {0% {} 100% {}} @keyframes b {0% {} 100% {}}'
+);
