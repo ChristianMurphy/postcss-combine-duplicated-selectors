@@ -282,3 +282,10 @@ test(
   '@media print { a{ color: blue; } } @media print { a{ background: green; } }',
   '@media print { a{ color: blue; background: green; } } @media print { }'
 );
+
+test(
+  'keyframe selectors with same percentage',
+  css,
+  '@keyframes a {0% { color: blue; } 0% { background: green; }}',
+  '@keyframes a {0% { color: blue; background: green; }}'
+);
