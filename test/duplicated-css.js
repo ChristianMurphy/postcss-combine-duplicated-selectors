@@ -1,6 +1,6 @@
-import test from 'ava';
-import testFactory from './_test-factory';
-import plugin from '../dist';
+const test = require('ava');
+const testFactory = require('./_test-factory');
+const plugin = require('../src');
 
 /**
  * These tests check css selectors that the plugin CAN combine together.
