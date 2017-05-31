@@ -1,9 +1,9 @@
-import test from 'ava';
-import testFactory from './_test-factory';
-import postcssNested from 'postcss-nested';
-import postcssLess from 'postcss-less';
-import postcssScss from 'postcss-scss';
-import plugin from '../dist';
+const test = require('ava');
+const testFactory = require('./_test-factory');
+const postcssNested = require('postcss-nested');
+const postcssLess = require('postcss-less');
+const postcssScss = require('postcss-scss');
+const plugin = require('../src');
 
 /**
  * These tests check css selectors that the plugin CANNOT combined together.

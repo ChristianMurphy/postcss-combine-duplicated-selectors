@@ -1,5 +1,5 @@
-import postcss from 'postcss';
-import parser from 'postcss-selector-parser';
+const postcss = require('postcss');
+const parser = require('postcss-selector-parser');
 
 /**
  * Ensure that attributes with different quotes match.
@@ -39,7 +39,7 @@ const uniformStyle = parser(
   }
 );
 
-export default postcss.plugin('postcss-combine-duplicated-selectors', () => {
+module.exports = postcss.plugin('postcss-combine-duplicated-selectors', () => {
   return (css) => {
     // Create a map to store maps
     const mapTable = new Map();
