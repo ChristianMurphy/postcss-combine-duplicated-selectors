@@ -30,7 +30,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "postcss": "^5.2.6",
+    "postcss": "^6.0.1",
     "postcss-selector-parser": "^2.2.2"
   },
   "devDependencies": {
@@ -43,9 +43,9 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-markdown": "^1.0.0-beta.6",
     "eslint-plugin-node": "^4.2.2",
-    "postcss-less": "^0.15.0",
-    "postcss-nested": "^1.0.1",
-    "postcss-scss": "^0.4.1",
+    "postcss-less": "^1.0.1",
+    "postcss-nested": "^2.0.2",
+    "postcss-scss": "^1.0.0",
     "remark-cli": "^3.0.0",
     "remark-preset-lint-consistent": "^2.0.0",
     "remark-preset-lint-recommended": "^2.0.0",
