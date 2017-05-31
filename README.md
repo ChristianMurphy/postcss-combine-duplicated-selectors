@@ -2,6 +2,7 @@
 
 [![Linux Build Status](https://travis-ci.org/ChristianMurphy/postcss-combine-duplicated-selectors.svg?branch=master)](https://travis-ci.org/ChristianMurphy/postcss-combine-duplicated-selectors)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/2dq6frg0c72il8v5/branch/master?svg=true)](https://ci.appveyor.com/project/ChristianMurphy/postcss-combine-duplicated-selectors/branch/master)
+[![Greenkeeper badge](https://badges.greenkeeper.io/ChristianMurphy/postcss-combine-duplicated-selectors.svg)](https://greenkeeper.io/)
 [![Dependency Status](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors.svg)](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors)
 [![devDependency Status](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors/dev-status.svg)](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors?type=dev)
 
