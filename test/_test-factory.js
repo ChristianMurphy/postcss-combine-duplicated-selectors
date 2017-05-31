@@ -1,4 +1,4 @@
-import postcss from 'postcss';
+const postcss = require('postcss');
 
 /**
  * Generates test functions and test titles
@@ -11,7 +11,7 @@ import postcss from 'postcss';
  * NOTE: this is an ".es" file because ava does not compile helpers,
  * instead "_factories.js" is built in the "pretest" step in "package.json"
  */
-export default function testFactory(version, plugins, syntax) {
+module.exports = function testFactory(version, plugins, syntax) {
   let tester = null;
 
   // setup test macro
