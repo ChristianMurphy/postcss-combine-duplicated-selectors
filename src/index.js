@@ -36,19 +36,15 @@ function sortGroups(selector) {
  * Remove duplicated properties
  * @param {Object} selector - postcss selector node
  */
-function removeDuplicatedProperties(selector) {
-  let actualNodeIndex = selector.nodes.length - 1;
+function removeDupProperties(selector) {
   // Remove duplicated properties from bottom to top
-  while (actualNodeIndex >= 1) {
-    let beforeNodeIndex = actualNodeIndex - 1;
-    while (beforeNodeIndex >= 0) {
+  for (let actualNodeIndex = selector.nodes.length - 1; actualNodeIndex >= 1; actualNodeIndex--) {
+    for (let beforeNodeIndex = actualNodeIndex - 1; beforeNodeIndex >= 0; beforeNodeIndex--) {
       if (selector.nodes[actualNodeIndex].prop === selector.nodes[beforeNodeIndex].prop) {
         selector.nodes[beforeNodeIndex].remove();
         actualNodeIndex--;
       }
-      beforeNodeIndex--;
     }
-    actualNodeIndex--;
   }
 }
 
@@ -59,11 +55,9 @@ const uniformStyle = parser(
   }
 );
 
-const defaultOptions = {
-  removeDuplicatedProperties: false
-};
-
-module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options = defaultOptions) => {
+module.exports = postcss.plugin('postcss-combine-duplicated-selectors', ({
+  removeDuplicatedProperties = true
+}) => {
 
   return (css) => {
     // Create a map to store maps
@@ -104,12 +98,12 @@ module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options
         // remove duplicated rule
         rule.remove();
 
-        if (options.removeDuplicatedProperties) {
-          removeDuplicatedProperties(destination);
+        if (removeDuplicatedProperties) {
+          removeDupProperties(destination);
         }
       } else {
-        if (options.removeDuplicatedProperties) {
-          removeDuplicatedProperties(rule);
+        if (removeDuplicatedProperties) {
+          removeDupProperties(rule);
         }
         // add new selector to symbol table
         map.set(selector, rule);
