@@ -56,7 +56,7 @@ const uniformStyle = parser(
 );
 
 const defaultOptions = {
-  removeDuplicatedProperties: false
+  removeDuplicatedProperties: false,
 };
 
 module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options = defaultOptions) => {
@@ -86,7 +86,7 @@ module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options
 
       const selector = uniformStyle.process(
         rule.selector, {
-          lossless: false
+          lossless: false,
         }
       ).result;
 
