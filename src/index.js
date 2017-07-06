@@ -55,7 +55,11 @@ const uniformStyle = parser(
   }
 );
 
-module.exports = postcss.plugin('postcss-combine-duplicated-selectors', ({removeDuplicatedProperties = true}) => {
+const defaultOptions = {
+  removeDuplicatedProperties: false
+};
+
+module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options = defaultOptions) => {
 
   return (css) => {
     // Create a map to store maps
@@ -96,11 +100,11 @@ module.exports = postcss.plugin('postcss-combine-duplicated-selectors', ({remove
         // remove duplicated rule
         rule.remove();
 
-        if (removeDuplicatedProperties) {
+        if (options.removeDuplicatedProperties) {
           removeDupProperties(destination);
         }
       } else {
-        if (removeDuplicatedProperties) {
+        if (options.removeDuplicatedProperties) {
           removeDupProperties(rule);
         }
         // add new selector to symbol table
