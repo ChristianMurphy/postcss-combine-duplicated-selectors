@@ -1,5 +1,7 @@
 const postcss = require('postcss');
 const parser = require('postcss-selector-parser');
+const {name} = require('../package.json');
+
 
 /**
  * Ensure that attributes with different quotes match.
@@ -59,7 +61,7 @@ const defaultOptions = {
   removeDuplicatedProperties: false,
 };
 
-module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options = defaultOptions) => {
+module.exports = postcss.plugin(name, (options = defaultOptions) => {
   return (css) => {
     // Create a map to store maps
     const mapTable = new Map();
