@@ -37,12 +37,12 @@ function sortGroups(selector) {
  * @param {Object} selector - postcss selector node
  */
 function removeDupProperties(selector) {
-  // Remove duplicated properties from bottom to top
-  for (let actualNodeIndex = selector.nodes.length - 1; actualNodeIndex >= 1; actualNodeIndex--) {
-    for (let beforeNodeIndex = actualNodeIndex - 1; beforeNodeIndex >= 0; beforeNodeIndex--) {
-      if (selector.nodes[actualNodeIndex].prop === selector.nodes[beforeNodeIndex].prop) {
-        selector.nodes[beforeNodeIndex].remove();
-        actualNodeIndex--;
+  // Remove duplicated properties from bottom to top ()
+  for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
+    for (let befIndex = actIndex - 1; befIndex >= 0; befIndex--) {
+      if (selector.nodes[actIndex].prop === selector.nodes[befIndex].prop) {
+        selector.nodes[befIndex].remove();
+        actIndex--;
       }
     }
   }
@@ -55,10 +55,11 @@ const uniformStyle = parser(
   }
 );
 
-module.exports = postcss.plugin('postcss-combine-duplicated-selectors', ({
-  removeDuplicatedProperties = true
-}) => {
+const defaultOptions = {
+  removeDuplicatedProperties: false,
+};
 
+module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options = defaultOptions) => {
   return (css) => {
     // Create a map to store maps
     const mapTable = new Map();
@@ -84,7 +85,7 @@ module.exports = postcss.plugin('postcss-combine-duplicated-selectors', ({
 
       const selector = uniformStyle.process(
         rule.selector, {
-          lossless: false
+          lossless: false,
         }
       ).result;
 
@@ -98,11 +99,11 @@ module.exports = postcss.plugin('postcss-combine-duplicated-selectors', ({
         // remove duplicated rule
         rule.remove();
 
-        if (removeDuplicatedProperties) {
+        if (options.removeDuplicatedProperties) {
           removeDupProperties(destination);
         }
       } else {
-        if (removeDuplicatedProperties) {
+        if (options.removeDuplicatedProperties) {
           removeDupProperties(rule);
         }
         // add new selector to symbol table
