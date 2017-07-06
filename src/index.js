@@ -55,9 +55,7 @@ const uniformStyle = parser(
   }
 );
 
-module.exports = postcss.plugin('postcss-combine-duplicated-selectors', ({
-  removeDuplicatedProperties = true
-}) => {
+module.exports = postcss.plugin('postcss-combine-duplicated-selectors', ({removeDuplicatedProperties = true}) => {
 
   return (css) => {
     // Create a map to store maps
