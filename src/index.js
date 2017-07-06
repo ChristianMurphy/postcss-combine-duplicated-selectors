@@ -58,11 +58,6 @@ const uniformStyle = parser(
 const defaultOptions = {
   removeDuplicatedProperties: false,
 };
-<<<<<<< HEAD
-=======
-
-module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options = defaultOptions) => {
->>>>>>> 75dbeff16efbe8c5c9830dac460c0c9cd56c2aa0
 
 module.exports = postcss.plugin('postcss-combine-duplicated-selectors', (options = defaultOptions) => {
   return (css) => {
