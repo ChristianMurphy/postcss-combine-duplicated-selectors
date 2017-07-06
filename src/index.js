@@ -61,7 +61,8 @@ const defaultOptions = {
   removeDuplicatedProperties: false,
 };
 
-module.exports = postcss.plugin(name, (options = defaultOptions) => {
+module.exports = postcss.plugin(name, (options) => {
+  options = Object.assign({}, defaultOptions, options);
   return (css) => {
     // Create a map to store maps
     const mapTable = new Map();
