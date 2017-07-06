@@ -66,6 +66,38 @@ Output
 }
 ```
 
+### Duplicated Properties
+
+Duplicated properties can optionally be combined.
+
+Set the `removeDuplicatedProperties` option to `true` to enable.
+
+``` js
+const postcss = require('postcss');
+const combineSelectors = require('postcss-combine-duplicated-selectors');
+
+postcss([combineSelectors({removeDuplicatedProperties: true})]);
+```
+
+When enabled the following css
+
+``` css
+.a {
+  height: 10px;
+  background: orange;
+  background: rgba(255, 165, 0, 0.5);
+}
+```
+
+will combine into
+
+```css
+.a {
+  height: 10px;
+  background: rgba(255, 165, 0, 0.5);
+}
+```
+
 ### Media Queries
 
 If you have code with media queries, pass code through [*mq-packer*](https://github.com/hail2u/node-css-mqpacker) before *postcss-combine-duplicated-selectors* to ensure optimal results.
