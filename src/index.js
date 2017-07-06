@@ -1,5 +1,7 @@
 const postcss = require('postcss');
 const parser = require('postcss-selector-parser');
+const {name} = require('../package.json');
+
 
 /**
  * Ensure that attributes with different quotes match.
@@ -32,6 +34,22 @@ function sortGroups(selector) {
   });
 }
 
+/**
+ * Remove duplicated properties
+ * @param {Object} selector - postcss selector node
+ */
+function removeDupProperties(selector) {
+  // Remove duplicated properties from bottom to top ()
+  for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
+    for (let befIndex = actIndex - 1; befIndex >= 0; befIndex--) {
+      if (selector.nodes[actIndex].prop === selector.nodes[befIndex].prop) {
+        selector.nodes[befIndex].remove();
+        actIndex--;
+      }
+    }
+  }
+}
+
 const uniformStyle = parser(
   (selector) => {
     normalizeAttributes(selector);
@@ -39,7 +57,11 @@ const uniformStyle = parser(
   }
 );
 
-module.exports = postcss.plugin('postcss-combine-duplicated-selectors', () => {
+const defaultOptions = {
+  removeDuplicatedProperties: false,
+};
+
+module.exports = postcss.plugin(name, (options = defaultOptions) => {
   return (css) => {
     // Create a map to store maps
     const mapTable = new Map();
@@ -64,8 +86,9 @@ module.exports = postcss.plugin('postcss-combine-duplicated-selectors', () => {
       }
 
       const selector = uniformStyle.process(
-        rule.selector,
-        {lossless: false}
+        rule.selector, {
+          lossless: false,
+        }
       ).result;
 
       if (map.has(selector)) {
@@ -77,7 +100,14 @@ module.exports = postcss.plugin('postcss-combine-duplicated-selectors', () => {
         }
         // remove duplicated rule
         rule.remove();
+
+        if (options.removeDuplicatedProperties) {
+          removeDupProperties(destination);
+        }
       } else {
+        if (options.removeDuplicatedProperties) {
+          removeDupProperties(rule);
+        }
         // add new selector to symbol table
         map.set(selector, rule);
       }
