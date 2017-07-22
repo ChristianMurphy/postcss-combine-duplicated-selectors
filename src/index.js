@@ -74,7 +74,9 @@ module.exports = postcss.plugin(name, (options) => {
       // Check selector parent for any at rule
       if (rule.parent.type === 'atrule') {
         // Use name and query params as the key
-        const query = rule.parent.name + rule.parent.params.replace(/\s+/g, '');
+        const query = rule.parent.name.toLowerCase()
+          + rule.parent.params.replace(/\s+/g, '');
+
         // See if this query key is already in the map table
         map = mapTable.has(query) ?
           // If it is use it
