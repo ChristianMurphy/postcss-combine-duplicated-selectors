@@ -33,4 +33,4 @@ module.exports = function testFactory(version, plugins, syntax) {
     `"${input}" becomes "${expected}" in ${version}`;
 
   return tester;
-}
+};
