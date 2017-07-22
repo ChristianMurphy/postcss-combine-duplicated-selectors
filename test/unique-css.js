@@ -160,6 +160,6 @@ test(
 test(
   'keyframe selectors with different prefixes',
   css,
-  '@-webkit-keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}',
+  '@keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}',
   '@keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}'
 );
