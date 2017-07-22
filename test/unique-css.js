@@ -156,3 +156,10 @@ test(
   '@keyframes a {0% {} 100% {}} @keyframes b {0% {} 100% {}}',
   '@keyframes a {0% {} 100% {}} @keyframes b {0% {} 100% {}}'
 );
+
+test(
+  'keyframe selectors with different prefixes',
+  css,
+  '@keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}',
+  '@keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}'
+);

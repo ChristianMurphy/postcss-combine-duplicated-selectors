@@ -289,3 +289,10 @@ test(
   '@keyframes a {0% { color: blue; } 0% { background: green; }}',
   '@keyframes a {0% { color: blue; background: green; }}'
 );
+
+test(
+  'multiple print media queries',
+  css,
+  '@media print { a{ color: blue; } } @MEDIA print { a{ background: green; } }',
+  '@media print { a{ color: blue; background: green; } } @MEDIA print { }'
+);
