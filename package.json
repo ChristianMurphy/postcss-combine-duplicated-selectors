@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "test": "ava && eslint --ext md,js . && remark *.md -q --no-stdout",
-    "precommit": "npm test"
+    "precommit": "npm test",
+    "commitmsg": "commitlint -e"
   },
   "keywords": [
     "postcss-plugin",
@@ -32,6 +33,8 @@
     "postcss-selector-parser": "^2.2.3"
   },
   "devDependencies": {
+    "@commitlint/cli": "^3.0.4",
+    "@commitlint/config-angular": "^3.0.4",
     "ava": "^0.21.0",
     "eslint": "~4.4.0",
     "eslint-config-google": "^0.9.1",
