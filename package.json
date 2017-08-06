@@ -1,6 +1,6 @@
 {
   "name": "postcss-combine-duplicated-selectors",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "automatically keep css selectors unique",
   "main": "src/index.js",
   "files": [
@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "test": "ava && eslint --ext md,js . && remark *.md -q --no-stdout",
+    "cz": "git-cz",
     "precommit": "npm test",
     "commitmsg": "commitlint -e"
   },
@@ -36,6 +37,8 @@
     "@commitlint/cli": "^3.0.4",
     "@commitlint/config-angular": "^3.0.4",
     "ava": "^0.21.0",
+    "commitizen": "^2.9.6",
+    "cz-conventional-changelog": "^2.0.0",
     "eslint": "~4.4.0",
     "eslint-config-google": "^0.9.1",
     "eslint-plugin-ava": "^4.2.1",
@@ -80,5 +83,10 @@
       "preset-lint-consistent",
       "validate-links"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
