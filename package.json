@@ -36,7 +36,7 @@
   "devDependencies": {
     "@commitlint/cli": "^3.0.4",
     "@commitlint/config-angular": "^3.0.4",
-    "ava": "^0.21.0",
+    "ava": "^0.22.0",
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.0.0",
     "eslint": "~4.4.0",
