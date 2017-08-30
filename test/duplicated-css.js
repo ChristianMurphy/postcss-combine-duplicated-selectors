@@ -210,7 +210,7 @@ test(
   'selectors with multiple properties',
   css,
   '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
-  '.a {color: black; height: 10px; background-color: red; width: 20px}'
+  '.a {color: black; height: 10px;background-color: red; width: 20px}'
 );
 
 test(
