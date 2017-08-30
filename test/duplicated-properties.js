@@ -17,7 +17,7 @@ test(
   'remove duplicated properties when combine selectors',
   removeDuplicates,
   '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
-  '.a {height: 10px; color: blue; width: 20px;}'
+  '.a {height: 10px;color: blue; width: 20px;}'
 );
 
 test(
@@ -37,7 +37,7 @@ test(
   'maintain duplicated properties when combine selectors',
   keepDuplicates,
   '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
-  '.a {height: 10px; color: black; color: blue; width: 20px;}'
+  '.a {height: 10px; color: black;color: blue; width: 20px;}'
 );
 
 test(

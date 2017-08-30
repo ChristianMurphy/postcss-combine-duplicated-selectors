@@ -99,7 +99,7 @@ module.exports = postcss.plugin(name, (options) => {
         const destination = map.get(selector);
         // move declarations to original rule
         while (rule.nodes.length > 0) {
-          rule.nodes[0].moveTo(destination);
+          destination.append(rule.nodes[0]);
         }
         // remove duplicated rule
         rule.remove();
