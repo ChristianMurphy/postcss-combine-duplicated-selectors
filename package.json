@@ -53,7 +53,7 @@
     "remark-validate-links": "^7.0.0"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=6"
   },
   "eslintConfig": {
     "root": true,
