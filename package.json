@@ -34,7 +34,7 @@
     "postcss-selector-parser": "^2.2.3"
   },
   "devDependencies": {
-    "@commitlint/cli": "^3.0.4",
+    "@commitlint/cli": "^4.0.0",
     "@commitlint/config-angular": "^3.0.4",
     "ava": "^0.22.0",
     "commitizen": "^2.9.6",
