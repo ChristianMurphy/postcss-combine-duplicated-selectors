@@ -88,11 +88,11 @@ module.exports = postcss.plugin(name, (options) => {
         map = mapTable.get('root');
       }
 
-      const selector = uniformStyle.process(
+      const selector = uniformStyle.processSync(
         rule.selector, {
           lossless: false,
         }
-      ).result;
+      );
 
       if (map.has(selector)) {
         // store original rule as destination
