@@ -18,12 +18,12 @@ module.exports = function testFactory(version, plugins, syntax) {
   if (syntax) {
     tester = (t, input, expected) => {
       const actual = postcss(plugins).process(input, {syntax}).css;
-      t.is(actual, expected);
+      t.is(expected, actual);
     };
   } else {
     tester = (t, input, expected) => {
       const actual = postcss(plugins).process(input).css;
-      t.is(actual, expected);
+      t.is(expected, actual);
     };
   }
 
