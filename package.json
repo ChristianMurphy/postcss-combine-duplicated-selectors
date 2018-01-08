@@ -10,7 +10,8 @@
     "commit": "commit",
     "test": "ava && eslint --ext md,js . && remark *.md -q --no-stdout",
     "precommit": "npm test",
-    "commitmsg": "commitlint -e"
+    "commitlint": "commitlint --from HEAD~1",
+    "commitlint-travis": "commitlint-travis"
   },
   "keywords": [
     "postcss-plugin",
@@ -35,8 +36,9 @@
   },
   "devDependencies": {
     "@commitlint/cli": "5.2.8",
-    "@commitlint/prompt-cli": "5.2.8",
     "@commitlint/config-conventional": "5.2.3",
+    "@commitlint/prompt-cli": "5.2.8",
+    "@commitlint/travis-cli": "5.2.8",
     "ava": "0.24.0",
     "eslint": "4.15.0",
     "eslint-config-google": "0.9.1",
