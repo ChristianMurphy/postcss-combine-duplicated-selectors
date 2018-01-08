@@ -87,5 +87,19 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "renovate": {
+    "extends": [
+      "config:base"
+    ],
+    "automerge": true,
+    "major": {
+      "automerge": false
+    },
+    "lockFileMaintenance": {
+      "enabled": true
+    },
+    "semanticPrefix": "chore:",
+    "semanticCommitScope": ""
   }
 }
