@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "6.0.2",
-    "@commitlint/config-conventional": "5.2.3",
+    "@commitlint/config-conventional": "6.0.2",
     "@commitlint/prompt-cli": "6.0.2",
     "@commitlint/travis-cli": "6.0.2",
     "ava": "0.24.0",
