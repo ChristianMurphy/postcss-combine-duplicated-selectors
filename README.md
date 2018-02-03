@@ -1,4 +1,9 @@
-# postcss combine duplicated selectors
+# Requirements
+
+In order to use this you will need to have [postcss](https://github.com/postcss/postcss) installed. Depending on whether or not you want to use the CLI you need to install [postcss-cli](https://github.com/postcss/postcss-cli).
+
+
+# Postcss combine duplicated selectors
 
 <!-- current project status -->
 [![npm](https://img.shields.io/npm/v/postcss-combine-duplicated-selectors.svg)](https://www.npmjs.com/package/postcss-combine-duplicated-selectors)
@@ -36,9 +41,8 @@ postcss([require('postcss-combine-duplicated-selectors')])
 ```
 
 ### Using PostCSS CLI
-
 ``` sh
-postcss --use postcss-combine-duplicated-selectors *.css
+postcss style.css --use postcss-combine-duplicated-selectors -o newcss.css)
 ```
 
 ## Example
