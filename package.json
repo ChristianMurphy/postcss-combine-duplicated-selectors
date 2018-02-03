@@ -38,7 +38,7 @@
     "@commitlint/cli": "6.1.0",
     "@commitlint/config-conventional": "6.1.0",
     "@commitlint/prompt-cli": "6.1.0",
-    "@commitlint/travis-cli": "6.0.5",
+    "@commitlint/travis-cli": "6.1.0",
     "ava": "0.25.0",
     "eslint": "4.17.0",
     "eslint-config-google": "0.9.1",
