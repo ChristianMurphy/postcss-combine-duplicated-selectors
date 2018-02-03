@@ -1,6 +1,6 @@
 # Requirements
 
-In order to use this you will need to have [postcss](https://github.com/postcss/postcss) installed. Depending on whether or not you want to use the CLI you also need the [postcss-cli](https://github.com/postcss/postcss-cli) installed.
+In order to use this you will need to have [postcss](https://github.com/postcss/postcss) installed. Depending on whether or not you want to use the CLI you need to install [postcss-cli](https://github.com/postcss/postcss-cli).
 
 
 # Postcss combine duplicated selectors
