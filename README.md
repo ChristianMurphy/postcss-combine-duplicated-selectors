@@ -1,7 +1,3 @@
-# Requirements
-
-In order to use this you will need to have [postcss](https://github.com/postcss/postcss) installed. Depending on whether or not you want to use the CLI you need to install [postcss-cli](https://github.com/postcss/postcss-cli).
-
 
 # Postcss combine duplicated selectors
 
@@ -23,6 +19,10 @@ Automatically detects and combines duplicated css selectors so you don't have to
 
 ## Usage
 
+### Requirements
+
+In order to use this you will need to have [postcss](https://github.com/postcss/postcss) installed. Depending on whether or not you want to use the CLI you need to install [postcss-cli](https://github.com/postcss/postcss-cli).
+
 ### Using PostCSS JS API
 
 ``` js
@@ -41,8 +41,9 @@ postcss([require('postcss-combine-duplicated-selectors')])
 ```
 
 ### Using PostCSS CLI
+
 ``` sh
-postcss style.css --use postcss-combine-duplicated-selectors -o newcss.css)
+postcss style.css --use postcss-combine-duplicated-selectors --output newcss.css
 ```
 
 ## Example
