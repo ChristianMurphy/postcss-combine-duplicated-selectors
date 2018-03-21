@@ -45,7 +45,7 @@
     "eslint-plugin-ava": "4.5.1",
     "eslint-plugin-markdown": "1.0.0-beta.7",
     "husky": "0.14.3",
-    "postcss-less": "1.1.4",
+    "postcss-less": "1.1.5",
     "postcss-nested": "3.0.0",
     "postcss-scss": "1.0.4",
     "remark-cli": "5.0.0",
