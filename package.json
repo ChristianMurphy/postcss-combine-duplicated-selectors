@@ -1,6 +1,6 @@
 {
   "name": "postcss-combine-duplicated-selectors",
-  "version": "4.0.5",
+  "version": "5.0.0",
   "description": "automatically keep css selectors unique",
   "main": "src/index.js",
   "files": [
