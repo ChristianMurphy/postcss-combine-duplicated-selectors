@@ -26,6 +26,7 @@
     "type": "git",
     "url": "git+https://github.com/ChristianMurphy/postcss-combine-duplicated-selectors.git"
   },
+  "homepage": "https://github.com/ChristianMurphy/postcss-combine-duplicated-selectors",
   "bugs": {
     "url": "https://github.com/ChristianMurphy/postcss-combine-duplicated-selectors/issues"
   },
