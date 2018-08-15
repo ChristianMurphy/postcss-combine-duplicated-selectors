@@ -265,8 +265,8 @@ body {
   font-weight: 400;
 }
 
- .home-ac {
-  height:100%;
+.home-ac {
+  height: 100%;
 }
 
 .home-ac {
@@ -278,11 +278,11 @@ body {
 }
 
 .white-80 {
-  color:rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .home-ac {
-  width:100%;
+  width: 100%;
 }
 `,
   minify`
@@ -312,9 +312,9 @@ body {
 }
 
 .home-ac {
-  height:100%;
+  height: 100%;
   position: fixed;
-  width:100%;
+  width: 100%;
 }
 
 .bg-black-80 {
@@ -322,7 +322,7 @@ body {
 }
 
 .white-80 {
-  color:rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 `
 );
