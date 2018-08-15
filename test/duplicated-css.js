@@ -8,35 +8,24 @@ const plugin = require('../src');
  * These tests check only standard css syntax.
  */
 
+/**
+ * Take string literals are remove newlines and extra spacing so results print
+ * as expected in logs
+ * @return {string} string without newlines and tabs
+ */
+function minify([string]) {
+  return string.replace(/\s+/gm, ' ');
+}
+
 const css = testFactory('css', [plugin]);
 
-test(
-  'class',
-  css,
-  '.module {} .module {}',
-  '.module {}'
-);
+test('class', css, '.module {} .module {}', '.module {}');
 
-test(
-  'id',
-  css,
-  '#one {} #one {}',
-  '#one {}'
-);
+test('id', css, '#one {} #one {}', '#one {}');
 
-test(
-  'tag',
-  css,
-  'a {} a {}',
-  'a {}'
-);
+test('tag', css, 'a {} a {}', 'a {}');
 
-test(
-  'universal',
-  css,
-  '* {} * {}',
-  '* {}'
-);
+test('universal', css, '* {} * {}', '* {}');
 
 test(
   'classes with " " combinator',
@@ -94,61 +83,21 @@ test(
   '#one~#two {}'
 );
 
-test(
-  'tags with " " combinator',
-  css,
-  'a b {} a  b {}',
-  'a b {}'
-);
+test('tags with " " combinator', css, 'a b {} a  b {}', 'a b {}');
 
-test(
-  'tags with ">" combinator',
-  css,
-  'a>b {} a > b {}',
-  'a>b {}'
-);
+test('tags with ">" combinator', css, 'a>b {} a > b {}', 'a>b {}');
 
-test(
-  'tags with "+" combinator',
-  css,
-  'a+b {} a + b {}',
-  'a+b {}'
-);
+test('tags with "+" combinator', css, 'a+b {} a + b {}', 'a+b {}');
 
-test(
-  'tags with "~" combinator',
-  css,
-  'a~b {} a ~ b {}',
-  'a~b {}'
-);
+test('tags with "~" combinator', css, 'a~b {} a ~ b {}', 'a~b {}');
 
-test(
-  'universals with " " combinator',
-  css,
-  '* * {} *  * {}',
-  '* * {}'
-);
+test('universals with " " combinator', css, '* * {} *  * {}', '* * {}');
 
-test(
-  'universals with ">" combinator',
-  css,
-  '*>* {} * > * {}',
-  '*>* {}'
-);
+test('universals with ">" combinator', css, '*>* {} * > * {}', '*>* {}');
 
-test(
-  'universals with "+" combinator',
-  css,
-  '*+* {} * + * {}',
-  '*+* {}'
-);
+test('universals with "+" combinator', css, '*+* {} * + * {}', '*+* {}');
 
-test(
-  'universals with "~" combinator',
-  css,
-  '*~* {} * ~ * {}',
-  '*~* {}'
-);
+test('universals with "~" combinator', css, '*~* {} * ~ * {}', '*~* {}');
 
 test(
   'class with declarations',
@@ -213,12 +162,7 @@ test(
   '.a {color: black; height: 10px;background-color: red; width: 20px}'
 );
 
-test(
-  'attribute selectors',
-  css,
-  '.a[href] {} .a[href] {}',
-  '.a[href] {}'
-);
+test('attribute selectors', css, '.a[href] {} .a[href] {}', '.a[href] {}');
 
 test(
   'attribute property selectors with different spacing',
@@ -248,12 +192,7 @@ test(
   '.a[href] {}'
 );
 
-test(
-  'pseudo classes',
-  css,
-  'a:link {} a:link {}',
-  'a:link {}'
-);
+test('pseudo classes', css, 'a:link {} a:link {}', 'a:link {}');
 
 test(
   'pseudo elements',
@@ -295,4 +234,95 @@ test(
   css,
   '@media print { a{ color: blue; } } @MEDIA print { a{ background: green; } }',
   '@media print { a{ color: blue; background: green; } } @MEDIA print { }'
+);
+
+test(
+  'example from issue #219',
+  css,
+  minify`
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font: 24px/1 Arial, Helvetica, sans-serif;
+}
+
+.bg-gold {
+  background-color: #ffd700;
+}
+
+.i {
+  font-style: italic;
+}
+
+.fw4 {
+  font-weight: 400;
+}
+
+.home-ac {
+  height: 100%;
+}
+
+.home-ac {
+  position: fixed;
+}
+
+.bg-black-80 {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.white-80 {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.home-ac {
+  width: 100%;
+}
+`,
+  minify`
+* {
+box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font: 24px/1 Arial, Helvetica, sans-serif;
+}
+
+.bg-gold {
+  background-color: #ffd700;
+}
+
+.i {
+  font-style: italic;
+}
+
+.fw4 {
+  font-weight: 400;
+}
+
+.home-ac {
+  height: 100%;
+  position: fixed;
+  width: 100%;
+}
+
+.bg-black-80 {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.white-80 {
+  color: rgba(255, 255, 255, 0.8);
+}
+`
 );
