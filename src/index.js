@@ -51,10 +51,10 @@ function removeDupProperties(selector) {
 }
 
 const uniformStyle = parser(
-  (selector) => {
-    normalizeAttributes(selector);
-    sortGroups(selector);
-  }
+    (selector) => {
+      normalizeAttributes(selector);
+      sortGroups(selector);
+    }
 );
 
 const defaultOptions = {
@@ -89,9 +89,9 @@ module.exports = postcss.plugin(name, (options) => {
       }
 
       const selector = uniformStyle.processSync(
-        rule.selector, {
-          lossless: false,
-        }
+          rule.selector, {
+            lossless: false,
+          }
       );
 
       if (map.has(selector)) {

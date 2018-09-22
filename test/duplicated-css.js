@@ -28,59 +28,59 @@ test('tag', css, 'a {} a {}', 'a {}');
 test('universal', css, '* {} * {}', '* {}');
 
 test(
-  'classes with " " combinator',
-  css,
-  '.one .two {} .one .two {}',
-  '.one .two {}'
+    'classes with " " combinator',
+    css,
+    '.one .two {} .one .two {}',
+    '.one .two {}'
 );
 
 test(
-  'classes with ">" combinator',
-  css,
-  '.one>.two {} .one > .two {}',
-  '.one>.two {}'
+    'classes with ">" combinator',
+    css,
+    '.one>.two {} .one > .two {}',
+    '.one>.two {}'
 );
 
 test(
-  'classes with "+" combinator',
-  css,
-  '.one+.two {} .one + .two {}',
-  '.one+.two {}'
+    'classes with "+" combinator',
+    css,
+    '.one+.two {} .one + .two {}',
+    '.one+.two {}'
 );
 
 test(
-  'classes with "~" combinator',
-  css,
-  '.one~.two {} .one ~ .two {}',
-  '.one~.two {}'
+    'classes with "~" combinator',
+    css,
+    '.one~.two {} .one ~ .two {}',
+    '.one~.two {}'
 );
 
 test(
-  'ids with " " combinator',
-  css,
-  '#one #two {} #one #two {}',
-  '#one #two {}'
+    'ids with " " combinator',
+    css,
+    '#one #two {} #one #two {}',
+    '#one #two {}'
 );
 
 test(
-  'ids with ">" combinator',
-  css,
-  '#one>#two {} #one > #two {}',
-  '#one>#two {}'
+    'ids with ">" combinator',
+    css,
+    '#one>#two {} #one > #two {}',
+    '#one>#two {}'
 );
 
 test(
-  'ids with "+" combinator',
-  css,
-  '#one+#two {} #one + #two {}',
-  '#one+#two {}'
+    'ids with "+" combinator',
+    css,
+    '#one+#two {} #one + #two {}',
+    '#one+#two {}'
 );
 
 test(
-  'ids with "~" combinator',
-  css,
-  '#one~#two {} #one ~ #two {}',
-  '#one~#two {}'
+    'ids with "~" combinator',
+    css,
+    '#one~#two {} #one ~ #two {}',
+    '#one~#two {}'
 );
 
 test('tags with " " combinator', css, 'a b {} a  b {}', 'a b {}');
@@ -100,146 +100,184 @@ test('universals with "+" combinator', css, '*+* {} * + * {}', '*+* {}');
 test('universals with "~" combinator', css, '*~* {} * ~ * {}', '*~* {}');
 
 test(
-  'class with declarations',
-  css,
-  '.module {color: green} .module {background: red}',
-  '.module {color: green;background: red}'
+    'class with declarations',
+    css,
+    '.module {color: green} .module {background: red}',
+    '.module {color: green;background: red}'
 );
 
 test(
-  'id with declarations',
-  css,
-  '#one {color: green} #one {background: red}',
-  '#one {color: green;background: red}'
+    'id with declarations',
+    css,
+    '#one {color: green} #one {background: red}',
+    '#one {color: green;background: red}'
 );
 
 test(
-  'tag with declarations',
-  css,
-  'a {color: green} a {background: red}',
-  'a {color: green;background: red}'
+    'tag with declarations',
+    css,
+    'a {color: green} a {background: red}',
+    'a {color: green;background: red}'
 );
 
 test(
-  'universal with declarations',
-  css,
-  '* {color: green} * {background: red}',
-  '* {color: green;background: red}'
+    'universal with declarations',
+    css,
+    '* {color: green} * {background: red}',
+    '* {color: green;background: red}'
 );
 
 test(
-  'classes with different spacing and declarations',
-  css,
-  '.one .two {color: green} .one  .two {background: red}',
-  '.one .two {color: green;background: red}'
+    'classes with different spacing and declarations',
+    css,
+    '.one .two {color: green} .one  .two {background: red}',
+    '.one .two {color: green;background: red}'
 );
 
 test(
-  'ids with different spacing and declarations',
-  css,
-  '#one #two {color: green} #one  #two {background: red}',
-  '#one #two {color: green;background: red}'
+    'ids with different spacing and declarations',
+    css,
+    '#one #two {color: green} #one  #two {background: red}',
+    '#one #two {color: green;background: red}'
 );
 
 test(
-  'tags with different spacing and declarations',
-  css,
-  'a b {color: green} a  b {background: red}',
-  'a b {color: green;background: red}'
+    'tags with different spacing and declarations',
+    css,
+    'a b {color: green} a  b {background: red}',
+    'a b {color: green;background: red}'
 );
 
 test(
-  'universals with different spacing and declarations',
-  css,
-  '* * {color: green} *  * {background: red}',
-  '* * {color: green;background: red}'
+    'universals with different spacing and declarations',
+    css,
+    '* * {color: green} *  * {background: red}',
+    '* * {color: green;background: red}'
 );
 
 test(
-  'selectors with multiple properties',
-  css,
-  '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
-  '.a {color: black; height: 10px;background-color: red; width: 20px}'
+    'selectors with multiple properties',
+    css,
+    '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
+    '.a {color: black; height: 10px;background-color: red; width: 20px}'
 );
 
 test('attribute selectors', css, '.a[href] {} .a[href] {}', '.a[href] {}');
 
 test(
-  'attribute property selectors with different spacing',
-  css,
-  '.a[href="a"] {} .a[href = "a"] {}',
-  '.a[href="a"] {}'
+    'attribute property selectors with different spacing',
+    css,
+    '.a[href="a"] {} .a[href = "a"] {}',
+    '.a[href="a"] {}'
 );
 
 test(
-  'attribute property selectors with different quoting',
-  css,
-  '.a[href="a"] {} .a[href=a] {}',
-  '.a[href="a"] {}'
+    'attribute property selectors with different quoting',
+    css,
+    '.a[href="a"] {} .a[href=a] {}',
+    '.a[href="a"] {}'
 );
 
 test(
-  'attribute property selectors with different quote marks',
-  css,
-  '.a[href="a"] {} .a[href=\'a\'] {}',
-  '.a[href="a"] {}'
+    'attribute property selectors with different quote marks',
+    css,
+    '.a[href="a"] {} .a[href=\'a\'] {}',
+    '.a[href="a"] {}'
 );
 
 test(
-  'attribute selectors with different spacing',
-  css,
-  '.a[href] {} .a[ href ] {}',
-  '.a[href] {}'
+    'attribute selectors with different spacing',
+    css,
+    '.a[href] {} .a[ href ] {}',
+    '.a[href] {}'
 );
 
 test('pseudo classes', css, 'a:link {} a:link {}', 'a:link {}');
 
 test(
-  'pseudo elements',
-  css,
-  'p::first-line {} p::first-line {}',
-  'p::first-line {}'
+    'pseudo elements',
+    css,
+    'p::first-line {} p::first-line {}',
+    'p::first-line {}'
 );
 
 test(
-  'selectors with different order',
-  css,
-  '.one.two {} .two.one {}',
-  '.one.two {}'
+    'selectors with different order',
+    css,
+    '.one.two {} .two.one {}',
+    '.one.two {}'
 );
 
 test(
-  'selectors and seperately selectors within media query',
-  css,
-  '.one{} .one{} @media print { .one{} .one{} }',
-  '.one{} @media print { .one{} }'
+    'selectors and seperately selectors within media query',
+    css,
+    '.one{} .one{} @media print { .one{} .one{} }',
+    '.one{} @media print { .one{} }'
 );
 
 test(
-  'multiple print media queries',
-  css,
-  '@media print { a{ color: blue; } } @media print { a{ background: green; } }',
-  '@media print { a{ color: blue; background: green; } } @media print { }'
+    'multiple print media queries',
+    css,
+    minify`
+@media print {
+  a {
+    color: blue;
+  }
+}
+@media print {
+  a {
+    background: green;
+  }
+}
+`,
+    minify`
+@media print {
+  a {
+    color: blue;
+    background: green;
+  }
+}
+@media print { }
+`
 );
 
 test(
-  'keyframe selectors with same percentage',
-  css,
-  '@keyframes a {0% { color: blue; } 0% { background: green; }}',
-  '@keyframes a {0% { color: blue; background: green; }}'
+    'keyframe selectors with same percentage',
+    css,
+    '@keyframes a {0% { color: blue; } 0% { background: green; }}',
+    '@keyframes a {0% { color: blue; background: green; }}'
 );
 
 test(
-  'multiple print media queries',
-  css,
-  '@media print { a{ color: blue; } } @MEDIA print { a{ background: green; } }',
-  '@media print { a{ color: blue; background: green; } } @MEDIA print { }'
+    'multiple print media queries',
+    css,
+    minify`
+@media print {
+  a {
+    color: blue;
+  }
+}
+@MEDIA print {
+  a {
+    background: green;
+  }
+}
+`,
+    minify`
+@media print {
+  a {
+    color: blue;
+    background: green;
+  }
+}
+@MEDIA print { }
+`
 );
 
 test(
-  'example from issue #219',
-  css,
-  minify`
+    'example from issue #219',
+    css,
+    minify`
 * {
   box-sizing: border-box;
 }
@@ -285,7 +323,7 @@ body {
   width: 100%;
 }
 `,
-  minify`
+    minify`
 * {
 box-sizing: border-box;
 }
