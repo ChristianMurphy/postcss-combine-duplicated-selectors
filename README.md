@@ -1,7 +1,7 @@
-
 # Postcss combine duplicated selectors
 
 <!-- current project status -->
+
 [![npm](https://img.shields.io/npm/v/postcss-combine-duplicated-selectors.svg)](https://www.npmjs.com/package/postcss-combine-duplicated-selectors)
 [![Linux Build Status](https://travis-ci.org/ChristianMurphy/postcss-combine-duplicated-selectors.svg?branch=master)](https://travis-ci.org/ChristianMurphy/postcss-combine-duplicated-selectors)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/2dq6frg0c72il8v5/branch/master?svg=true)](https://ci.appveyor.com/project/ChristianMurphy/postcss-combine-duplicated-selectors/branch/master)
@@ -9,6 +9,7 @@
 [![devDependency Status](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors/dev-status.svg)](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors?type=dev)
 
 <!-- standards and technologies used in project -->
+
 [![Built with PostCSS](https://img.shields.io/badge/built_with-postcss-blue.svg)](http://postcss.org/)
 [![Semver](http://img.shields.io/SemVer/2.0.0.png)](http://semver.org/spec/v2.0.0.html)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
@@ -25,7 +26,7 @@ In order to use this you will need to have [postcss](https://github.com/postcss/
 
 ### Using PostCSS JS API
 
-``` js
+```js
 'use strict';
 
 const fs = require('fs');
@@ -33,16 +34,16 @@ const postcss = require('postcss');
 const css = fs.readFileSync('src/app.css');
 
 postcss([require('postcss-combine-duplicated-selectors')])
-  .process(css, {from: 'src/app.css', to: 'app.css'})
-  .then((result) => {
-    fs.writeFileSync('app.css', result.css);
-    if (result.map) fs.writeFileSync('app.css.map', result.map);
-  });
+    .process(css, {from: 'src/app.css', to: 'app.css'})
+    .then((result) => {
+      fs.writeFileSync('app.css', result.css);
+      if (result.map) fs.writeFileSync('app.css.map', result.map);
+    });
 ```
 
 ### Using PostCSS CLI
 
-``` sh
+```sh
 postcss style.css --use postcss-combine-duplicated-selectors --output newcss.css
 ```
 
@@ -50,31 +51,31 @@ postcss style.css --use postcss-combine-duplicated-selectors --output newcss.css
 
 Input
 
-``` css
+```css
 .module {
-  color: green
+  color: green;
 }
 .another-module {
-  color: blue
+  color: blue;
 }
 .module {
-  background: red
+  background: red;
 }
 .another-module {
-  background: yellow
+  background: yellow;
 }
 ```
 
 Output
 
-``` css
+```css
 .module {
   color: green;
-  background: red
+  background: red;
 }
 .another-module {
   color: blue;
-  background: yellow
+  background: yellow;
 }
 ```
 
@@ -84,7 +85,7 @@ Duplicated properties can optionally be combined.
 
 Set the `removeDuplicatedProperties` option to `true` to enable.
 
-``` js
+```js
 const postcss = require('postcss');
 const combineSelectors = require('postcss-combine-duplicated-selectors');
 
@@ -93,7 +94,7 @@ postcss([combineSelectors({removeDuplicatedProperties: true})]);
 
 When enabled the following css
 
-``` css
+```css
 .a {
   height: 10px;
   background: orange;
@@ -112,4 +113,4 @@ will combine into
 
 ### Media Queries
 
-If you have code with media queries, pass code through [*mq-packer*](https://github.com/hail2u/node-css-mqpacker) before *postcss-combine-duplicated-selectors* to ensure optimal results.
+If you have code with media queries, pass code through [_mq-packer_](https://github.com/hail2u/node-css-mqpacker) before _postcss-combine-duplicated-selectors_ to ensure optimal results.

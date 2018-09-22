@@ -15,43 +15,43 @@ const nestedCSS = testFactory('nested css', [postcssNested, plugin]);
 const scss = testFactory('scss', [postcssNested, plugin], postcssScss);
 
 test(
-  'nested class selectors',
-  [nestedCSS, scss],
-  '.one.two {color: green} .one {&.two {background: red}}',
-  '.one.two {color: green;background: red}'
+    'nested class selectors',
+    [nestedCSS, scss],
+    '.one.two {color: green} .one {&.two {background: red}}',
+    '.one.two {color: green;background: red}'
 );
 
 test(
-  'nested class selectors with  " " combinator',
-  [nestedCSS, scss],
-  '.one .two {color: green} .one {.two {background: red}}',
-  '.one .two {color: green;background: red}'
+    'nested class selectors with  " " combinator',
+    [nestedCSS, scss],
+    '.one .two {color: green} .one {.two {background: red}}',
+    '.one .two {color: green;background: red}'
 );
 
 test(
-  'reordered nested selectors',
-  [nestedCSS, scss],
-  '.one.two {} .two { .one& {} }',
-  '.one.two {}'
+    'reordered nested selectors',
+    [nestedCSS, scss],
+    '.one.two {} .two { .one& {} }',
+    '.one.two {}'
 );
 
 test(
-  'multi-level nested selectors',
-  [nestedCSS, scss],
-  '.one .two .three {} .one { .two { .three {} } }',
-  '.one .two .three {}'
+    'multi-level nested selectors',
+    [nestedCSS, scss],
+    '.one .two .three {} .one { .two { .three {} } }',
+    '.one .two .three {}'
 );
 
 test(
-  'nested selectors with different order',
-  [nestedCSS, scss],
-  '.one {&.two {}} .two{&.one {}}',
-  '.one.two {}'
+    'nested selectors with different order',
+    [nestedCSS, scss],
+    '.one {&.two {}} .two{&.one {}}',
+    '.one.two {}'
 );
 
 test(
-  'nested and un-nested selectors with different order',
-  [nestedCSS, scss],
-  '.one.two {} .two{&.one {}}',
-  '.one.two {}'
+    'nested and un-nested selectors with different order',
+    [nestedCSS, scss],
+    '.one.two {} .two{&.one {}}',
+    '.one.two {}'
 );
