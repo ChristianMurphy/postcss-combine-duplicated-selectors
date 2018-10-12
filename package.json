@@ -9,7 +9,6 @@
   "scripts": {
     "commit": "commit",
     "test": "ava && eslint --ext md,js . && remark *.md -q --no-stdout",
-    "precommit": "npm test",
     "commitlint": "commitlint --from HEAD~1",
     "commitlint-travis": "commitlint-travis"
   },
@@ -45,7 +44,7 @@
     "eslint-config-google": "0.10.0",
     "eslint-plugin-ava": "5.1.1",
     "eslint-plugin-markdown": "1.0.0-beta.8",
-    "husky": "0.14.3",
+    "husky": "1.1.2",
     "postcss-less": "3.0.2",
     "postcss-nested": "4.1.0",
     "postcss-scss": "2.0.0",
@@ -104,5 +103,10 @@
     },
     "semanticPrefix": "chore:",
     "semanticCommitScope": ""
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
   }
 }
