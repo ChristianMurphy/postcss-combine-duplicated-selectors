@@ -9,7 +9,6 @@
   "scripts": {
     "commit": "commit",
     "test": "ava && eslint --ext md,js . && remark *.md -q --no-stdout",
-    "precommit": "npm test",
     "commitlint": "commitlint --from HEAD~1",
     "commitlint-travis": "commitlint-travis"
   },
@@ -104,5 +103,10 @@
     },
     "semanticPrefix": "chore:",
     "semanticCommitScope": ""
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
   }
 }
