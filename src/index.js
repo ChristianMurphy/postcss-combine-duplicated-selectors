@@ -2,7 +2,6 @@ const postcss = require('postcss');
 const parser = require('postcss-selector-parser');
 const {name} = require('../package.json');
 
-
 /**
  * Ensure that attributes with different quotes match.
  * @param {Object} selector - postcss selector node
@@ -32,6 +31,8 @@ function sortGroups(selector) {
       return a.value < b.value ? -1 : 1;
     });
   });
+
+  selector.sort((a, b) => (a.nodes.join('') < b.nodes.join('') ? -1 : 1));
 }
 
 /**
@@ -50,12 +51,10 @@ function removeDupProperties(selector) {
   }
 }
 
-const uniformStyle = parser(
-    (selector) => {
-      normalizeAttributes(selector);
-      sortGroups(selector);
-    }
-);
+const uniformStyle = parser((selector) => {
+  normalizeAttributes(selector);
+  sortGroups(selector);
+});
 
 const defaultOptions = {
   removeDuplicatedProperties: false,
@@ -74,25 +73,24 @@ module.exports = postcss.plugin(name, (options) => {
       // Check selector parent for any at rule
       if (rule.parent.type === 'atrule') {
         // Use name and query params as the key
-        const query = rule.parent.name.toLowerCase()
-          + rule.parent.params.replace(/\s+/g, '');
+        const query =
+          rule.parent.name.toLowerCase() +
+          rule.parent.params.replace(/\s+/g, '');
 
         // See if this query key is already in the map table
-        map = mapTable.has(query) ?
-          // If it is use it
-          mapTable.get(query) :
-          // if not set it and get it
-          mapTable.set(query, new Map()).get(query);
+        map = mapTable.has(query)
+          ? // If it is use it
+            mapTable.get(query)
+          : // if not set it and get it
+            mapTable.set(query, new Map()).get(query);
       } else {
         // Otherwise we are dealing with a selector in the root
         map = mapTable.get('root');
       }
 
-      const selector = uniformStyle.processSync(
-          rule.selector, {
-            lossless: false,
-          }
-      );
+      const selector = uniformStyle.processSync(rule.selector, {
+        lossless: false,
+      });
 
       if (map.has(selector)) {
         // store original rule as destination

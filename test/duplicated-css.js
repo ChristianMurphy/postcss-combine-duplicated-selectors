@@ -209,6 +209,20 @@ test(
 );
 
 test(
+    'selector groups',
+    css,
+    '.one .two, .one .three {} .one .two, .one .three {}',
+    '.one .two, .one .three {}'
+);
+
+test(
+    'selector groups with different order',
+    css,
+    '.one .two, .one .three {} .one .three, .one .two {}',
+    '.one .two, .one .three {}'
+);
+
+test(
     'selectors and seperately selectors within media query',
     css,
     '.one{} .one{} @media print { .one{} .one{} }',
