@@ -55,3 +55,10 @@ test(
     '.one.two {} .two{&.one {}}',
     '.one.two {}'
 );
+
+test(
+    'nested selector grouping',
+    [nestedCSS, scss],
+    '.one {&.two, .two& {}} .one {.two&, &.two {}}',
+    '.one.two, .two.one {}'
+);

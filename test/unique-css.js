@@ -163,3 +163,10 @@ test(
     '@keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}',
     '@keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}'
 );
+
+test(
+    'selector groups partially overlapping',
+    css,
+    '.one, .two {} .one, .two, .three {}',
+    '.one, .two {} .one, .two, .three {}'
+);
