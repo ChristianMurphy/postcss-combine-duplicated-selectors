@@ -35,10 +35,10 @@
     "postcss-selector-parser": "^5.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "7.5.0",
+    "@commitlint/cli": "7.5.1",
     "@commitlint/config-conventional": "7.5.0",
     "@commitlint/prompt-cli": "7.5.0",
-    "@commitlint/travis-cli": "7.5.0",
+    "@commitlint/travis-cli": "7.5.1",
     "ava": "0.25.0",
     "eslint": "5.13.0",
     "eslint-config-google": "0.12.0",
