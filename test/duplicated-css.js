@@ -263,7 +263,7 @@ test(
 );
 
 test(
-    'multiple print media queries',
+    'multiple print media queries with different case',
     css,
     minify`
 @media print {
