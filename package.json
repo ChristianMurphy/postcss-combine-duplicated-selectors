@@ -54,7 +54,7 @@
     "remark-validate-links": "8.0.3"
   },
   "engines": {
-    "node": "^6.0.0 || ^8.0.0 || >=10.0.0"
+    "node": "^8.0.0 || ^10.0.0 || >=12.0.0"
   },
   "eslintConfig": {
     "root": true,
