@@ -18,12 +18,12 @@ test(
     'nested selectors same with classes',
     [nestedCSS, scss],
     '.one {.two {}} .one{&.two {}}',
-    '.one .two {} .one.two {}'
+    '.one .two {} .one.two {}',
 );
 
 test(
     'selectors with different specifity',
     [nestedCSS, scss],
     '.one {.two {}} .one {.two {.three {}}}',
-    '.one .two {} .one .two .three {}'
+    '.one .two {} .one .two .three {}',
 );
