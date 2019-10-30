@@ -78,10 +78,8 @@ module.exports = postcss.plugin(name, (options) => {
           rule.parent.params.replace(/\s+/g, '');
 
         // See if this query key is already in the map table
-        map = mapTable.has(query)
-          ? // If it is use it
-            mapTable.get(query)
-          : // if not set it and get it
+        map = mapTable.has(query) ? // If it is use it
+            mapTable.get(query) : // if not set it and get it
             mapTable.set(query, new Map()).get(query);
       } else {
         // Otherwise we are dealing with a selector in the root
