@@ -113,4 +113,4 @@ will combine into
 
 ### Media Queries
 
-If you have code with media queries, pass code through [_mq-packer_](https://github.com/hail2u/node-css-mqpacker) before _postcss-combine-duplicated-selectors_ to ensure optimal results.
+If you have code with media queries, pass code through [_postcss-combine-media-query_](https://github.com/SassNinja/postcss-combine-media-query) before _postcss-combine-duplicated-selectors_ to ensure optimal results.
