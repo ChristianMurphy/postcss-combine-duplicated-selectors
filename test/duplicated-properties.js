@@ -19,14 +19,14 @@ function minify([string]) {
 // Duplicated properties should be removed
 const removeDuplicates = testFactory(
     'css',
-    [plugin({removeDuplicatedProperties: true})]
+    [plugin({removeDuplicatedProperties: true})],
 );
 
 test(
     'remove duplicated properties when combine selectors',
     removeDuplicates,
     '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
-    '.a {height: 10px;color: blue; width: 20px;}'
+    '.a {height: 10px;color: blue; width: 20px;}',
 );
 
 test(
@@ -44,20 +44,20 @@ test(
   height: 10px;
   background: rgba(255, 165, 0, 0.5);
 }
-`
+`,
 );
 
 // Duplicated properties should be maintained
 const keepDuplicates = testFactory(
     'css',
-    [plugin({removeDuplicatedProperties: false})]
+    [plugin({removeDuplicatedProperties: false})],
 );
 
 test(
     'maintain duplicated properties when combine selectors',
     keepDuplicates,
     '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
-    '.a {height: 10px; color: black;color: blue; width: 20px;}'
+    '.a {height: 10px; color: black;color: blue; width: 20px;}',
 );
 
 test(
@@ -76,5 +76,5 @@ test(
   background: orange;
   background: rgba(255, 165, 0, 0.5);
 }
-`
+`,
 );
