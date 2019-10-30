@@ -9,8 +9,7 @@
   "scripts": {
     "commit": "commit",
     "test": "ava && eslint --ext md,js . && remark *.md -q --no-stdout",
-    "commitlint": "commitlint --from HEAD~1",
-    "commitlint-travis": "commitlint-travis"
+    "commitlint": "commitlint --from HEAD~1"
   },
   "keywords": [
     "postcss-plugin",
@@ -18,7 +17,7 @@
   ],
   "author": {
     "name": "Christian Murphy",
-    "email": "Christian.Murphy.42@gmail.com",
+    "email": "christian.murphy.42@gmail.com",
     "url": "https://github.com/ChristianMurphy"
   },
   "repository": {
@@ -38,7 +37,6 @@
     "@commitlint/cli": "8.2.0",
     "@commitlint/config-conventional": "8.2.0",
     "@commitlint/prompt-cli": "8.2.0",
-    "@commitlint/travis-cli": "8.2.0",
     "ava": "2.4.0",
     "eslint": "6.6.0",
     "eslint-config-google": "0.14.0",
@@ -106,7 +104,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test"
+      "pre-commit": "npm test",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   }
 }
