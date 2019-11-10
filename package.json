@@ -44,7 +44,7 @@
     "eslint-plugin-markdown": "1.0.1",
     "husky": "3.0.9",
     "postcss-less": "3.1.4",
-    "postcss-nested": "4.1.2",
+    "postcss-nested": "4.2.1",
     "postcss-scss": "2.0.0",
     "remark-cli": "7.0.1",
     "remark-preset-lint-consistent": "2.0.3",
