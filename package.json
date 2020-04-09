@@ -42,7 +42,7 @@
     "eslint-config-google": "0.14.0",
     "eslint-plugin-ava": "10.2.0",
     "eslint-plugin-markdown": "1.0.2",
-    "husky": "4.2.4",
+    "husky": "4.2.5",
     "postcss-less": "3.1.4",
     "postcss-nested": "4.2.1",
     "postcss-scss": "2.0.0",
