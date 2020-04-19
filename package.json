@@ -37,7 +37,7 @@
     "@commitlint/cli": "8.3.5",
     "@commitlint/config-conventional": "8.3.4",
     "@commitlint/prompt-cli": "8.3.5",
-    "ava": "3.7.0",
+    "ava": "3.7.1",
     "eslint": "6.8.0",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-ava": "10.2.0",
