@@ -11,10 +11,9 @@ jobs:
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-latest]
         node-version:
-          - 8
           - 10
           - 12
-          - 13
+          - 14
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
