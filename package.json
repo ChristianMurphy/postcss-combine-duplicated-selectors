@@ -52,7 +52,7 @@
     "remark-validate-links": "10.0.2"
   },
   "engines": {
-    "node": "^8.0.0 || ^10.0.0 || >=12.0.0"
+    "node": "^10.0.0 || ^12.0.0 || >=14.0.0"
   },
   "eslintConfig": {
     "root": true,
