@@ -38,14 +38,21 @@ function sortGroups(selector) {
 /**
  * Remove duplicated properties
  * @param {Object} selector - postcss selector node
+ * @param {Boolean} exact
  */
-function removeDupProperties(selector) {
+function removeDupProperties(selector, exact) {
   // Remove duplicated properties from bottom to top ()
   for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
     for (let befIndex = actIndex - 1; befIndex >= 0; befIndex--) {
       if (selector.nodes[actIndex].prop === selector.nodes[befIndex].prop) {
-        selector.nodes[befIndex].remove();
-        actIndex--;
+        if (
+          !exact ||
+          (exact &&
+            selector.nodes[actIndex].value === selector.nodes[befIndex].value)
+        ) {
+          selector.nodes[befIndex].remove();
+          actIndex--;
+        }
       }
     }
   }
@@ -79,8 +86,8 @@ module.exports = postcss.plugin(name, (options) => {
 
         // See if this query key is already in the map table
         map = mapTable.has(query) ? // If it is use it
-            mapTable.get(query) : // if not set it and get it
-            mapTable.set(query, new Map()).get(query);
+          mapTable.get(query) : // if not set it and get it
+          mapTable.set(query, new Map()).get(query);
       } else {
         // Otherwise we are dealing with a selector in the root
         map = mapTable.get('root');
@@ -100,12 +107,20 @@ module.exports = postcss.plugin(name, (options) => {
         // remove duplicated rule
         rule.remove();
 
-        if (options.removeDuplicatedProperties) {
-          removeDupProperties(destination);
+        if (options.removeDuplicatedProperties ||
+          options.removeDuplicatedValues) {
+          removeDupProperties(
+              destination,
+              options.removeDuplicatedValues,
+          );
         }
       } else {
-        if (options.removeDuplicatedProperties) {
-          removeDupProperties(rule);
+        if (options.removeDuplicatedProperties ||
+          options.removeDuplicatedValues) {
+          removeDupProperties(
+              rule,
+              options.removeDuplicatedValues,
+          );
         }
         // add new selector to symbol table
         map.set(selector, rule);

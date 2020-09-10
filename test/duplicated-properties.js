@@ -8,7 +8,7 @@ const plugin = require('../src');
  */
 
 /**
- * Take string literals are remove newlines and extra spacing so results print
+ * Take string literals and remove newlines and extra spacing so results print
  * as expected in logs
  * @return {string} string without newlines and tabs
  */
@@ -23,7 +23,7 @@ const removeDuplicates = testFactory(
 );
 
 test(
-    'remove duplicated properties when combine selectors',
+    'remove duplicated properties when combining selectors',
     removeDuplicates,
     '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
     '.a {height: 10px;color: blue; width: 20px;}',
@@ -54,7 +54,7 @@ const keepDuplicates = testFactory(
 );
 
 test(
-    'maintain duplicated properties when combine selectors',
+    'maintain duplicated properties when combining selectors',
     keepDuplicates,
     '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
     '.a {height: 10px; color: black;color: blue; width: 20px;}',
@@ -75,6 +75,59 @@ test(
   height: 10px;
   background: orange;
   background: rgba(255, 165, 0, 0.5);
+}
+`,
+);
+
+// Only duplicated properties with matching values should be removed
+const removeExactDuplicates = testFactory(
+    'css',
+    [plugin({removeDuplicatedValues: true})],
+);
+
+test(
+    'remove duplicated properties with matching values with combined selectors',
+    removeExactDuplicates,
+    '.a {height: 10px; color: red;} .a {color: red; color: blue; width: 20px;}',
+    '.a {height: 10px;color: red; color: blue; width: 20px;}',
+);
+
+test(
+    'remove duplicated properties with matching values in a selector',
+    removeExactDuplicates,
+    minify`
+.a {
+  height: 10px;
+  background: orange;
+  background: orange;
+  background: rgba(255, 165, 0, 0.5);
+}
+`,
+    minify`
+.a {
+  height: 10px;
+  background: orange;
+  background: rgba(255, 165, 0, 0.5);
+}
+`,
+);
+
+test(
+    'remove duplicate property with matching value, allow fallback',
+    removeExactDuplicates,
+    minify`
+.a {
+  height: 10px;
+}
+.a {
+  height: 10px;
+  height: var(--linkHeight);
+}
+`,
+    minify`
+.a {
+  height: 10px;
+  height: var(--linkHeight);
 }
 `,
 );
