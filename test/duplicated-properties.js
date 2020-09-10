@@ -78,3 +78,36 @@ test(
 }
 `,
 );
+
+// Only duplicated properties with matching values should be removed
+const removeExactDuplicates = testFactory(
+    'css',
+    [plugin({removeDuplicatedValues: true})],
+);
+
+test(
+    'remove duplicated properties with matching values when combine selectors',
+    removeExactDuplicates,
+    '.a {height: 10px; color: red;} .a {color: red; color: blue; width: 20px;}',
+    '.a {height: 10px;color: red; color: blue; width: 20px;}',
+);
+
+test(
+    'remove duplicated properties with matching values in a selector',
+    removeExactDuplicates,
+    minify`
+.a {
+  height: 10px;
+  background: orange;
+  background: orange;
+  background: rgba(255, 165, 0, 0.5);
+}
+`,
+    minify`
+.a {
+  height: 10px;
+  background: orange;
+  background: rgba(255, 165, 0, 0.5);
+}
+`,
+);

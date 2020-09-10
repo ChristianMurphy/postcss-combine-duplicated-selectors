@@ -110,6 +110,40 @@ will combine into
 }
 ```
 
+In order to limit this to only combining properties when the values are equal, set the `removeDuplicatedValues` option to `true` instead. This could clean up duplicated properties, but allow for conscious duplicates such as fallbacks for custom properties.
+
+```js
+const postcss = require('postcss');
+const combineSelectors = require('postcss-combine-duplicated-selectors');
+
+postcss([combineSelectors({removeDuplicatedValues: true})]);
+```
+
+This will transform the following css
+
+```css
+.a {
+  height: 10px;
+}
+
+.a {
+  width: 20px;
+  background: var(--custom-color);
+  background: rgba(255, 165, 0, 0.5);
+}
+```
+
+into
+
+```css
+.a {
+  height: 10px;
+  width: 20px;
+  background: var(--custom-color);
+  background: rgba(255, 165, 0, 0.5);
+}
+```
+
 ### Media Queries
 
 If you have code with media queries, pass code through [_postcss-combine-media-query_](https://github.com/SassNinja/postcss-combine-media-query) or [_css-mquery-packer_](https://github.com/n19htz/css-mquery-packer) before _postcss-combine-duplicated-selectors_ to ensure optimal results.
