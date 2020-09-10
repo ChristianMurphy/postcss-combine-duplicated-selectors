@@ -109,19 +109,17 @@ module.exports = postcss.plugin(name, (options) => {
 
         if (options.removeDuplicatedProperties ||
           options.removeDuplicatedValues) {
-          const exact = options.removeDuplicatedValues;
           removeDupProperties(
               destination,
-              exact,
+              options.removeDuplicatedValues,
           );
         }
       } else {
         if (options.removeDuplicatedProperties ||
           options.removeDuplicatedValues) {
-          const exact = options.removeDuplicatedValues;
           removeDupProperties(
               rule,
-              exact,
+              options.removeDuplicatedValues,
           );
         }
         // add new selector to symbol table
