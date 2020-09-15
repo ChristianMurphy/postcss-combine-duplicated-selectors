@@ -30,7 +30,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "postcss": "^7.0.0",
+    "postcss": "^8.0.0",
     "postcss-selector-parser": "^6.0.0"
   },
   "devDependencies": {
