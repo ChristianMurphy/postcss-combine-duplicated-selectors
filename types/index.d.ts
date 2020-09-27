@@ -30,6 +30,9 @@ declare namespace postcssCombineDuplicatedSelectors {
   type Exported = Plugin & { default: Plugin };
 }
 
+/**
+ * Automatically detects and combines duplicated css selectors
+ */
 declare const postcssCombineDuplicatedSelectors: postcssCombineDuplicatedSelectors.Exported;
 
 export = postcssCombineDuplicatedSelectors;
