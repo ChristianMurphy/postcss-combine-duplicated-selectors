@@ -3,12 +3,18 @@
   "version": "9.3.0",
   "description": "automatically keep css selectors unique",
   "main": "src/index.js",
+  "types": "types/index.d.ts",
   "files": [
-    "src"
+    "src",
+    "types/index.d.ts"
   ],
   "scripts": {
     "commit": "commit",
-    "test": "ava && eslint --ext md,js . && remark *.md -q --no-stdout",
+    "test": "run-s test:*",
+    "test:unit": "ava",
+    "test:lint-js": "eslint --ext md,js .",
+    "test:lint-md": "remark *.md -q --no-stdout",
+    "test:types": "dtslint types",
     "commitlint": "commitlint --from HEAD~1"
   },
   "keywords": [
@@ -40,11 +46,13 @@
     "@commitlint/config-conventional": "11.0.0",
     "@commitlint/prompt-cli": "11.0.0",
     "ava": "3.13.0",
+    "dtslint": "4.0.4",
     "eslint": "7.10.0",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-ava": "11.0.0",
     "eslint-plugin-markdown": "1.0.2",
     "husky": "4.3.0",
+    "npm-run-all": "4.1.5",
     "postcss": "8.1.0",
     "postcss-less": "3.1.4",
     "postcss-nested": "5.0.1",
@@ -52,7 +60,8 @@
     "remark-cli": "8.0.1",
     "remark-preset-lint-consistent": "3.0.1",
     "remark-preset-lint-recommended": "4.0.1",
-    "remark-validate-links": "10.0.2"
+    "remark-validate-links": "10.0.2",
+    "typescript": "4.0.3"
   },
   "engines": {
     "node": "^10.0.0 || ^12.0.0 || >=14.0.0"
