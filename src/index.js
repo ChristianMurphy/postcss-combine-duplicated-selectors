@@ -70,7 +70,7 @@ module.exports = (options) => {
   options = Object.assign({}, defaultOptions, options);
   return {
     postcssPlugin: name,
-    Root: (css) => {
+    Once: (css) => {
       // Create a map to store maps
       const mapTable = new Map();
       // root map to store root selectors
