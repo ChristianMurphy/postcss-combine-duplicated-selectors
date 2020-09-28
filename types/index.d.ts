@@ -23,16 +23,16 @@ declare namespace postcssCombineDuplicatedSelectors {
    * Plugin provides a creator with specific options supported
    */
   type Plugin = PluginCreator<Options>;
-
-  /**
-   * Either root export or default export can be used
-   */
-  type Exported = Plugin & { default: Plugin };
 }
 
 /**
  * Automatically detects and combines duplicated css selectors
+ *
+ * @example
+ * ```typescript
+ * postcss([postcssCombineDuplicatedSelectors()]);
+ * ```
  */
-declare const postcssCombineDuplicatedSelectors: postcssCombineDuplicatedSelectors.Exported;
+declare const postcssCombineDuplicatedSelectors: postcssCombineDuplicatedSelectors.Plugin;
 
 export = postcssCombineDuplicatedSelectors;
