@@ -17,9 +17,9 @@ Automatically detects and combines duplicated css selectors so you don't have to
 In order to use this you will need to have [postcss](https://github.com/postcss/postcss) installed. Depending on whether or not you want to use the CLI you need to install [postcss-cli](https://github.com/postcss/postcss-cli).
 
 ```bash
-npm install --save-dev postcsss postcss-combine-duplicated-selectors
+npm install --save-dev postcss postcss-combine-duplicated-selectors
 # or
-yarn add --dev postcsss postcss-combine-duplicated-selectors
+yarn add --dev postcss postcss-combine-duplicated-selectors
 ```
 
 ### Using PostCSS JS API
