@@ -7,13 +7,6 @@
 [![dependency status](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors.svg)](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors)
 [![devDependency status](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors/dev-status.svg)](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors?type=dev)
 
-<!-- standards and technologies used in project -->
-
-[![Built with PostCSS](https://img.shields.io/badge/built_with-postcss-blue.svg)](http://postcss.org/)
-[![Semver](https://img.shields.io/badge/SemVer-2.0.0-green.svg)](http://semver.org/spec/v2.0.0.html)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-green.svg)](https://conventionalcommits.org)
-[![Google code style](https://img.shields.io/badge/code_style-Google-brightgreen.svg?style=flat)](https://google.github.io/styleguide/jsguide.html)
-
 Automatically detects and combines duplicated css selectors so you don't have to
 :smile:
 
@@ -24,9 +17,9 @@ Automatically detects and combines duplicated css selectors so you don't have to
 In order to use this you will need to have [postcss](https://github.com/postcss/postcss) installed. Depending on whether or not you want to use the CLI you need to install [postcss-cli](https://github.com/postcss/postcss-cli).
 
 ```bash
-npm install --save-dev postcsss postcss-combine-duplicated-selectors
+npm install --save-dev postcss postcss-combine-duplicated-selectors
 # or
-yarn add --dev postcsss postcss-combine-duplicated-selectors
+yarn add --dev postcss postcss-combine-duplicated-selectors
 ```
 
 ### Using PostCSS JS API
