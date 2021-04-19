@@ -39,7 +39,7 @@
     "postcss": "^8.1.0"
   },
   "dependencies": {
-    "postcss-selector-parser": "^6.0.0"
+    "postcss-selector-parser": "^6.0.4"
   },
   "devDependencies": {
     "@commitlint/cli": "12.1.1",
