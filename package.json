@@ -43,9 +43,9 @@
     "postcss-selector-parser": "^6.0.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "13.2.1",
-    "@commitlint/config-conventional": "13.2.0",
-    "@commitlint/prompt-cli": "13.2.1",
+    "@commitlint/cli": "14.1.0",
+    "@commitlint/config-conventional": "14.1.0",
+    "@commitlint/prompt-cli": "14.1.0",
     "ava": "3.15.0",
     "dtslint": "4.2.0",
     "eslint": "8.2.0",
