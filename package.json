@@ -57,7 +57,7 @@
     "postcss": "8.4.5",
     "postcss-less": "6.0.0",
     "postcss-nested": "5.0.6",
-    "postcss-scss": "4.0.2",
+    "postcss-scss": "4.0.3",
     "remark-cli": "10.0.1",
     "remark-preset-lint-consistent": "5.1.1",
     "remark-preset-lint-recommended": "6.1.2",
