@@ -41,24 +41,18 @@ function sortGroups(selector) {
  */
 function removeDupProperties(selector, exact) {
   if (!exact) { // Remove duplicated properties, regardless of value
-    const lastIndices = new Map(); // stores the last index at which each prop is found
-    const indicesToRemove = []; // list of indices to remove in descending order
+    const retainedProps = new Set();
 
     for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
       const prop = selector.nodes[actIndex].prop;
       if (prop !== undefined) {
-        if (!lastIndices.has(prop)) {
-          lastIndices.set(prop, actIndex); // Store the last occurrence of the prop - it will be kept
+        if (!retainedProps.has(prop)) {
+          retainedProps.add(prop); // Mark the prop as retained, all other occurrences must be removed
         } else {
-          indicesToRemove.push(actIndex); // This occurrence of the prop must be removed
+          selector.nodes[actIndex].remove(); // This occurrence of the prop must be removed
         }
       }
     }
-
-    // Indeces to be removed are already sorted from biggest to last
-    indicesToRemove.forEach(indexToRemove => {
-      selector.nodes[indexToRemove].remove();
-    });
   } else {
     // Remove duplicated properties from bottom to top ()
     for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
