@@ -40,14 +40,32 @@ function sortGroups(selector) {
  * @param {Boolean} exact
  */
 function removeDupProperties(selector, exact) {
-  // Remove duplicated properties from bottom to top ()
-  for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
-    for (let befIndex = actIndex - 1; befIndex >= 0; befIndex--) {
-      if (selector.nodes[actIndex].prop === selector.nodes[befIndex].prop) {
+  if (!exact) { // Remove duplicated properties, regardless of value
+    const lastIndices = new Map(); // stores the last index at which each prop is found
+    const indicesToRemove = []; // list of indices to remove in descending order
+
+    for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
+      const prop = selector.nodes[actIndex].prop;
+      if (prop !== undefined) {
+        if (!lastIndices.has(prop)) {
+          lastIndices.set(prop, actIndex); // Store the last occurrence of the prop - it will be kept
+        } else {
+          indicesToRemove.push(actIndex); // This occurrence of the prop must be removed
+        }
+      }
+    }
+
+    // Indeces to be removed are already sorted from biggest to last
+    indicesToRemove.forEach(indexToRemove => {
+      selector.nodes[indexToRemove].remove();
+    });
+  } else {
+    // Remove duplicated properties from bottom to top ()
+    for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
+      for (let befIndex = actIndex - 1; befIndex >= 0; befIndex--) {
         if (
-          !exact ||
-          (exact &&
-            selector.nodes[actIndex].value === selector.nodes[befIndex].value)
+          selector.nodes[actIndex].prop === selector.nodes[befIndex].prop &&
+          selector.nodes[actIndex].value === selector.nodes[befIndex].value
         ) {
           selector.nodes[befIndex].remove();
           actIndex--;
