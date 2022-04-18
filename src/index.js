@@ -47,9 +47,11 @@ function removeDupProperties(selector, exact) {
       const prop = selector.nodes[actIndex].prop;
       if (prop !== undefined) {
         if (!retainedProps.has(prop)) {
-          retainedProps.add(prop); // Mark the prop as retained, all other occurrences must be removed
+          // Mark the prop as retained, all other occurrences must be removed
+          retainedProps.add(prop);
         } else {
-          selector.nodes[actIndex].remove(); // This occurrence of the prop must be removed
+          // This occurrence of the prop must be removed
+          selector.nodes[actIndex].remove();
         }
       }
     }
