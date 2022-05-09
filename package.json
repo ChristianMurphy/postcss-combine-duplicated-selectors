@@ -52,7 +52,7 @@
     "eslint-config-google": "0.14.0",
     "eslint-plugin-ava": "13.2.0",
     "eslint-plugin-markdown": "2.2.1",
-    "husky": "8.0.0",
+    "husky": "8.0.1",
     "npm-run-all": "4.1.5",
     "postcss": "8.4.13",
     "postcss-less": "6.0.0",
