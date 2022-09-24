@@ -48,7 +48,7 @@
     "@commitlint/prompt-cli": "17.1.2",
     "ava": "3.15.0",
     "dtslint": "4.2.1",
-    "eslint": "8.23.1",
+    "eslint": "8.24.0",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-ava": "13.2.0",
     "eslint-plugin-markdown": "3.0.0",
