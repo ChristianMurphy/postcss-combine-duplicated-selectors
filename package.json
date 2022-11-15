@@ -62,7 +62,7 @@
     "remark-preset-lint-consistent": "5.1.1",
     "remark-preset-lint-recommended": "6.1.2",
     "remark-validate-links": "12.1.0",
-    "typescript": "4.8.4"
+    "typescript": "4.9.3"
   },
   "engines": {
     "node": "^14.0.0 || ^16.0.0 || >=18.0.0"
