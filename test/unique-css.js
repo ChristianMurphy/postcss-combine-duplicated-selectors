@@ -10,61 +10,21 @@ const plugin = require('../src');
 
 const css = testFactory('css', [plugin]);
 
-test(
-    'class',
-    css,
-    '.module {}',
-    '.module {}',
-);
+test('class', css, '.module {}', '.module {}');
 
-test(
-    'id',
-    css,
-    '#one {}',
-    '#one {}',
-);
+test('id', css, '#one {}', '#one {}');
 
-test(
-    'tag',
-    css,
-    'a {}',
-    'a {}',
-);
+test('tag', css, 'a {}', 'a {}');
 
-test(
-    'universal',
-    css,
-    '* {}',
-    '* {}',
-);
+test('universal', css, '* {}', '* {}');
 
-test(
-    'classes',
-    css,
-    '.one {} .two {}',
-    '.one {} .two {}',
-);
+test('classes', css, '.one {} .two {}', '.one {} .two {}');
 
-test(
-    'ids',
-    css,
-    '#one {} #two {}',
-    '#one {} #two {}',
-);
+test('ids', css, '#one {} #two {}', '#one {} #two {}');
 
-test(
-    'tags',
-    css,
-    'a {} b {}',
-    'a {} b {}',
-);
+test('tags', css, 'a {} b {}', 'a {} b {}');
 
-test(
-    'universals',
-    css,
-    '* a {} * b {}',
-    '* a {} * b {}',
-);
+test('universals', css, '* a {} * b {}', '* a {} * b {}');
 
 test(
     'combinations of classes',
@@ -101,12 +61,7 @@ test(
     '.a [href] {} .a[href] {}',
 );
 
-test(
-    'pseudo classes',
-    css,
-    'a:link {} a:visited {}',
-    'a:link {} a:visited {}',
-);
+test('pseudo classes', css, 'a:link {} a:visited {}', 'a:link {} a:visited {}');
 
 test(
     'pseudo class and non pseudo class',
@@ -169,4 +124,13 @@ test(
     css,
     '.one, .two {} .one, .two, .three {}',
     '.one, .two {} .one, .two, .three {}',
+);
+
+test(
+    'media query',
+    css,
+    // eslint-disable-next-line max-len
+    '@media (prefers-color-scheme: light) {:root {--text-color: oklch(0% 0 0);}} @media (prefers-color-scheme: dark) {:root {--text-color: oklch(100% 0 0);}}',
+    // eslint-disable-next-line max-len
+    '@media (prefers-color-scheme: light) {:root {--text-color: oklch(0% 0 0);}} @media (prefers-color-scheme: dark) {:root {--text-color: oklch(100% 0 0);}}',
 );
