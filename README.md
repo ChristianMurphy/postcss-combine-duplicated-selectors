@@ -45,6 +45,16 @@ postcss([require('postcss-combine-duplicated-selectors')])
 postcss style.css --use postcss-combine-duplicated-selectors --output newcss.css
 ```
 
+### Using Vite
+
+In a `postcss.config.js` file :
+
+```js
+module.exports = {
+  plugins: [require('postcss-combine-duplicated-selectors')],
+};
+```
+
 ## Example
 
 Input
