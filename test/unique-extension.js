@@ -1,29 +1,30 @@
-const test = require('ava');
+const {describe, it} = require('node:test');
 const testFactory = require('./_test-factory');
 const postcssNested = require('postcss-nested');
 const postcssScss = require('postcss-scss');
 const plugin = require('../src');
 
-/**
- * These tests check css selectors that the plugin CANNOT combined together.
- * Meaning that the selectors provided are unique.
- * These tests check against css super set languages:
- * less, sass, and postcss-nested.
- */
-
 const nestedCSS = testFactory('nested css', [postcssNested, plugin]);
 const scss = testFactory('scss', [postcssNested, plugin], postcssScss);
 
-test(
-    'nested selectors same with classes',
-    [nestedCSS, scss],
-    '.one {.two {}} .one{&.two {}}',
-    '.one .two {} .one.two {}',
-);
+const cases = [
+  {
+    label: 'nested selectors same with classes',
+    input: '.one {.two {}} .one{&.two {}}',
+    expected: '.one .two {} .one.two {}',
+  },
+  {
+    label: 'selectors with different specifity',
+    input: '.one {.two {}} .one {.two {.three {}}}',
+    expected: '.one .two {} .one .two .three {}',
+  },
+];
 
-test(
-    'selectors with different specifity',
-    [nestedCSS, scss],
-    '.one {.two {}} .one {.two {.three {}}}',
-    '.one .two {} .one .two .three {}',
-);
+describe('Unique Extension Tests', () => {
+  for (const {label, input, expected} of cases) {
+    it(label, () => {
+      nestedCSS({}, input, expected);
+      scss({}, input, expected);
+    });
+  }
+});

@@ -1,4 +1,4 @@
-const test = require('ava');
+const {describe, it} = require('node:test');
 const testFactory = require('./_test-factory');
 const postcssNested = require('postcss-nested');
 const postcssScss = require('postcss-scss');
@@ -14,51 +14,49 @@ const plugin = require('../src');
 const nestedCSS = testFactory('nested css', [postcssNested, plugin]);
 const scss = testFactory('scss', [postcssNested, plugin], postcssScss);
 
-test(
-    'nested class selectors',
-    [nestedCSS, scss],
-    '.one.two {color: green} .one {&.two {background: red}}',
-    '.one.two {color: green;background: red}',
-);
+const cases = [
+  {
+    label: 'nested class selectors',
+    input: '.one.two {color: green} .one {&.two {background: red}}',
+    expected: '.one.two {color: green;background: red}',
+  },
+  {
+    label: 'nested class selectors with " " combinator',
+    input: '.one .two {color: green} .one {.two {background: red}}',
+    expected: '.one .two {color: green;background: red}',
+  },
+  {
+    label: 'reordered nested selectors',
+    input: '.one.two {} .two { .one& {} }',
+    expected: '.one.two {}',
+  },
+  {
+    label: 'multi-level nested selectors',
+    input: '.one .two .three {} .one { .two { .three {} } }',
+    expected: '.one .two .three {}',
+  },
+  {
+    label: 'nested selectors with different order',
+    input: '.one {&.two {}} .two{&.one {}}',
+    expected: '.one.two {}',
+  },
+  {
+    label: 'nested and un-nested selectors with different order',
+    input: '.one.two {} .two{&.one {}}',
+    expected: '.one.two {}',
+  },
+  {
+    label: 'nested selector grouping',
+    input: '.one {&.two, .two& {}} .one {.two&, &.two {}}',
+    expected: '.one.two, .two.one {}',
+  },
+];
 
-test(
-    'nested class selectors with  " " combinator',
-    [nestedCSS, scss],
-    '.one .two {color: green} .one {.two {background: red}}',
-    '.one .two {color: green;background: red}',
-);
-
-test(
-    'reordered nested selectors',
-    [nestedCSS, scss],
-    '.one.two {} .two { .one& {} }',
-    '.one.two {}',
-);
-
-test(
-    'multi-level nested selectors',
-    [nestedCSS, scss],
-    '.one .two .three {} .one { .two { .three {} } }',
-    '.one .two .three {}',
-);
-
-test(
-    'nested selectors with different order',
-    [nestedCSS, scss],
-    '.one {&.two {}} .two{&.one {}}',
-    '.one.two {}',
-);
-
-test(
-    'nested and un-nested selectors with different order',
-    [nestedCSS, scss],
-    '.one.two {} .two{&.one {}}',
-    '.one.two {}',
-);
-
-test(
-    'nested selector grouping',
-    [nestedCSS, scss],
-    '.one {&.two, .two& {}} .one {.two&, &.two {}}',
-    '.one.two, .two.one {}',
-);
+describe('Duplicated Extension Tests', () => {
+  for (const {label, input, expected} of cases) {
+    it(label, () => {
+      nestedCSS({}, input, expected);
+      scss({}, input, expected);
+    });
+  }
+});

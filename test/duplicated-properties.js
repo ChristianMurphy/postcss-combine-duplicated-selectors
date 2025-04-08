@@ -1,4 +1,4 @@
-const test = require('ava');
+const {describe, it} = require('node:test');
 const testFactory = require('./_test-factory');
 const plugin = require('../src');
 
@@ -17,85 +17,99 @@ function minify([string]) {
 }
 
 // Duplicated properties should be removed
-const removeDuplicates = testFactory(
-    'css',
-    [plugin({removeDuplicatedProperties: true})],
-);
+const removeDuplicates = testFactory('css', [
+  plugin({removeDuplicatedProperties: true}),
+]);
 
-test(
-    'remove duplicated properties when combining selectors',
-    removeDuplicates,
-    '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
-    '.a {height: 10px;color: blue; width: 20px;}',
-);
-
-test(
-    'remove duplicated properties in a selector',
-    removeDuplicates,
-    minify`
+describe('Duplicated Properties - Removed', () => {
+  const cases = [
+    {
+      label: 'remove duplicated properties when combining selectors',
+      input: '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
+      expected: '.a {height: 10px;color: blue; width: 20px;}',
+    },
+    {
+      label: 'remove duplicated properties in a selector',
+      input: minify`
 .a {
   height: 10px;
   background: orange;
   background: rgba(255, 165, 0, 0.5);
 }
 `,
-    minify`
+      expected: minify`
 .a {
   height: 10px;
   background: rgba(255, 165, 0, 0.5);
 }
 `,
-);
+    },
+  ];
+
+  for (const {label, input, expected} of cases) {
+    it(label, () => {
+      removeDuplicates({}, input, expected);
+    });
+  }
+});
 
 // Duplicated properties should be maintained
-const keepDuplicates = testFactory(
-    'css',
-    [plugin({removeDuplicatedProperties: false})],
-);
+const keepDuplicates = testFactory('css', [
+  plugin({removeDuplicatedProperties: false}),
+]);
 
-test(
-    'maintain duplicated properties when combining selectors',
-    keepDuplicates,
-    '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
-    '.a {height: 10px; color: black;color: blue; width: 20px;}',
-);
-
-test(
-    'maintain duplicated properties in a selector',
-    keepDuplicates,
-    minify`
+describe('Duplicated Properties - Kept', () => {
+  const cases = [
+    {
+      label: 'maintain duplicated properties when combining selectors',
+      input: '.a {height: 10px; color: black;} .a {color: blue; width: 20px;}',
+      expected: '.a {height: 10px; color: black;color: blue; width: 20px;}',
+    },
+    {
+      label: 'maintain duplicated properties in a selector',
+      input: minify`
 .a {
   height: 10px;
   background: orange;
   background: rgba(255, 165, 0, 0.5);
 }
 `,
-    minify`
+      expected: minify`
 .a {
   height: 10px;
   background: orange;
   background: rgba(255, 165, 0, 0.5);
 }
 `,
-);
+    },
+  ];
+
+  for (const {label, input, expected} of cases) {
+    it(label, () => {
+      keepDuplicates({}, input, expected);
+    });
+  }
+});
 
 // Only duplicated properties with matching values should be removed
-const removeExactDuplicates = testFactory(
-    'css',
-    [plugin({removeDuplicatedValues: true})],
-);
+const removeExactDuplicates = testFactory('css', [
+  plugin({removeDuplicatedValues: true}),
+]);
 
-test(
-    'remove duplicated properties with matching values with combined selectors',
-    removeExactDuplicates,
-    '.a {height: 10px; color: red;} .a {color: red; color: blue; width: 20px;}',
-    '.a {height: 10px;color: red; color: blue; width: 20px;}',
-);
-
-test(
-    'remove duplicated properties with matching values in a selector',
-    removeExactDuplicates,
-    minify`
+describe('Duplicated Properties - Remove Exact Duplicates', () => {
+  const cases = [
+    {
+      label:
+        // eslint-disable-next-line max-len
+        'remove duplicated properties with matching values (combined selectors)',
+      input:
+        // eslint-disable-next-line max-len
+        '.a {height: 10px; color: red;} .a {color: red; color: blue; width: 20px;}',
+      expected: '.a {height: 10px;color: red; color: blue; width: 20px;}',
+    },
+    {
+      label: 'remove duplicated properties with matching values in a selector',
+      input: minify`
 .a {
   height: 10px;
   background: orange;
@@ -103,19 +117,17 @@ test(
   background: rgba(255, 165, 0, 0.5);
 }
 `,
-    minify`
+      expected: minify`
 .a {
   height: 10px;
   background: orange;
   background: rgba(255, 165, 0, 0.5);
 }
 `,
-);
-
-test(
-    'remove duplicate property with matching value, allow fallback',
-    removeExactDuplicates,
-    minify`
+    },
+    {
+      label: 'remove duplicate property with matching value, allow fallback',
+      input: minify`
 .a {
   height: 10px;
 }
@@ -124,10 +136,18 @@ test(
   height: var(--linkHeight);
 }
 `,
-    minify`
+      expected: minify`
 .a {
   height: 10px;
   height: var(--linkHeight);
 }
 `,
-);
+    },
+  ];
+
+  for (const {label, input, expected} of cases) {
+    it(label, () => {
+      removeExactDuplicates({}, input, expected);
+    });
+  }
+});

@@ -1,4 +1,4 @@
-const test = require('ava');
+const {describe, it} = require('node:test');
 const testFactory = require('./_test-factory');
 const plugin = require('../src');
 
@@ -19,220 +19,196 @@ function minify([string]) {
 
 const css = testFactory('css', [plugin]);
 
-test('class', css, '.module {} .module {}', '.module {}');
-
-test('id', css, '#one {} #one {}', '#one {}');
-
-test('tag', css, 'a {} a {}', 'a {}');
-
-test('universal', css, '* {} * {}', '* {}');
-
-test(
-    'classes with " " combinator',
-    css,
-    '.one .two {} .one .two {}',
-    '.one .two {}',
-);
-
-test(
-    'classes with ">" combinator',
-    css,
-    '.one>.two {} .one > .two {}',
-    '.one>.two {}',
-);
-
-test(
-    'classes with "+" combinator',
-    css,
-    '.one+.two {} .one + .two {}',
-    '.one+.two {}',
-);
-
-test(
-    'classes with "~" combinator',
-    css,
-    '.one~.two {} .one ~ .two {}',
-    '.one~.two {}',
-);
-
-test(
-    'ids with " " combinator',
-    css,
-    '#one #two {} #one #two {}',
-    '#one #two {}',
-);
-
-test(
-    'ids with ">" combinator',
-    css,
-    '#one>#two {} #one > #two {}',
-    '#one>#two {}',
-);
-
-test(
-    'ids with "+" combinator',
-    css,
-    '#one+#two {} #one + #two {}',
-    '#one+#two {}',
-);
-
-test(
-    'ids with "~" combinator',
-    css,
-    '#one~#two {} #one ~ #two {}',
-    '#one~#two {}',
-);
-
-test('tags with " " combinator', css, 'a b {} a  b {}', 'a b {}');
-
-test('tags with ">" combinator', css, 'a>b {} a > b {}', 'a>b {}');
-
-test('tags with "+" combinator', css, 'a+b {} a + b {}', 'a+b {}');
-
-test('tags with "~" combinator', css, 'a~b {} a ~ b {}', 'a~b {}');
-
-test('universals with " " combinator', css, '* * {} *  * {}', '* * {}');
-
-test('universals with ">" combinator', css, '*>* {} * > * {}', '*>* {}');
-
-test('universals with "+" combinator', css, '*+* {} * + * {}', '*+* {}');
-
-test('universals with "~" combinator', css, '*~* {} * ~ * {}', '*~* {}');
-
-test(
-    'class with declarations',
-    css,
-    '.module {color: green} .module {background: red}',
-    '.module {color: green;background: red}',
-);
-
-test(
-    'id with declarations',
-    css,
-    '#one {color: green} #one {background: red}',
-    '#one {color: green;background: red}',
-);
-
-test(
-    'tag with declarations',
-    css,
-    'a {color: green} a {background: red}',
-    'a {color: green;background: red}',
-);
-
-test(
-    'universal with declarations',
-    css,
-    '* {color: green} * {background: red}',
-    '* {color: green;background: red}',
-);
-
-test(
-    'classes with different spacing and declarations',
-    css,
-    '.one .two {color: green} .one  .two {background: red}',
-    '.one .two {color: green;background: red}',
-);
-
-test(
-    'ids with different spacing and declarations',
-    css,
-    '#one #two {color: green} #one  #two {background: red}',
-    '#one #two {color: green;background: red}',
-);
-
-test(
-    'tags with different spacing and declarations',
-    css,
-    'a b {color: green} a  b {background: red}',
-    'a b {color: green;background: red}',
-);
-
-test(
-    'universals with different spacing and declarations',
-    css,
-    '* * {color: green} *  * {background: red}',
-    '* * {color: green;background: red}',
-);
-
-test(
-    'selectors with multiple properties',
-    css,
-    '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
-    '.a {color: black; height: 10px;background-color: red; width: 20px}',
-);
-
-test('attribute selectors', css, '.a[href] {} .a[href] {}', '.a[href] {}');
-
-test(
-    'attribute property selectors with different spacing',
-    css,
-    '.a[href="a"] {} .a[href = "a"] {}',
-    '.a[href="a"] {}',
-);
-
-test(
-    'attribute property selectors with different quoting',
-    css,
-    '.a[href="a"] {} .a[href=a] {}',
-    '.a[href="a"] {}',
-);
-
-test(
-    'attribute property selectors with different quote marks',
-    css,
-    '.a[href="a"] {} .a[href=\'a\'] {}',
-    '.a[href="a"] {}',
-);
-
-test(
-    'attribute selectors with different spacing',
-    css,
-    '.a[href] {} .a[ href ] {}',
-    '.a[href] {}',
-);
-
-test('pseudo classes', css, 'a:link {} a:link {}', 'a:link {}');
-
-test(
-    'pseudo elements',
-    css,
-    'p::first-line {} p::first-line {}',
-    'p::first-line {}',
-);
-
-test(
-    'selectors with different order',
-    css,
-    '.one.two {} .two.one {}',
-    '.one.two {}',
-);
-
-test(
-    'selector groups',
-    css,
-    '.one .two, .one .three {} .one .two, .one .three {}',
-    '.one .two, .one .three {}',
-);
-
-test(
-    'selector groups with different order',
-    css,
-    '.one .two, .one .three {} .one .three, .one .two {}',
-    '.one .two, .one .three {}',
-);
-
-test(
-    'selectors and seperately selectors within media query',
-    css,
-    '.one{} .one{} @media print { .one{} .one{} }',
-    '.one{} @media print { .one{} }',
-);
-
-test(
-    'multiple print media queries',
-    css,
-    minify`
+const cases = [
+  {label: 'class', input: '.module {} .module {}', expected: '.module {}'},
+  {label: 'id', input: '#one {} #one {}', expected: '#one {}'},
+  {label: 'tag', input: 'a {} a {}', expected: 'a {}'},
+  {label: 'universal', input: '* {} * {}', expected: '* {}'},
+  {
+    label: 'classes with " " combinator',
+    input: '.one .two {} .one .two {}',
+    expected: '.one .two {}',
+  },
+  {
+    label: 'classes with ">" combinator',
+    input: '.one>.two {} .one > .two {}',
+    expected: '.one>.two {}',
+  },
+  {
+    label: 'classes with "+" combinator',
+    input: '.one+.two {} .one + .two {}',
+    expected: '.one+.two {}',
+  },
+  {
+    label: 'classes with "~" combinator',
+    input: '.one~.two {} .one ~ .two {}',
+    expected: '.one~.two {}',
+  },
+  {
+    label: 'ids with " " combinator',
+    input: '#one #two {} #one #two {}',
+    expected: '#one #two {}',
+  },
+  {
+    label: 'ids with ">" combinator',
+    input: '#one>#two {} #one > #two {}',
+    expected: '#one>#two {}',
+  },
+  {
+    label: 'ids with "+" combinator',
+    input: '#one+#two {} #one + #two {}',
+    expected: '#one+#two {}',
+  },
+  {
+    label: 'ids with "~" combinator',
+    input: '#one~#two {} #one ~ #two {}',
+    expected: '#one~#two {}',
+  },
+  {
+    label: 'tags with " " combinator',
+    input: 'a b {} a  b {}',
+    expected: 'a b {}',
+  },
+  {
+    label: 'tags with ">" combinator',
+    input: 'a>b {} a > b {}',
+    expected: 'a>b {}',
+  },
+  {
+    label: 'tags with "+" combinator',
+    input: 'a+b {} a + b {}',
+    expected: 'a+b {}',
+  },
+  {
+    label: 'tags with "~" combinator',
+    input: 'a~b {} a ~ b {}',
+    expected: 'a~b {}',
+  },
+  {
+    label: 'universals with " " combinator',
+    input: '* * {} *  * {}',
+    expected: '* * {}',
+  },
+  {
+    label: 'universals with ">" combinator',
+    input: '*>* {} * > * {}',
+    expected: '*>* {}',
+  },
+  {
+    label: 'universals with "+" combinator',
+    input: '*+* {} * + * {}',
+    expected: '*+* {}',
+  },
+  {
+    label: 'universals with "~" combinator',
+    input: '*~* {} * ~ * {}',
+    expected: '*~* {}',
+  },
+  {
+    label: 'class with declarations',
+    input: '.module {color: green} .module {background: red}',
+    expected: '.module {color: green;background: red}',
+  },
+  {
+    label: 'id with declarations',
+    input: '#one {color: green} #one {background: red}',
+    expected: '#one {color: green;background: red}',
+  },
+  {
+    label: 'tag with declarations',
+    input: 'a {color: green} a {background: red}',
+    expected: 'a {color: green;background: red}',
+  },
+  {
+    label: 'universal with declarations',
+    input: '* {color: green} * {background: red}',
+    expected: '* {color: green;background: red}',
+  },
+  {
+    label: 'classes with different spacing and declarations',
+    input: '.one .two {color: green} .one  .two {background: red}',
+    expected: '.one .two {color: green;background: red}',
+  },
+  {
+    label: 'ids with different spacing and declarations',
+    input: '#one #two {color: green} #one  #two {background: red}',
+    expected: '#one #two {color: green;background: red}',
+  },
+  {
+    label: 'tags with different spacing and declarations',
+    input: 'a b {color: green} a  b {background: red}',
+    expected: 'a b {color: green;background: red}',
+  },
+  {
+    label: 'universals with different spacing and declarations',
+    input: '* * {color: green} *  * {background: red}',
+    expected: '* * {color: green;background: red}',
+  },
+  {
+    label: 'selectors with multiple properties',
+    // eslint-disable-next-line max-len
+    input: '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
+    // eslint-disable-next-line max-len
+    expected: '.a {color: black; height: 10px;background-color: red; width: 20px}',
+  },
+  {
+    label: 'attribute selectors',
+    input: '.a[href] {} .a[href] {}',
+    expected: '.a[href] {}',
+  },
+  {
+    label: 'attribute property selectors with different spacing',
+    input: '.a[href="a"] {} .a[href = "a"] {}',
+    expected: '.a[href="a"] {}',
+  },
+  {
+    label: 'attribute property selectors with different quoting',
+    input: '.a[href="a"] {} .a[href=a] {}',
+    expected: '.a[href="a"] {}',
+  },
+  {
+    label: 'attribute property selectors with different quote marks',
+    input: '.a[href="a"] {} .a[href=\'a\'] {}',
+    expected: '.a[href="a"] {}',
+  },
+  {
+    label: 'attribute selectors with different spacing',
+    input: '.a[href] {} .a[ href ] {}',
+    expected: '.a[href] {}',
+  },
+  {
+    label: 'pseudo classes',
+    input: 'a:link {} a:link {}',
+    expected: 'a:link {}',
+  },
+  {
+    label: 'pseudo elements',
+    input: 'p::first-line {} p::first-line {}',
+    expected: 'p::first-line {}',
+  },
+  {
+    label: 'selectors with different order',
+    input: '.one.two {} .two.one {}',
+    expected: '.one.two {}',
+  },
+  {
+    label: 'selector groups',
+    input: '.one .two, .one .three {} .one .two, .one .three {}',
+    expected: '.one .two, .one .three {}',
+  },
+  {
+    label: 'selector groups with different order',
+    input: '.one .two, .one .three {} .one .three, .one .two {}',
+    expected: '.one .two, .one .three {}',
+  },
+  {
+    label: 'selectors and separately selectors within media query',
+    input: '.one{} .one{} @media print { .one{} .one{} }',
+    expected: '.one{} @media print { .one{} }',
+  },
+  {
+    label: 'multiple print media queries',
+    input: minify`
 @media print {
   a {
     color: blue;
@@ -244,7 +220,7 @@ test(
   }
 }
 `,
-    minify`
+    expected: minify`
 @media print {
   a {
     color: blue;
@@ -253,19 +229,15 @@ test(
 }
 @media print { }
 `,
-);
-
-test(
-    'keyframe selectors with same percentage',
-    css,
-    '@keyframes a {0% { color: blue; } 0% { background: green; }}',
-    '@keyframes a {0% { color: blue; background: green; }}',
-);
-
-test(
-    'multiple print media queries with different case',
-    css,
-    minify`
+  },
+  {
+    label: 'keyframe selectors with same percentage',
+    input: '@keyframes a {0% { color: blue; } 0% { background: green; }}',
+    expected: '@keyframes a {0% { color: blue; background: green; }}',
+  },
+  {
+    label: 'multiple print media queries with different case',
+    input: minify`
 @media print {
   a {
     color: blue;
@@ -277,7 +249,7 @@ test(
   }
 }
 `,
-    minify`
+    expected: minify`
 @media print {
   a {
     color: blue;
@@ -286,12 +258,10 @@ test(
 }
 @MEDIA print { }
 `,
-);
-
-test(
-    'example from issue #219',
-    css,
-    minify`
+  },
+  {
+    label: 'example from issue #219',
+    input: minify`
 * {
   box-sizing: border-box;
 }
@@ -337,9 +307,9 @@ body {
   width: 100%;
 }
 `,
-    minify`
+    expected: minify`
 * {
-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html,
@@ -377,4 +347,13 @@ body {
   color: rgba(255, 255, 255, 0.8);
 }
 `,
-);
+  },
+];
+
+describe('Duplicated CSS Tests', () => {
+  for (const {label, input, expected} of cases) {
+    it(label, () => {
+      css({}, input, expected);
+    });
+  }
+});
