@@ -1,4 +1,5 @@
 const postcss = require('postcss');
+const assert = require('node:assert/strict');
 
 /**
  * Generates test functions and test titles
@@ -7,30 +8,24 @@ const postcss = require('postcss');
  * @param {Array<Object>} plugins - postcss plugins to use with tests
  * @param {Object} [syntax] - optional alternative syntax parser
  * @return {function} test function
- *
- * NOTE: this is an ".es" file because ava does not compile helpers,
- * instead "_factories.js" is built in the "pretest" step in "package.json"
  */
 module.exports = function testFactory(version, plugins, syntax) {
-  let tester = null;
-
-  // setup test macro
+  let tester;
   if (syntax) {
-    tester = (t, input, expected) => {
-      const actual = postcss(plugins).process(input, {syntax}).css;
-      t.is(expected, actual);
+    tester = (_t, input, expected) => {
+      const actual = postcss(plugins).process(input, { syntax }).css;
+      assert.strictEqual(actual, expected);
     };
   } else {
-    tester = (t, input, expected) => {
+    tester = (_t, input, expected) => {
       const actual = postcss(plugins).process(input).css;
-      t.is(expected, actual);
+      assert.strictEqual(actual, expected);
     };
   }
-
-  // setup test macro title
-  tester.title = (providedTitle, input, expected) => providedTitle ?
-    `${providedTitle} in ${version}` :
-    `"${input}" becomes "${expected}" in ${version}`;
-
+  // Setup test macro title generator
+  tester.title = (providedTitle, input, expected) =>
+    providedTitle
+      ? `${providedTitle} in ${version}`
+      : `"${input}" becomes "${expected}" in ${version}`;
   return tester;
 };
