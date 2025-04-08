@@ -51,7 +51,7 @@
     "eslint-config-google": "0.14.0",
     "eslint-plugin-markdown": "3.0.1",
     "husky": "8.0.3",
-    "npm-run-all2": "5.0.0",
+    "npm-run-all2": "5.0.2",
     "postcss": "8.5.3",
     "postcss-less": "6.0.0",
     "postcss-nested": "6.0.1",
