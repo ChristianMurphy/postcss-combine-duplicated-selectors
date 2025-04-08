@@ -227,13 +227,38 @@ const cases = [
     background: green;
   }
 }
-@media print { }
 `,
   },
   {
     label: 'keyframe selectors with same percentage',
     input: '@keyframes a {0% { color: blue; } 0% { background: green; }}',
     expected: '@keyframes a {0% { color: blue; background: green; }}',
+  },
+  {
+    label: 'keyframe selectors with duplicate animation properties',
+    input: minify`
+@keyframes ping {
+  75%,
+  to {
+      transform: scale(2);
+  }
+}
+@keyframes ping {
+  75%,
+  to {
+      opacity: 0;
+  }
+}
+`,
+    expected: minify`
+@keyframes ping {
+    75%,
+    to {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+`,
   },
   {
     label: 'multiple print media queries with different case',
@@ -256,7 +281,6 @@ const cases = [
     background: green;
   }
 }
-@MEDIA print { }
 `,
   },
   {
