@@ -1,15 +1,21 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches: 
+      - main
 jobs:
   build-and-test:
     name: '${{ matrix.platform }}: node.js ${{ matrix.node-version }}'
+    timeout-minutes: 1
     strategy:
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-latest]
+        platform:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
         node-version:
           - 18
           - 20
@@ -20,5 +26,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
+      - run: npm ci
       - run: npm test
