@@ -114,14 +114,15 @@ module.exports = (options) => {
 
             // store the original rule parent before removal in case an atrule
             // becomes empty as a result of the removal
-            let ruleParent = rule.parent;
+            const ruleParent = rule.parent;
 
             // remove duplicated rule
             rule.remove();
 
-            // on removal of the node, the parent atrule could have no declarations associated.
-            // This is an issue for @keyframes that interpret @keyframes <name> {} as overwriting
-            // existing keyframe transitions.
+            // on removal of the node, the parent atrule could have no
+            // declarations associated. This is an issue for @keyframes that
+            // interpret @keyframes <name> {} as overwriting existing keyframe
+            // transitions.
             if (ruleParent.type === 'atrule' && ruleParent.nodes.length === 0) {
               const ruleParentIndex = ruleParent.parent.index(ruleParent);
               ruleParent.parent.nodes[ruleParentIndex].remove();
