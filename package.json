@@ -61,7 +61,7 @@
     "remark-preset-lint-recommended": "7.0.1",
     "remark-validate-links": "13.1.0",
     "tsd": "^0.32.0",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
   "engines": {
     "node": "^18.0.0 || ^20.0.0 || >=22.0.0"
