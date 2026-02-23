@@ -49,7 +49,7 @@
     "@commitlint/prompt-cli": "17.8.1",
     "eslint": "8.57.1",
     "eslint-config-google": "0.14.0",
-    "eslint-plugin-markdown": "3.0.1",
+    "eslint-plugin-markdown": "5.1.0",
     "husky": "8.0.3",
     "npm-run-all2": "8.0.4",
     "postcss": "8.5.6",
