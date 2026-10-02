@@ -19,7 +19,7 @@
     "commit": "commit",
     "format": "oxfmt",
     "test": "run-s test:*",
-    "test:unit": "node --test",
+    "test:unit": "node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100",
     "test:lint-js": "oxlint",
     "test:format": "oxfmt --check",
     "test:lint-md": "remark *.md -q --no-stdout",
