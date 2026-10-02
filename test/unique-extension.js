@@ -6,6 +6,7 @@ import plugin from '../src/index.js';
 
 const nestedCSS = testFactory([postcssNested, plugin]);
 const scss = testFactory([postcssNested, plugin], postcssScss);
+const scssWithoutNesting = testFactory([plugin], postcssScss);
 
 const cases = [
   {
@@ -27,4 +28,15 @@ describe('Unique Extension Tests', () => {
       scss(input, expected);
     });
   }
+
+  it('repeated selectors in a group with an inline comment', () => {
+    scssWithoutNesting('.a, // c\n.b, .a{x:1}', '.a, // c\n.b, .a{x:1}');
+  });
+
+  it('nesting selectors whose suffix and class run together', () => {
+    scssWithoutNesting(
+      '.p{ &.is-active__el, &__el.is-active{x:1} }',
+      '.p{ &.is-active__el, &__el.is-active{x:1} }',
+    );
+  });
 });

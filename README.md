@@ -90,6 +90,8 @@ Output
 }
 ```
 
+Within one rule, a selector that repeats an earlier selector in the list is removed. For example, `.one.two, .two.one {}` becomes `.one.two {}`.
+
 ### Options
 
 | Option                       | Default | Effect                                                                     |
