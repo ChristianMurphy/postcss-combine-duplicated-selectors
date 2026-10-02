@@ -25,19 +25,22 @@ yarn add --dev postcss postcss-combine-duplicated-selectors
 ### Using PostCSS JS API
 
 ```js
-'use strict';
+import fs from 'node:fs';
+import postcss from 'postcss';
+import combineSelectors from 'postcss-combine-duplicated-selectors';
 
-const fs = require('fs');
-const postcss = require('postcss');
 const css = fs.readFileSync('src/app.css');
 
-postcss([require('postcss-combine-duplicated-selectors')])
+postcss([combineSelectors])
   .process(css, { from: 'src/app.css', to: 'app.css' })
   .then((result) => {
     fs.writeFileSync('app.css', result.css);
     if (result.map) fs.writeFileSync('app.css.map', result.map);
   });
 ```
+
+The package ships as an ECMAScript module. CommonJS code loads it with
+`require('postcss-combine-duplicated-selectors').default`.
 
 ### Using PostCSS CLI
 
@@ -47,11 +50,13 @@ postcss style.css --use postcss-combine-duplicated-selectors --output newcss.css
 
 ### Using Vite
 
-In a `postcss.config.js` file :
+In a `postcss.config.mjs` file:
 
 ```js
-module.exports = {
-  plugins: [require('postcss-combine-duplicated-selectors')],
+import combineSelectors from 'postcss-combine-duplicated-selectors';
+
+export default {
+  plugins: [combineSelectors],
 };
 ```
 
@@ -94,8 +99,8 @@ Duplicated properties can optionally be combined.
 Set the `removeDuplicatedProperties` option to `true` to enable.
 
 ```js
-const postcss = require('postcss');
-const combineSelectors = require('postcss-combine-duplicated-selectors');
+import postcss from 'postcss';
+import combineSelectors from 'postcss-combine-duplicated-selectors';
 
 postcss([combineSelectors({ removeDuplicatedProperties: true })]);
 ```
@@ -122,8 +127,8 @@ will combine into
 In order to limit this to only combining properties when the values are equal, set the `removeDuplicatedValues` option to `true` instead. This could clean up duplicated properties, but allow for conscious duplicates such as fallbacks for custom properties.
 
 ```js
-const postcss = require('postcss');
-const combineSelectors = require('postcss-combine-duplicated-selectors');
+import postcss from 'postcss';
+import combineSelectors from 'postcss-combine-duplicated-selectors';
 
 postcss([combineSelectors({ removeDuplicatedValues: true })]);
 ```

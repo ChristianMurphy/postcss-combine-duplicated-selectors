@@ -1,8 +1,8 @@
-const { describe, it } = require('node:test');
-const testFactory = require('./_test-factory');
-const postcssNested = require('postcss-nested').default;
-const postcssScss = require('postcss-scss');
-const plugin = require('../src');
+import { describe, it } from 'node:test';
+import testFactory from './_test-factory.js';
+import postcssNested from 'postcss-nested';
+import postcssScss from 'postcss-scss';
+import plugin from '../src/index.js';
 
 const nestedCSS = testFactory('nested css', [postcssNested, plugin]);
 const scss = testFactory('scss', [postcssNested, plugin], postcssScss);

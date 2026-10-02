@@ -2,8 +2,15 @@
   "name": "postcss-combine-duplicated-selectors",
   "version": "10.0.3",
   "description": "automatically keep css selectors unique",
-  "main": "src/index.js",
-  "types": "types/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./types/index.d.ts",
   "files": [
     "src",
     "types/index.d.ts"
