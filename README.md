@@ -4,8 +4,6 @@
 
 [![npm](https://img.shields.io/npm/v/postcss-combine-duplicated-selectors.svg)](https://www.npmjs.com/package/postcss-combine-duplicated-selectors)
 [![build status](https://github.com/ChristianMurphy/postcss-combine-duplicated-selectors/workflows/CI/badge.svg)](https://github.com/ChristianMurphy/postcss-combine-duplicated-selectors/actions)
-[![dependency status](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors.svg)](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors)
-[![devDependency status](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors/dev-status.svg)](https://david-dm.org/ChristianMurphy/postcss-combine-duplicated-selectors?type=dev)
 
 Automatically detects and combines duplicated css selectors so you don't have to
 :smile:
@@ -14,7 +12,7 @@ Automatically detects and combines duplicated css selectors so you don't have to
 
 ### Requirements
 
-In order to use this you will need to have [postcss](https://github.com/postcss/postcss) installed. Depending on whether or not you want to use the CLI you need to install [postcss-cli](https://github.com/postcss/postcss-cli).
+This plugin needs Node.js 24 or newer and [postcss](https://github.com/postcss/postcss) 8. To use the command line, also install [postcss-cli](https://github.com/postcss/postcss-cli).
 
 ```bash
 npm install --save-dev postcss postcss-combine-duplicated-selectors
@@ -92,6 +90,15 @@ Output
 }
 ```
 
+### Options
+
+| Option                       | Default | Effect                                                                     |
+| ---------------------------- | ------- | -------------------------------------------------------------------------- |
+| `removeDuplicatedProperties` | `false` | Keep only the last declaration of each property in a combined rule         |
+| `removeDuplicatedValues`     | `false` | Remove a declaration only when a later one has the same property and value |
+
+Set at most one of these options. The TypeScript types reject both together. If both are `true`, the plugin uses `removeDuplicatedValues`.
+
 ### Duplicated Properties
 
 Duplicated properties can optionally be combined.
@@ -160,7 +167,7 @@ into
 
 ### Media Queries
 
-If you have code with media queries, pass code through [_postcss-combine-media-query_](https://github.com/SassNinja/postcss-combine-media-query) or [_css-mquery-packer_](https://github.com/n19htz/css-mquery-packer) before _postcss-combine-duplicated-selectors_ to ensure optimal results.
+For CSS with media queries, first combine the queries with [_postcss-combine-media-query_](https://github.com/SassNinja/postcss-combine-media-query) or [_postcss-merge-queries_](https://github.com/n19htz/postcss-merge-queries). Then run _postcss-combine-duplicated-selectors_ for the best results.
 
 ### Nested rules and at-rules
 
@@ -209,3 +216,33 @@ becomes
   }
 }
 ```
+
+### Rule order
+
+The plugin moves the declarations of a later rule into the first rule with the same selector. When a different rule sits between them, the moved declarations come before it. That can change which declaration wins for elements that match both rules.
+
+```css
+.a {
+  color: red;
+}
+.b {
+  color: blue;
+}
+.a {
+  color: green;
+}
+```
+
+becomes
+
+```css
+.a {
+  color: red;
+  color: green;
+}
+.b {
+  color: blue;
+}
+```
+
+An element with both classes was green and is now blue. Check the output when your CSS depends on rule order.
