@@ -1,4 +1,4 @@
-const {describe, it} = require('node:test');
+const { describe, it } = require('node:test');
 const testFactory = require('./_test-factory');
 const plugin = require('../src');
 
@@ -10,6 +10,7 @@ const plugin = require('../src');
 /**
  * Take string literals and remove newlines and extra spacing so results print
  * as expected in logs
+ * @param {TemplateStringsArray} strings - template literal parts
  * @return {string} string without newlines and tabs
  */
 function minify([string]) {
@@ -18,7 +19,7 @@ function minify([string]) {
 
 // Duplicated properties should be removed
 const removeDuplicates = testFactory('css', [
-  plugin({removeDuplicatedProperties: true}),
+  plugin({ removeDuplicatedProperties: true }),
 ]);
 
 describe('Duplicated Properties - Removed', () => {
@@ -46,7 +47,7 @@ describe('Duplicated Properties - Removed', () => {
     },
   ];
 
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       removeDuplicates({}, input, expected);
     });
@@ -55,7 +56,7 @@ describe('Duplicated Properties - Removed', () => {
 
 // Duplicated properties should be maintained
 const keepDuplicates = testFactory('css', [
-  plugin({removeDuplicatedProperties: false}),
+  plugin({ removeDuplicatedProperties: false }),
 ]);
 
 describe('Duplicated Properties - Kept', () => {
@@ -84,7 +85,7 @@ describe('Duplicated Properties - Kept', () => {
     },
   ];
 
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       keepDuplicates({}, input, expected);
     });
@@ -93,17 +94,15 @@ describe('Duplicated Properties - Kept', () => {
 
 // Only duplicated properties with matching values should be removed
 const removeExactDuplicates = testFactory('css', [
-  plugin({removeDuplicatedValues: true}),
+  plugin({ removeDuplicatedValues: true }),
 ]);
 
 describe('Duplicated Properties - Remove Exact Duplicates', () => {
   const cases = [
     {
       label:
-        // eslint-disable-next-line max-len
         'remove duplicated properties with matching values (combined selectors)',
       input:
-        // eslint-disable-next-line max-len
         '.a {height: 10px; color: red;} .a {color: red; color: blue; width: 20px;}',
       expected: '.a {height: 10px;color: red; color: blue; width: 20px;}',
     },
@@ -145,7 +144,7 @@ describe('Duplicated Properties - Remove Exact Duplicates', () => {
     },
   ];
 
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       removeExactDuplicates({}, input, expected);
     });

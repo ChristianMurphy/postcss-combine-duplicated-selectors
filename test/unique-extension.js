@@ -1,6 +1,6 @@
-const {describe, it} = require('node:test');
+const { describe, it } = require('node:test');
 const testFactory = require('./_test-factory');
-const postcssNested = require('postcss-nested');
+const postcssNested = require('postcss-nested').default;
 const postcssScss = require('postcss-scss');
 const plugin = require('../src');
 
@@ -21,7 +21,7 @@ const cases = [
 ];
 
 describe('Unique Extension Tests', () => {
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       nestedCSS({}, input, expected);
       scss({}, input, expected);
