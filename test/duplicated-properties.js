@@ -1,4 +1,4 @@
-const {describe, it} = require('node:test');
+const { describe, it } = require('node:test');
 const testFactory = require('./_test-factory');
 const plugin = require('../src');
 
@@ -19,7 +19,7 @@ function minify([string]) {
 
 // Duplicated properties should be removed
 const removeDuplicates = testFactory('css', [
-  plugin({removeDuplicatedProperties: true}),
+  plugin({ removeDuplicatedProperties: true }),
 ]);
 
 describe('Duplicated Properties - Removed', () => {
@@ -47,7 +47,7 @@ describe('Duplicated Properties - Removed', () => {
     },
   ];
 
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       removeDuplicates({}, input, expected);
     });
@@ -56,7 +56,7 @@ describe('Duplicated Properties - Removed', () => {
 
 // Duplicated properties should be maintained
 const keepDuplicates = testFactory('css', [
-  plugin({removeDuplicatedProperties: false}),
+  plugin({ removeDuplicatedProperties: false }),
 ]);
 
 describe('Duplicated Properties - Kept', () => {
@@ -85,7 +85,7 @@ describe('Duplicated Properties - Kept', () => {
     },
   ];
 
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       keepDuplicates({}, input, expected);
     });
@@ -94,7 +94,7 @@ describe('Duplicated Properties - Kept', () => {
 
 // Only duplicated properties with matching values should be removed
 const removeExactDuplicates = testFactory('css', [
-  plugin({removeDuplicatedValues: true}),
+  plugin({ removeDuplicatedValues: true }),
 ]);
 
 describe('Duplicated Properties - Remove Exact Duplicates', () => {
@@ -144,7 +144,7 @@ describe('Duplicated Properties - Remove Exact Duplicates', () => {
     },
   ];
 
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       removeExactDuplicates({}, input, expected);
     });

@@ -1,5 +1,5 @@
 const parser = require('postcss-selector-parser');
-const {name} = require('../package.json');
+const { name } = require('../package.json');
 
 /**
  * Ensure that attributes with different quotes match.
@@ -87,9 +87,9 @@ module.exports = (options) => {
               rule.parent.params.replace(/\s+/g, '');
 
             // See if this query key is already in the map table
-            map = mapTable.has(query) ? // If it is use it
-              mapTable.get(query) : // if not set it and get it
-              mapTable.set(query, new Map()).get(query);
+            map = mapTable.has(query) // If it is use it
+              ? mapTable.get(query) // if not set it and get it
+              : mapTable.set(query, new Map()).get(query);
           } else {
             // Otherwise we are dealing with a selector in the root
             map = mapTable.get('root');
@@ -132,10 +132,7 @@ module.exports = (options) => {
               options.removeDuplicatedProperties ||
               options.removeDuplicatedValues
             ) {
-              removeDupProperties(
-                  destination,
-                  options.removeDuplicatedValues,
-              );
+              removeDupProperties(destination, options.removeDuplicatedValues);
             }
           } else {
             if (

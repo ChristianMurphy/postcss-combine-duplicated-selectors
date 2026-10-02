@@ -1,7 +1,7 @@
-import postcss from "postcss";
+import postcss from 'postcss';
 
 // root export
-import postcssCombineDuplicatedSelectors from "./index";
+import postcssCombineDuplicatedSelectors from './index';
 
 postcss([postcssCombineDuplicatedSelectors()]);
 postcss([
@@ -11,9 +11,7 @@ postcss([
   postcssCombineDuplicatedSelectors({ removeDuplicatedProperties: false }),
 ]);
 postcss([postcssCombineDuplicatedSelectors({ removeDuplicatedValues: true })]);
-postcss([
-  postcssCombineDuplicatedSelectors({ removeDuplicatedValues: false }),
-]);
+postcss([postcssCombineDuplicatedSelectors({ removeDuplicatedValues: false })]);
 postcss([
   postcssCombineDuplicatedSelectors({
     removeDuplicatedValues: true,

@@ -1,5 +1,5 @@
 // TypeScript Version: 4.0
-import { PluginCreator } from "postcss";
+import { PluginCreator } from 'postcss';
 
 declare namespace postcssCombineDuplicatedSelectors {
   /**

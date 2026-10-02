@@ -1,4 +1,4 @@
-const {describe, it} = require('node:test');
+const { describe, it } = require('node:test');
 const testFactory = require('./_test-factory');
 const plugin = require('../src');
 
@@ -21,10 +21,10 @@ function minify([string]) {
 const css = testFactory('css', [plugin]);
 
 const cases = [
-  {label: 'class', input: '.module {} .module {}', expected: '.module {}'},
-  {label: 'id', input: '#one {} #one {}', expected: '#one {}'},
-  {label: 'tag', input: 'a {} a {}', expected: 'a {}'},
-  {label: 'universal', input: '* {} * {}', expected: '* {}'},
+  { label: 'class', input: '.module {} .module {}', expected: '.module {}' },
+  { label: 'id', input: '#one {} #one {}', expected: '#one {}' },
+  { label: 'tag', input: 'a {} a {}', expected: 'a {}' },
+  { label: 'universal', input: '* {} * {}', expected: '* {}' },
   {
     label: 'classes with " " combinator',
     input: '.one .two {} .one .two {}',
@@ -147,8 +147,10 @@ const cases = [
   },
   {
     label: 'selectors with multiple properties',
-    input: '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
-    expected: '.a {color: black; height: 10px;background-color: red; width: 20px}',
+    input:
+      '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
+    expected:
+      '.a {color: black; height: 10px;background-color: red; width: 20px}',
   },
   {
     label: 'attribute selectors',
@@ -374,7 +376,7 @@ body {
 ];
 
 describe('Duplicated CSS Tests', () => {
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       css({}, input, expected);
     });

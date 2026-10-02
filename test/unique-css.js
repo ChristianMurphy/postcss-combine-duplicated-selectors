@@ -1,4 +1,4 @@
-const {describe, it} = require('node:test');
+const { describe, it } = require('node:test');
 const testFactory = require('./_test-factory');
 const plugin = require('../src'); // Adjust path if needed
 
@@ -11,14 +11,14 @@ const plugin = require('../src'); // Adjust path if needed
 const css = testFactory('css', [plugin]);
 
 const cases = [
-  {label: 'class', input: '.module {}', expected: '.module {}'},
-  {label: 'id', input: '#one {}', expected: '#one {}'},
-  {label: 'tag', input: 'a {}', expected: 'a {}'},
-  {label: 'universal', input: '* {}', expected: '* {}'},
-  {label: 'classes', input: '.one {} .two {}', expected: '.one {} .two {}'},
-  {label: 'ids', input: '#one {} #two {}', expected: '#one {} #two {}'},
-  {label: 'tags', input: 'a {} b {}', expected: 'a {} b {}'},
-  {label: 'universals', input: '* a {} * b {}', expected: '* a {} * b {}'},
+  { label: 'class', input: '.module {}', expected: '.module {}' },
+  { label: 'id', input: '#one {}', expected: '#one {}' },
+  { label: 'tag', input: 'a {}', expected: 'a {}' },
+  { label: 'universal', input: '* {}', expected: '* {}' },
+  { label: 'classes', input: '.one {} .two {}', expected: '.one {} .two {}' },
+  { label: 'ids', input: '#one {} #two {}', expected: '#one {} #two {}' },
+  { label: 'tags', input: 'a {} b {}', expected: 'a {} b {}' },
+  { label: 'universals', input: '* a {} * b {}', expected: '* a {} * b {}' },
   {
     label: 'combinations of classes',
     input: '.one.two {} .one .two {}',
@@ -105,7 +105,7 @@ const cases = [
 ];
 
 describe('Unique CSS Tests', () => {
-  for (const {label, input, expected} of cases) {
+  for (const { label, input, expected } of cases) {
     it(label, () => {
       css({}, input, expected);
     });

@@ -32,11 +32,11 @@ const postcss = require('postcss');
 const css = fs.readFileSync('src/app.css');
 
 postcss([require('postcss-combine-duplicated-selectors')])
-    .process(css, {from: 'src/app.css', to: 'app.css'})
-    .then((result) => {
-      fs.writeFileSync('app.css', result.css);
-      if (result.map) fs.writeFileSync('app.css.map', result.map);
-    });
+  .process(css, { from: 'src/app.css', to: 'app.css' })
+  .then((result) => {
+    fs.writeFileSync('app.css', result.css);
+    if (result.map) fs.writeFileSync('app.css.map', result.map);
+  });
 ```
 
 ### Using PostCSS CLI
@@ -97,7 +97,7 @@ Set the `removeDuplicatedProperties` option to `true` to enable.
 const postcss = require('postcss');
 const combineSelectors = require('postcss-combine-duplicated-selectors');
 
-postcss([combineSelectors({removeDuplicatedProperties: true})]);
+postcss([combineSelectors({ removeDuplicatedProperties: true })]);
 ```
 
 When enabled the following css
@@ -125,7 +125,7 @@ In order to limit this to only combining properties when the values are equal, s
 const postcss = require('postcss');
 const combineSelectors = require('postcss-combine-duplicated-selectors');
 
-postcss([combineSelectors({removeDuplicatedValues: true})]);
+postcss([combineSelectors({ removeDuplicatedValues: true })]);
 ```
 
 This will transform the following css

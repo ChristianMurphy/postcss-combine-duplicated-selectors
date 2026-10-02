@@ -27,5 +27,5 @@
 
 ## Additional Resources
 
-*   [PostCSS API](http://api.postcss.org)
-*   [PostCSS Selector Parser API](https://github.com/postcss/postcss-selector-parser/blob/master/API.md)
+- [PostCSS API](http://api.postcss.org)
+- [PostCSS Selector Parser API](https://github.com/postcss/postcss-selector-parser/blob/master/API.md)
