@@ -91,9 +91,54 @@ const cases = [
       '@keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}',
   },
   {
+    label: 'selectors whose classes swap across a combinator',
+    input: '.c.a .b {x:1} .c.b .a {y:2}',
+    expected: '.c.a .b {x:1} .c.b .a {y:2}',
+  },
+  {
+    label: 'selectors within a group whose classes swap across a combinator',
+    input: '.c.a .b, .c.b .a {}',
+    expected: '.c.a .b, .c.b .a {}',
+  },
+  {
+    label: 'type selector and class whose names run together',
+    input: '.adiv {x:1} div.a {y:2}',
+    expected: '.adiv {x:1} div.a {y:2}',
+  },
+  {
+    label: 'type selector and class within a group whose names run together',
+    input: '.ba, a.b {}',
+    expected: '.ba, a.b {}',
+  },
+  {
+    label: 'id and type selector whose names run together',
+    input: '#xdiv {x:1} div#x {y:2}',
+    expected: '#xdiv {x:1} div#x {y:2}',
+  },
+  {
+    label: 'pseudo class arguments with different selectors',
+    input: ':is(.a.b) {x:1} :is(.a .b) {y:2}',
+    expected: ':is(.a.b) {x:1} :is(.a .b) {y:2}',
+  },
+  {
+    label: 'pseudo class before and after a pseudo element',
+    input: 'a:hover::before, a::before:hover {}',
+    expected: 'a:hover::before, a::before:hover {}',
+  },
+  {
+    label: 'pseudo class before and after a legacy pseudo element',
+    input: 'a:hover:before {x:1} a:before:hover {y:2}',
+    expected: 'a:hover:before {x:1} a:before:hover {y:2}',
+  },
+  {
     label: 'attribute values that differ by a quote inside the value',
     input: '[x="a\'"] {x:1} [x=a] {y:2}',
     expected: '[x="a\'"] {x:1} [x=a] {y:2}',
+  },
+  {
+    label: 'attribute values within a group that differ by a quote',
+    input: '[x="a\'"], [x=a] {}',
+    expected: '[x="a\'"], [x=a] {}',
   },
   {
     label: 'selector groups partially overlapping',

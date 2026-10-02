@@ -48,7 +48,7 @@ const cases = [
   {
     label: 'nested selector grouping',
     input: '.one {&.two, .two& {}} .one {.two&, &.two {}}',
-    expected: '.one.two, .two.one {}',
+    expected: '.one.two {}',
   },
 ];
 

@@ -203,6 +203,92 @@ const cases = [
     expected: '.one .two, .one .three {}',
   },
   {
+    label: 'repeated selectors within a group',
+    input: '.a, .a {}',
+    expected: '.a {}',
+  },
+  {
+    label: 'selectors within a group that differ in spacing',
+    input: '.a .b, .a  .b, .a>.b, .a > .b {}',
+    expected: '.a .b, .a>.b {}',
+  },
+  {
+    label: 'selectors within a group with different class order',
+    input: '.one.two, .two.one {}',
+    expected: '.one.two {}',
+  },
+  {
+    label: 'selectors within a group with different order before a combinator',
+    input: '.three.two .one, .two.three .one {}',
+    expected: '.three.two .one {}',
+  },
+  {
+    label: 'selectors with different order before a combinator',
+    input: '.three.two .one {x:1} .two.three .one {y:2}',
+    expected: '.three.two .one {x:1;y:2}',
+  },
+  {
+    label: 'pseudo classes in different order',
+    input: 'a:hover:focus {x:1} a:focus:hover {y:2}',
+    expected: 'a:hover:focus {x:1;y:2}',
+  },
+  {
+    label: 'attribute selectors within a group with different quote marks',
+    input: '[x="a"], [x=\'a\'], [x=a] {}',
+    expected: '[x="a"] {}',
+  },
+  {
+    label: 'repeated selectors on separate lines within a group',
+    input: '.a,\n  .b,\n  .a {}',
+    expected: '.a,\n  .b {}',
+  },
+  {
+    label: 'comments kept when a repeated selector is removed',
+    input: '.a /* keep */, .b, .a {}',
+    expected: '.a /* keep */, .b {}',
+  },
+  {
+    label: 'comment removed with the repeated selector it sits in',
+    input: '.a, /* gone */ .a, .b {}',
+    expected: '.a, .b {}',
+  },
+  {
+    label: 'selector with a comment and a repeat, then a later rule',
+    input: '.a /* keep */, .a {x:1} .a {y:2}',
+    expected: '.a /* keep */ {x:1;y:2}',
+  },
+  {
+    label: 'selectors within :is() with different class order',
+    input: ':is(.b.a) {x:1} :is(.a.b) {y:2}',
+    expected: ':is(.b.a) {x:1;y:2}',
+  },
+  {
+    label: 'selector lists within :where() and :not() in different order',
+    input:
+      ':where(.a, .b) :not(.c, .d, .c) {x:1} :where(.b,.a) :not(.d,.c) {y:2}',
+    expected: ':where(.a, .b) :not(.c, .d, .c) {x:1;y:2}',
+  },
+  {
+    label: 'relative selectors within :has() with different class order',
+    input: 'a:has(> .b.c, + .d) {x:1} a:has(+ .d, > .c.b) {y:2}',
+    expected: 'a:has(> .b.c, + .d) {x:1;y:2}',
+  },
+  {
+    label: 'repeated :is() within :not() with different class order',
+    input: ':not(:is(.b.a), :is(.a.b)) {x:1} :not(:is(.a.b)) {y:2}',
+    expected: ':not(:is(.b.a), :is(.a.b)) {x:1;y:2}',
+  },
+  {
+    label: 'selectors within :is() in a group',
+    input: ':is(.b.a), :is(.a.b) {}',
+    expected: ':is(.b.a) {}',
+  },
+  {
+    label: 'group with a repeated selector and a later rule',
+    input: '.a, .a {x:1} .a {y:2}',
+    expected: '.a {x:1;y:2}',
+  },
+  {
     label: 'selectors and separately selectors within media query',
     input: '.one{} .one{} @media print { .one{} .one{} }',
     expected: '.one{} @media print { .one{} }',
