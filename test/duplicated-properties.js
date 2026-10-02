@@ -1,6 +1,6 @@
-const { describe, it } = require('node:test');
-const testFactory = require('./_test-factory');
-const plugin = require('../src');
+import { describe, it } from 'node:test';
+import testFactory from './_test-factory.js';
+import plugin from '../src/index.js';
 
 /**
  * These tests check if duplicated properties are deleted or maintained

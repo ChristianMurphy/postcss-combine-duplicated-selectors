@@ -1,5 +1,7 @@
-const parser = require('postcss-selector-parser');
-const { name } = require('../package.json');
+import parser from 'postcss-selector-parser';
+import packageJson from '../package.json' with { type: 'json' };
+
+const { name } = packageJson;
 
 /**
  * Ensure that attributes with different quotes match.
@@ -66,7 +68,7 @@ const defaultOptions = {
   removeDuplicatedProperties: false,
 };
 
-module.exports = (options) => {
+const plugin = (options) => {
   options = Object.assign({}, defaultOptions, options);
   return {
     postcssPlugin: name,
@@ -150,4 +152,6 @@ module.exports = (options) => {
   };
 };
 
-module.exports.postcss = true;
+plugin.postcss = true;
+
+export default plugin;

@@ -1,7 +1,7 @@
 import postcss from 'postcss';
 
 // root export
-import postcssCombineDuplicatedSelectors from './index';
+import postcssCombineDuplicatedSelectors from 'postcss-combine-duplicated-selectors';
 
 postcss([postcssCombineDuplicatedSelectors()]);
 postcss([

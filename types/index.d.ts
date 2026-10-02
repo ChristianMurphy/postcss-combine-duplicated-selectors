@@ -35,4 +35,4 @@ declare namespace postcssCombineDuplicatedSelectors {
  */
 declare const postcssCombineDuplicatedSelectors: postcssCombineDuplicatedSelectors.Plugin;
 
-export = postcssCombineDuplicatedSelectors;
+export default postcssCombineDuplicatedSelectors;

@@ -1,5 +1,5 @@
-const postcss = require('postcss');
-const assert = require('node:assert/strict');
+import postcss from 'postcss';
+import assert from 'node:assert/strict';
 
 /**
  * Generates test functions and test titles
@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
  * @param {Object} [syntax] - optional alternative syntax parser
  * @return {function} test function
  */
-module.exports = function testFactory(version, plugins, syntax) {
+export default function testFactory(version, plugins, syntax) {
   let tester;
   if (syntax) {
     tester = (_t, input, expected) => {
@@ -23,4 +23,4 @@ module.exports = function testFactory(version, plugins, syntax) {
     };
   }
   return tester;
-};
+}
