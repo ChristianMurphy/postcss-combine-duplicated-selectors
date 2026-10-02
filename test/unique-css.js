@@ -91,6 +91,11 @@ const cases = [
       '@keyframes a {0% {} 100% {}} @-webkit-keyframes a {0% {} 100% {}}',
   },
   {
+    label: 'attribute values that differ by a quote inside the value',
+    input: '[x="a\'"] {x:1} [x=a] {y:2}',
+    expected: '[x="a\'"] {x:1} [x=a] {y:2}',
+  },
+  {
     label: 'selector groups partially overlapping',
     input: '.one, .two {} .one, .two, .three {}',
     expected: '.one, .two {} .one, .two, .three {}',

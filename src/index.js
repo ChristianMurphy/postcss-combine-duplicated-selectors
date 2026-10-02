@@ -11,8 +11,7 @@ const { name } = packageJson;
 function normalizeAttributes(selector) {
   selector.walkAttributes((node) => {
     if (node.value) {
-      // remove quotes
-      node.value = node.value.replace(/'|\\'|"|\\"/g, '');
+      node.quoteMark = '"';
     }
   });
 }
