@@ -1,4 +1,5 @@
 import parser from 'postcss-selector-parser';
+import valueParser from 'postcss-value-parser';
 import packageJson from '../package.json' with { type: 'json' };
 
 const { name } = packageJson;
@@ -65,6 +66,38 @@ const uniformStyle = parser((selector) => {
 });
 
 /**
+ * Normalize at-rule params so that spacing differences are ignored.
+ * @param {string} params - at-rule params
+ * @return {string} params with single spaces, no padding around brackets,
+ * commas, slashes and colons, and selector() arguments normalized as selectors
+ */
+function normalizeParams(params) {
+  const parsed = valueParser(params);
+  parsed.walk((node) => {
+    // Spaces in a selector can be combinators, so parse it as a selector
+    if (node.type === 'function' && node.value.toLowerCase() === 'selector') {
+      const selector = uniformStyle.processSync(
+        valueParser.stringify(node.nodes),
+        {
+          lossless: false,
+        },
+      );
+      node.nodes = [{ type: 'word', value: selector }];
+      node.before = '';
+      node.after = '';
+      return false;
+    }
+    if (node.type === 'space') {
+      node.value = ' ';
+    } else if (node.type === 'function' || node.type === 'div') {
+      node.before = '';
+      node.after = '';
+    }
+  });
+  return parsed.toString();
+}
+
+/**
  * Describe every ancestor of a rule, from the root down, as one string.
  * @param {Object} rule - postcss rule node
  * @param {WeakMap<Object, string>} stepCache - steps already computed per node
@@ -78,7 +111,7 @@ function getContextKey(rule, stepCache) {
       stepCache.set(
         node,
         node.type === 'atrule'
-          ? `@${node.name.toLowerCase()}${node.params.replace(/\s+/g, '')}`
+          ? `@${node.name.toLowerCase()} ${normalizeParams(node.params)}`
           : uniformStyle.processSync(node.selector, { lossless: false }),
       );
     }

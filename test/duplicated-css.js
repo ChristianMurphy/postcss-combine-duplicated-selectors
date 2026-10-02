@@ -393,6 +393,16 @@ body {
     expected: '@media (min-width:1px){@supports (x:y){a{b:1;c:2}}}',
   },
   {
+    label: 'selectors within at-rules whose params differ in spacing',
+    input: '@media screen   and  (x){a{b:1}}@media screen and (x){a{c:2}}',
+    expected: '@media screen   and  (x){a{b:1;c:2}}',
+  },
+  {
+    label: 'selectors within selector() params that differ in spacing',
+    input: '@supports selector(a>b){x{a:1}}@supports selector( a > b ){x{b:2}}',
+    expected: '@supports selector(a>b){x{a:1;b:2}}',
+  },
+  {
     label: 'selectors nested in the same parent selector',
     input: '.a{.b{x:1}}.a{.b{y:2}}',
     expected: '.a{.b{x:1;y:2}}',

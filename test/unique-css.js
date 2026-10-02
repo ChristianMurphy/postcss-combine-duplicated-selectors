@@ -144,6 +144,33 @@ const cases = [
     expected: '@media screen{a{x:1}}mediascreen{a{y:2}}',
   },
   {
+    label: 'at-rule params that differ only by a descendant combinator',
+    input: '@supports selector(.a .b){x{a:1}}@supports selector(.a.b){x{b:2}}',
+    expected:
+      '@supports selector(.a .b){x{a:1}}@supports selector(.a.b){x{b:2}}',
+  },
+  {
+    label: 'selector() params that differ by a descendant combinator',
+    input:
+      '@supports selector(a :hover){x{a:1}}@supports selector(a:hover){x{b:2}}',
+    expected:
+      '@supports selector(a :hover){x{a:1}}@supports selector(a:hover){x{b:2}}',
+  },
+  {
+    // value-parser reads 400px<=width<=700px as one word, so these stay apart
+    label: 'media range params with different spacing around operators',
+    input:
+      '@media (400px <= width <= 700px){a{x:1}}@media (400px<=width<=700px){a{y:2}}',
+    expected:
+      '@media (400px <= width <= 700px){a{x:1}}@media (400px<=width<=700px){a{y:2}}',
+  },
+  {
+    label: 'at-rule params that differ only by spaces inside a string',
+    input: '@supports (content:"a b"){x{a:1}}@supports (content:"ab"){x{b:2}}',
+    expected:
+      '@supports (content:"a b"){x{a:1}}@supports (content:"ab"){x{b:2}}',
+  },
+  {
     label: 'selectors in different control flow at-rules',
     input: '@if $x {.a{a:1}} @else {.a{b:2}}',
     expected: '@if $x {.a{a:1}} @else {.a{b:2}}',
