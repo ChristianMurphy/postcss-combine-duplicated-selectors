@@ -102,6 +102,79 @@ const cases = [
     expected:
       '@media (prefers-color-scheme: light) {:root {--text-color: oklch(0% 0 0);}} @media (prefers-color-scheme: dark) {:root {--text-color: oklch(100% 0 0);}}',
   },
+  {
+    label:
+      'selectors in the same inner at-rule within different outer at-rules',
+    input:
+      '@media screen{@supports (x:y){div{a:1}}}@media print{@supports (x:y){div{b:2}}}',
+    expected:
+      '@media screen{@supports (x:y){div{a:1}}}@media print{@supports (x:y){div{b:2}}}',
+  },
+  {
+    label: 'selectors in at-rule chains of different depth',
+    input: '@supports (x:y){div{a:1}}@media screen{@supports (x:y){div{b:2}}}',
+    expected:
+      '@supports (x:y){div{a:1}}@media screen{@supports (x:y){div{b:2}}}',
+  },
+  {
+    label: 'keyframes within different media queries',
+    input:
+      '@media screen{@keyframes x{from{a:1}}}@media print{@keyframes x{from{b:2}}}',
+    expected:
+      '@media screen{@keyframes x{from{a:1}}}@media print{@keyframes x{from{b:2}}}',
+  },
+  {
+    label: 'nesting selectors in different parent selectors',
+    input: '.a{&:hover{x:1}}.c{&:hover{y:2}}',
+    expected: '.a{&:hover{x:1}}.c{&:hover{y:2}}',
+  },
+  {
+    label: 'nested selector and top level selector',
+    input: '.a{.b{color:red}}.b{color:blue}',
+    expected: '.a{.b{color:red}}.b{color:blue}',
+  },
+  {
+    label: 'selectors in the same at-rule nested in different selectors',
+    input: '.a{@media screen{.b{x:1}}}.c{@media screen{.b{y:2}}}',
+    expected: '.a{@media screen{.b{x:1}}}.c{@media screen{.b{y:2}}}',
+  },
+  {
+    label: 'at-rule and selector that read the same without the at sign',
+    input: '@media screen{a{x:1}}mediascreen{a{y:2}}',
+    expected: '@media screen{a{x:1}}mediascreen{a{y:2}}',
+  },
+  {
+    label: 'at-rule params that differ only by a descendant combinator',
+    input: '@supports selector(.a .b){x{a:1}}@supports selector(.a.b){x{b:2}}',
+    expected:
+      '@supports selector(.a .b){x{a:1}}@supports selector(.a.b){x{b:2}}',
+  },
+  {
+    label: 'selector() params that differ by a descendant combinator',
+    input:
+      '@supports selector(a :hover){x{a:1}}@supports selector(a:hover){x{b:2}}',
+    expected:
+      '@supports selector(a :hover){x{a:1}}@supports selector(a:hover){x{b:2}}',
+  },
+  {
+    // value-parser reads 400px<=width<=700px as one word, so these stay apart
+    label: 'media range params with different spacing around operators',
+    input:
+      '@media (400px <= width <= 700px){a{x:1}}@media (400px<=width<=700px){a{y:2}}',
+    expected:
+      '@media (400px <= width <= 700px){a{x:1}}@media (400px<=width<=700px){a{y:2}}',
+  },
+  {
+    label: 'at-rule params that differ only by spaces inside a string',
+    input: '@supports (content:"a b"){x{a:1}}@supports (content:"ab"){x{b:2}}',
+    expected:
+      '@supports (content:"a b"){x{a:1}}@supports (content:"ab"){x{b:2}}',
+  },
+  {
+    label: 'selectors in different control flow at-rules',
+    input: '@if $x {.a{a:1}} @else {.a{b:2}}',
+    expected: '@if $x {.a{a:1}} @else {.a{b:2}}',
+  },
 ];
 
 describe('Unique CSS Tests', () => {
