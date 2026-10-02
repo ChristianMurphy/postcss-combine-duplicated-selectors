@@ -8,7 +8,7 @@ import plugin from '../src/index.js';
  * These tests check only standard css syntax.
  */
 
-const css = testFactory('css', [plugin]);
+const css = testFactory([plugin]);
 
 const cases = [
   { label: 'class', input: '.module {}', expected: '.module {}' },
@@ -107,7 +107,7 @@ const cases = [
 describe('Unique CSS Tests', () => {
   for (const { label, input, expected } of cases) {
     it(label, () => {
-      css({}, input, expected);
+      css(input, expected);
     });
   }
 });

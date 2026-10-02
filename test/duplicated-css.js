@@ -18,7 +18,7 @@ function minify([string]) {
   return string.replace(/\s+/gm, ' ');
 }
 
-const css = testFactory('css', [plugin]);
+const css = testFactory([plugin]);
 
 const cases = [
   { label: 'class', input: '.module {} .module {}', expected: '.module {}' },
@@ -378,7 +378,7 @@ body {
 describe('Duplicated CSS Tests', () => {
   for (const { label, input, expected } of cases) {
     it(label, () => {
-      css({}, input, expected);
+      css(input, expected);
     });
   }
 });

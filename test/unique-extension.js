@@ -4,8 +4,8 @@ import postcssNested from 'postcss-nested';
 import postcssScss from 'postcss-scss';
 import plugin from '../src/index.js';
 
-const nestedCSS = testFactory('nested css', [postcssNested, plugin]);
-const scss = testFactory('scss', [postcssNested, plugin], postcssScss);
+const nestedCSS = testFactory([postcssNested, plugin]);
+const scss = testFactory([postcssNested, plugin], postcssScss);
 
 const cases = [
   {
@@ -23,8 +23,8 @@ const cases = [
 describe('Unique Extension Tests', () => {
   for (const { label, input, expected } of cases) {
     it(label, () => {
-      nestedCSS({}, input, expected);
-      scss({}, input, expected);
+      nestedCSS(input, expected);
+      scss(input, expected);
     });
   }
 });

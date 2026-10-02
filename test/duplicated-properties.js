@@ -18,7 +18,7 @@ function minify([string]) {
 }
 
 // Duplicated properties should be removed
-const removeDuplicates = testFactory('css', [
+const removeDuplicates = testFactory([
   plugin({ removeDuplicatedProperties: true }),
 ]);
 
@@ -49,13 +49,13 @@ describe('Duplicated Properties - Removed', () => {
 
   for (const { label, input, expected } of cases) {
     it(label, () => {
-      removeDuplicates({}, input, expected);
+      removeDuplicates(input, expected);
     });
   }
 });
 
 // Duplicated properties should be maintained
-const keepDuplicates = testFactory('css', [
+const keepDuplicates = testFactory([
   plugin({ removeDuplicatedProperties: false }),
 ]);
 
@@ -87,13 +87,13 @@ describe('Duplicated Properties - Kept', () => {
 
   for (const { label, input, expected } of cases) {
     it(label, () => {
-      keepDuplicates({}, input, expected);
+      keepDuplicates(input, expected);
     });
   }
 });
 
 // Only duplicated properties with matching values should be removed
-const removeExactDuplicates = testFactory('css', [
+const removeExactDuplicates = testFactory([
   plugin({ removeDuplicatedValues: true }),
 ]);
 
@@ -146,7 +146,7 @@ describe('Duplicated Properties - Remove Exact Duplicates', () => {
 
   for (const { label, input, expected } of cases) {
     it(label, () => {
-      removeExactDuplicates({}, input, expected);
+      removeExactDuplicates(input, expected);
     });
   }
 });
