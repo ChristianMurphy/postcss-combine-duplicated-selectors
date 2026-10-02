@@ -98,10 +98,8 @@ const cases = [
   {
     label: 'media query',
     input:
-      // eslint-disable-next-line max-len
       '@media (prefers-color-scheme: light) {:root {--text-color: oklch(0% 0 0);}} @media (prefers-color-scheme: dark) {:root {--text-color: oklch(100% 0 0);}}',
     expected:
-      // eslint-disable-next-line max-len
       '@media (prefers-color-scheme: light) {:root {--text-color: oklch(0% 0 0);}} @media (prefers-color-scheme: dark) {:root {--text-color: oklch(100% 0 0);}}',
   },
 ];

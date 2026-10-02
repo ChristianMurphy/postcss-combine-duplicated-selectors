@@ -22,10 +22,5 @@ module.exports = function testFactory(version, plugins, syntax) {
       assert.strictEqual(actual, expected);
     };
   }
-  // Setup test macro title generator
-  tester.title = (providedTitle, input, expected) =>
-    providedTitle
-      ? `${providedTitle} in ${version}`
-      : `"${input}" becomes "${expected}" in ${version}`;
   return tester;
 };

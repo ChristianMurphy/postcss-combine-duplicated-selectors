@@ -10,14 +10,15 @@
   ],
   "scripts": {
     "commit": "commit",
-    "format": "eslint --fix --ext md,js .",
+    "format": "oxfmt",
     "test": "run-s test:*",
     "test:unit": "node --test",
-    "test:lint-js": "eslint --ext md,js .",
+    "test:lint-js": "oxlint",
+    "test:format": "oxfmt --check",
     "test:lint-md": "remark *.md -q --no-stdout",
-    "test:types": "tsd",
+    "test:types": "tsc -p types",
     "commitlint": "commitlint --from HEAD~1",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "keywords": [
     "postcss-plugin",
@@ -44,47 +45,24 @@
     "postcss-selector-parser": "^7.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.8.1",
-    "@commitlint/config-conventional": "17.8.1",
-    "@commitlint/prompt-cli": "17.8.1",
-    "eslint": "8.57.1",
-    "eslint-config-google": "0.14.0",
-    "eslint-plugin-markdown": "3.0.1",
-    "husky": "8.0.3",
-    "npm-run-all2": "8.0.4",
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3",
+    "@commitlint/prompt-cli": "21.2.3",
+    "husky": "9.1.7",
+    "npm-run-all2": "9.0.3",
+    "oxfmt": "0.71.0",
+    "oxlint": "1.86.0",
     "postcss": "8.5.28",
-    "postcss-less": "6.0.0",
-    "postcss-nested": "7.0.2",
+    "postcss-nested": "8.0.1",
     "postcss-scss": "4.0.9",
     "remark-cli": "12.0.1",
     "remark-preset-lint-consistent": "6.0.1",
     "remark-preset-lint-recommended": "7.0.1",
     "remark-validate-links": "13.1.0",
-    "tsd": "^0.33.0",
-    "typescript": "5.9.3"
+    "typescript": "7.0.2"
   },
   "engines": {
-    "node": "^18.0.0 || ^20.0.0 || >=22.0.0"
-  },
-  "eslintConfig": {
-    "root": true,
-    "parserOptions": {
-      "ecmaVersion": "2021"
-    },
-    "env": {
-      "es6": true,
-      "node": true
-    },
-    "extends": [
-      "eslint:recommended",
-      "google",
-      "plugin:markdown/recommended"
-    ],
-    "rules": {
-      "prefer-arrow-callback": "error",
-      "prefer-const": "error",
-      "prefer-template": "error"
-    }
+    "node": ">=24"
   },
   "remarkConfig": {
     "plugins": [
@@ -100,7 +78,7 @@
   },
   "renovate": {
     "extends": [
-      "config:base"
+      "config:recommended"
     ],
     "automerge": true,
     "major": {

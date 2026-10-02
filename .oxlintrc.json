@@ -1,0 +1,39 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["unicorn", "oxc", "typescript", "jsdoc"],
+  "env": {
+    "node": true,
+    "es2021": true
+  },
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "no-fallthrough": "error",
+    "no-prototype-builtins": "error",
+    "no-case-declarations": "error",
+    "no-empty": "error",
+    "prefer-const": "error",
+    "prefer-template": "error",
+    "prefer-arrow-callback": "error",
+    "jsdoc/require-param": "error",
+    "jsdoc/require-returns": "error"
+  },
+  "ignorePatterns": ["dist"],
+  "settings": {
+    "jsdoc": {
+      "tagNamePreference": {
+        "returns": "return"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.js"],
+      "rules": {
+        "no-undef": "error",
+        "no-redeclare": "error"
+      }
+    }
+  ]
+}

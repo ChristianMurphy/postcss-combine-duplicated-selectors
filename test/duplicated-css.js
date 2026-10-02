@@ -11,6 +11,7 @@ const plugin = require('../src');
 /**
  * Take string literals are remove newlines and extra spacing so results print
  * as expected in logs
+ * @param {TemplateStringsArray} strings - template literal parts
  * @return {string} string without newlines and tabs
  */
 function minify([string]) {
@@ -146,9 +147,7 @@ const cases = [
   },
   {
     label: 'selectors with multiple properties',
-    // eslint-disable-next-line max-len
     input: '.a {color: black; height: 10px} .a {background-color: red; width: 20px}',
-    // eslint-disable-next-line max-len
     expected: '.a {color: black; height: 10px;background-color: red; width: 20px}',
   },
   {

@@ -1,4 +1,3 @@
-import {expectError} from 'tsd';
 import postcss from "postcss";
 
 // root export
@@ -15,11 +14,10 @@ postcss([postcssCombineDuplicatedSelectors({ removeDuplicatedValues: true })]);
 postcss([
   postcssCombineDuplicatedSelectors({ removeDuplicatedValues: false }),
 ]);
-expectError(
-  postcss([
-    postcssCombineDuplicatedSelectors({
-      removeDuplicatedValues: true,
-      removeDuplicatedProperties: true, // $ExpectError
-    }),
-  ]) 
-);
+postcss([
+  postcssCombineDuplicatedSelectors({
+    removeDuplicatedValues: true,
+    // @ts-expect-error both options cannot be enabled together
+    removeDuplicatedProperties: true,
+  }),
+]);

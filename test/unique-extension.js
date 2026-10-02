@@ -1,6 +1,6 @@
 const {describe, it} = require('node:test');
 const testFactory = require('./_test-factory');
-const postcssNested = require('postcss-nested');
+const postcssNested = require('postcss-nested').default;
 const postcssScss = require('postcss-scss');
 const plugin = require('../src');
 

@@ -4,9 +4,6 @@
     "lib": ["es2021"],
     "module": "node16",
     "strict": true,
-    "baseUrl": ".",
-    "paths": {
-      "postcss-combine-duplicated-selectors": ["index.d.ts"]
-    }
+    "noEmit": true
   }
 }

@@ -10,6 +10,7 @@ const plugin = require('../src');
 /**
  * Take string literals and remove newlines and extra spacing so results print
  * as expected in logs
+ * @param {TemplateStringsArray} strings - template literal parts
  * @return {string} string without newlines and tabs
  */
 function minify([string]) {
@@ -100,10 +101,8 @@ describe('Duplicated Properties - Remove Exact Duplicates', () => {
   const cases = [
     {
       label:
-        // eslint-disable-next-line max-len
         'remove duplicated properties with matching values (combined selectors)',
       input:
-        // eslint-disable-next-line max-len
         '.a {height: 10px; color: red;} .a {color: red; color: blue; width: 20px;}',
       expected: '.a {height: 10px;color: red; color: blue; width: 20px;}',
     },
