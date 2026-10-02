@@ -161,3 +161,51 @@ into
 ### Media Queries
 
 If you have code with media queries, pass code through [_postcss-combine-media-query_](https://github.com/SassNinja/postcss-combine-media-query) or [_css-mquery-packer_](https://github.com/n19htz/css-mquery-packer) before _postcss-combine-duplicated-selectors_ to ensure optimal results.
+
+### Nested rules and at-rules
+
+Selectors combine only when they sit in the same context. That means the same chain of at-rules, such as `@media` and `@supports`. With CSS nesting, it also means the same parent selectors.
+
+```css
+@media screen {
+  @supports (display: grid) {
+    div {
+      display: grid;
+    }
+  }
+}
+@media screen {
+  @supports (display: grid) {
+    div {
+      gap: 1rem;
+    }
+  }
+}
+@media print {
+  @supports (display: grid) {
+    div {
+      display: block;
+    }
+  }
+}
+```
+
+becomes
+
+```css
+@media screen {
+  @supports (display: grid) {
+    div {
+      display: grid;
+      gap: 1rem;
+    }
+  }
+}
+@media print {
+  @supports (display: grid) {
+    div {
+      display: block;
+    }
+  }
+}
+```

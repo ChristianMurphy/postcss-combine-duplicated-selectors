@@ -373,6 +373,45 @@ body {
 }
 `,
   },
+  {
+    label: 'selectors within the same nested at-rules',
+    input:
+      '@media screen{@supports (display:grid){div{display:grid}}}@media screen{@supports (display:grid){div{color:red}}}',
+    expected:
+      '@media screen{@supports (display:grid){div{display:grid;color:red}}}',
+  },
+  {
+    label: 'selectors within the same deeply nested at-rules',
+    input:
+      '@media screen{@supports (x:y){@layer a{div{a:1}}}}@media screen{@supports (x:y){@layer a{div{b:2}}}}',
+    expected: '@media screen{@supports (x:y){@layer a{div{a:1;b:2}}}}',
+  },
+  {
+    label: 'selectors within nested at-rules that differ only in whitespace',
+    input:
+      '@media (min-width:1px){@supports (x:y){a{b:1}}}@media ( min-width: 1px ){@supports (x:y){a{c:2}}}',
+    expected: '@media (min-width:1px){@supports (x:y){a{b:1;c:2}}}',
+  },
+  {
+    label: 'selectors nested in the same parent selector',
+    input: '.a{.b{x:1}}.a{.b{y:2}}',
+    expected: '.a{.b{x:1;y:2}}',
+  },
+  {
+    label: 'nesting selectors in the same parent selector',
+    input: '.a{&:hover{x:1}}.a{&:hover{y:2}}',
+    expected: '.a{&:hover{x:1;y:2}}',
+  },
+  {
+    label: 'selectors in the same at-rule nested in the same selector',
+    input: '.a{@media screen{.b{x:1}}}.a{@media screen{.b{y:2}}}',
+    expected: '.a{@media screen{.b{x:1;y:2}}}',
+  },
+  {
+    label: 'selectors next to an at-rule that was empty in the input',
+    input: '@media s{a{x:1}}@media s{@supports (x){}a{y:1}}',
+    expected: '@media s{a{x:1;y:1}}@media s{@supports (x){}}',
+  },
 ];
 
 describe('Duplicated CSS Tests', () => {

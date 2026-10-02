@@ -64,6 +64,29 @@ const uniformStyle = parser((selector) => {
   sortGroups(selector);
 });
 
+/**
+ * Describe every ancestor of a rule, from the root down, as one string.
+ * @param {Object} rule - postcss rule node
+ * @param {WeakMap<Object, string>} stepCache - steps already computed per node
+ * @return {string} key shared by rules in the same nesting context
+ */
+function getContextKey(rule, stepCache) {
+  const steps = [];
+  for (let node = rule.parent; node.type !== 'root'; node = node.parent) {
+    // Re-parsing ancestor selectors for every nested rule tripled run time
+    if (!stepCache.has(node)) {
+      stepCache.set(
+        node,
+        node.type === 'atrule'
+          ? `@${node.name.toLowerCase()}${node.params.replace(/\s+/g, '')}`
+          : uniformStyle.processSync(node.selector, { lossless: false }),
+      );
+    }
+    steps.unshift(stepCache.get(node));
+  }
+  return JSON.stringify(steps);
+}
+
 const defaultOptions = {
   removeDuplicatedProperties: false,
 };
@@ -73,29 +96,17 @@ const plugin = (options) => {
   return {
     postcssPlugin: name,
     prepare() {
-      // Create a map to store maps
+      // Map each nesting context to the rules seen in it
       const mapTable = new Map();
-      // root map to store root selectors
-      mapTable.set('root', new Map());
+      const stepCache = new WeakMap();
 
       return {
         Rule: (rule) => {
-          let map;
-          // Check selector parent for any at rule
-          if (rule.parent.type === 'atrule') {
-            // Use name and query params as the key
-            const query =
-              rule.parent.name.toLowerCase() +
-              rule.parent.params.replace(/\s+/g, '');
-
-            // See if this query key is already in the map table
-            map = mapTable.has(query) // If it is use it
-              ? mapTable.get(query) // if not set it and get it
-              : mapTable.set(query, new Map()).get(query);
-          } else {
-            // Otherwise we are dealing with a selector in the root
-            map = mapTable.get('root');
-          }
+          // Rules only combine when every ancestor at-rule and rule matches
+          const context = getContextKey(rule, stepCache);
+          const map = mapTable.has(context)
+            ? mapTable.get(context)
+            : mapTable.set(context, new Map()).get(context);
 
           // create a uniform selector
           const selector = uniformStyle.processSync(rule.selector, {
@@ -114,9 +125,9 @@ const plugin = (options) => {
               destination.append(rule.nodes[0]);
             }
 
-            // store the original rule parent before removal in case an atrule
-            // becomes empty as a result of the removal
-            const ruleParent = rule.parent;
+            // store the original rule parent before removal in case it or
+            // its ancestors become empty as a result of the removal
+            let emptied = rule.parent;
 
             // remove duplicated rule
             rule.remove();
@@ -124,10 +135,11 @@ const plugin = (options) => {
             // on removal of the node, the parent atrule could have no
             // declarations associated. This is an issue for @keyframes that
             // interpret @keyframes <name> {} as overwriting existing keyframe
-            // transitions.
-            if (ruleParent.type === 'atrule' && ruleParent.nodes.length === 0) {
-              const ruleParentIndex = ruleParent.parent.index(ruleParent);
-              ruleParent.parent.nodes[ruleParentIndex].remove();
+            // transitions. Nested wrappers can empty in turn, so walk up.
+            while (emptied.type !== 'root' && emptied.nodes.length === 0) {
+              const parent = emptied.parent;
+              emptied.remove();
+              emptied = parent;
             }
 
             if (
