@@ -38,3 +38,15 @@ jobs:
           node-version: 26
       - run: npm ci
       - run: npm run fuzz
+  bench:
+    name: 'bench: ubuntu-latest, node.js 26'
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+      - run: npm ci
+      - run: npm ci --prefix bench --omit=peer
+      - run: node --experimental-bench --bench --bench-samples=1 --bench-warmup=0 bench/frameworks.js

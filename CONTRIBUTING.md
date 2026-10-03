@@ -25,6 +25,15 @@
 8.  Push changes to GitHub
 9.  Open a Pull Request
 
+## Benchmarking
+
+`npm run bench` times the plugin on the CSS of popular frameworks with each option.
+It needs Node.js 26.9 or later.
+
+1.  Install the frameworks: `npm ci --prefix bench --omit=peer`
+2.  Run the benchmark: `npm run bench`
+3.  Save results as JSON to compare later: `node --experimental-bench --bench --bench-reporter=json bench/frameworks.js > before.ndjson`
+
 ## Additional Resources
 
 - [PostCSS API](http://api.postcss.org)
