@@ -131,6 +131,16 @@ const cases = [
     expected: 'a:hover:before {x:1} a:before:hover {y:2}',
   },
   {
+    label: 'pseudo class before and after an uppercase legacy pseudo element',
+    input: 'a:hover:BEFORE {x:1} a:BEFORE:hover {y:2}',
+    expected: 'a:hover:BEFORE {x:1} a:BEFORE:hover {y:2}',
+  },
+  {
+    label: 'pseudo class arguments with different case',
+    input: ':lang(EN) {x:1} :lang(en) {y:2}',
+    expected: ':lang(EN) {x:1} :lang(en) {y:2}',
+  },
+  {
     label: 'attribute values that differ by a quote inside the value',
     input: '[x="a\'"] {x:1} [x=a] {y:2}',
     expected: '[x="a\'"] {x:1} [x=a] {y:2}',

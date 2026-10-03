@@ -29,6 +29,13 @@ describe('Unique Extension Tests', () => {
     });
   }
 
+  it('pseudo classes built from variables with different case', () => {
+    scssWithoutNesting(
+      '.a:#{$State}{x:1} .a:#{$state}{y:2}',
+      '.a:#{$State}{x:1} .a:#{$state}{y:2}',
+    );
+  });
+
   it('repeated selectors in a group with an inline comment', () => {
     scssWithoutNesting('.a, // c\n.b, .a{x:1}', '.a, // c\n.b, .a{x:1}');
   });

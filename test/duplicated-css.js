@@ -279,6 +279,16 @@ const cases = [
     expected: ':not(:is(.b.a), :is(.a.b)) {x:1;y:2}',
   },
   {
+    label: 'pseudo classes with different case',
+    input: ':NOT(.a) {x:1} :not(.a) {y:2} a:HOVER {z:3} a:hover {w:4}',
+    expected: ':NOT(.a) {x:1;y:2} a:HOVER {z:3;w:4}',
+  },
+  {
+    label: 'selectors within :IS() with different class order',
+    input: ':IS(.b.a) {x:1} :is(.a.b) {y:2}',
+    expected: ':IS(.b.a) {x:1;y:2}',
+  },
+  {
     label: 'selectors within :is() in a group',
     input: ':is(.b.a), :is(.a.b) {}',
     expected: ':is(.b.a) {}',

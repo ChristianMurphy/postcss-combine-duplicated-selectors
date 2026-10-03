@@ -63,13 +63,18 @@ const listPseudos = new Set([
 ]);
 
 /**
- * Normalize the selector lists inside pseudo-class arguments.
+ * Lowercase pseudo-class and pseudo-element names, which CSS treats as
+ * case-insensitive, and normalize the selector lists inside their arguments.
  * @param {Object} selectors - postcss selector root
  */
-function sortPseudoArguments(selectors) {
+function normalizePseudos(selectors) {
   const pseudos = [];
   selectors.walkPseudos((pseudo) => {
-    if (listPseudos.has(pseudo.value.toLowerCase())) pseudos.push(pseudo);
+    // Sass interpolation such as :#{$State} stays case-sensitive
+    if (/^::?[a-z-]+$/i.test(pseudo.value)) {
+      pseudo.value = pseudo.value.toLowerCase();
+    }
+    if (listPseudos.has(pseudo.value)) pseudos.push(pseudo);
   });
   // The walk lists outer pseudo-classes first; inner ones must sort first
   for (const pseudo of pseudos.reverse()) {
@@ -106,7 +111,7 @@ function removeDupProperties(selector, exact) {
 // elements read the same
 const getSelectorKeys = parser((selectors) => {
   normalizeAttributes(selectors);
-  sortPseudoArguments(selectors);
+  normalizePseudos(selectors);
   selectors.each(sortCompounds);
   return selectors.map(String);
 });
