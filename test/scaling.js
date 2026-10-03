@@ -81,6 +81,15 @@ const cases = [
     modes: [{}],
   },
   {
+    label: 'rules nested in at-rules and rules',
+    // Each level adds two nodes, so a shallower tree keeps the stack small
+    build: (size) => {
+      const depth = size / 8;
+      return `${'@media (width: 1px){.a{'.repeat(depth)}x:1${'}}'.repeat(depth)}`;
+    },
+    modes: [{}],
+  },
+  {
     label: 'a selector list repeating one selector',
     // Removing one selector is cheap, so squared growth shows only in a
     // longer list
@@ -93,7 +102,10 @@ describe('Scaling', () => {
   for (const { label, build, modes } of cases) {
     for (const options of modes) {
       it(`${label} with ${JSON.stringify(options)}`, () => {
-        const ratio = getRunTimeRatio(build, options);
+        let ratio = getRunTimeRatio(build, options);
+        // A busy machine can slow one measurement, but squared growth fails
+        // every time
+        if (ratio >= maximumRatio) ratio = getRunTimeRatio(build, options);
         assert.ok(
           ratio < maximumRatio,
           `${scale} times the input took ${ratio.toFixed(1)} times as long`,

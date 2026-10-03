@@ -473,40 +473,62 @@ const plugin = (options) => {
       const shapeCache = new Map();
       let blockId = 0;
 
-      // Each rule's key: the steps of its ancestors and itself, from the root
-      // down. Rules merge when every ancestor at-rule and rule matches.
+      // Each rule's key: the number of its context and its own normalized
+      // selector. Equal contexts share a number, so rules merge when every
+      // ancestor at-rule and rule matches, and keys stay short at any depth.
       /** @type {Map<Rule, string>} */
       const ruleKeys = new Map();
+      /** @type {Map<string, number>} */
+      const contextIds = new Map();
       /**
-       * @param {Array<ChildNode>} nodes - children whose rules to key
-       * @param {string} path - key of the parent
+       * @param {number} context - number of the parent context
+       * @param {string} step - normalized selector or at-rule
+       * @return {string} the key of the step within its context
+       */
+      const getKey = (context, step) => `${context}${JSON.stringify(step)}`;
+      /**
+       * @param {string} key - key from getKey
+       * @return {number} the number of the context the key opens
+       */
+      const getContextId = (key) =>
+        getCached(contextIds, key, () => contextIds.size + 1);
+      // A work list instead of recursion, so deep nesting cannot overflow the
+      // stack. Children go on in reverse, so rules come off in document order.
+      /** @type {Array<[Rule | AtRule, number]>} */
+      const pending = [];
+      /**
+       * @param {Array<ChildNode>} nodes - children to visit
+       * @param {number} context - number of their context
        * @return {undefined}
        */
-      const keyRules = (nodes, path) => {
-        for (const node of nodes) {
-          if (node.type === 'rule') {
-            const keys = getCached(selectorCache, node.selector, (selector) =>
-              getSelectorKeys.transformSync(selector, { lossless: false }),
-            );
-            removeRepeatedSelectors(node, keys);
-            const key = path + JSON.stringify(joinSelectorKeys(keys));
-            ruleKeys.set(node, key);
-            keyRules(node.nodes, key);
-          } else if (node.type === 'atrule' && node.nodes) {
-            const atName = node.name.toLowerCase();
-            const params = getCached(paramsCache, node.params, normalizeParams);
-            const step = `@${atName} ${params}`;
-            keyRules(
-              node.nodes,
-              path +
-                JSON.stringify(
-                  mergeableAtRules.has(atName) ? step : `${step} #${++blockId}`,
-                ),
-            );
+      const visit = (nodes, context) => {
+        for (const node of nodes.toReversed()) {
+          if (node.type === 'rule' || node.type === 'atrule') {
+            pending.push([node, context]);
           }
         }
       };
-      keyRules(root.nodes, '');
+      visit(root.nodes, 0);
+      for (let entry = pending.pop(); entry; entry = pending.pop()) {
+        const [node, context] = entry;
+        if (node.type === 'rule') {
+          const keys = getCached(selectorCache, node.selector, (selector) =>
+            getSelectorKeys.transformSync(selector, { lossless: false }),
+          );
+          removeRepeatedSelectors(node, keys);
+          const key = getKey(context, joinSelectorKeys(keys));
+          ruleKeys.set(node, key);
+          visit(node.nodes, getContextId(key));
+        } else if (node.nodes) {
+          const atName = node.name.toLowerCase();
+          const params = getCached(paramsCache, node.params, normalizeParams);
+          const step = `@${atName} ${params}`;
+          const blockStep = mergeableAtRules.has(atName)
+            ? step
+            : `${step} #${++blockId}`;
+          visit(node.nodes, getContextId(getKey(context, blockStep)));
+        }
+      }
 
       // Move the children of each repeated rule into the first one
       /** @type {Array<ChildNode>} */
