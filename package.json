@@ -5,27 +5,28 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
+      "types": "./src/index.d.ts",
       "default": "./src/index.js"
     },
     "./package.json": "./package.json"
   },
-  "types": "./types/index.d.ts",
+  "types": "./src/index.d.ts",
   "files": [
-    "src",
-    "types/index.d.ts"
+    "src"
   ],
   "scripts": {
     "commit": "commit",
     "format": "oxfmt",
+    "build": "tsc --build --clean && tsc --build && type-coverage",
+    "prepack": "npm run build",
     "test": "run-s test:*",
-    "test:unit": "node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100",
+    "test:unit": "node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 \"test/**/*.js\"",
     "test:lint-js": "oxlint",
     "test:format": "oxfmt --check",
     "test:lint-md": "remark *.md -q --no-stdout",
-    "test:types": "tsc -p types && tsc --noEmit && type-coverage",
     "commitlint": "commitlint --from HEAD~1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:types": "npm run build"
   },
   "keywords": [
     "postcss-plugin",

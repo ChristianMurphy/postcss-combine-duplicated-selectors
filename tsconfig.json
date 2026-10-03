@@ -12,5 +12,5 @@
     "target": "es2025",
     "types": ["node"]
   },
-  "include": ["src/", "test/"]
+  "include": ["src/**/*.js", "test/**/*.js"]
 }
