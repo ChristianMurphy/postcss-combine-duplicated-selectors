@@ -1,7 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import postcss from 'postcss';
 import plugin from '../src/index.js';
 // Importing by package name resolves through the "exports" map in package.json
 import pluginByName from 'postcss-combine-duplicated-selectors';
@@ -14,9 +13,13 @@ describe('package exports', () => {
   });
 
   it('exposes the plugin as default to CommonJS require', () => {
-    const { css } = postcss([
-      require('postcss-combine-duplicated-selectors').default,
-    ]).process('.a{color:red}.a{margin:0}', { from: undefined });
-    assert.equal(css, '.a{color:red;margin:0}');
+    /** @type {unknown} */
+    const required = require('postcss-combine-duplicated-selectors');
+    assert.ok(
+      typeof required === 'object' &&
+        required !== null &&
+        'default' in required,
+    );
+    assert.equal(required.default, plugin);
   });
 });

@@ -23,7 +23,7 @@
     "test:lint-js": "oxlint",
     "test:format": "oxfmt --check",
     "test:lint-md": "remark *.md -q --no-stdout",
-    "test:types": "tsc -p types",
+    "test:types": "tsc -p types && tsc --noEmit && type-coverage",
     "commitlint": "commitlint --from HEAD~1",
     "prepare": "husky"
   },
@@ -56,6 +56,7 @@
     "@commitlint/cli": "21.2.3",
     "@commitlint/config-conventional": "21.2.3",
     "@commitlint/prompt-cli": "21.2.3",
+    "@types/node": "24.19.1",
     "husky": "9.1.7",
     "npm-run-all2": "9.0.3",
     "oxfmt": "0.71.0",
@@ -67,6 +68,7 @@
     "remark-preset-lint-consistent": "6.0.1",
     "remark-preset-lint-recommended": "7.0.1",
     "remark-validate-links": "13.1.0",
+    "type-coverage": "2.30.2",
     "typescript": "7.0.2"
   },
   "engines": {
@@ -97,5 +99,16 @@
     },
     "semanticPrefix": "chore:",
     "semanticCommitScope": ""
+  },
+  "overrides": {
+    "type-coverage-core": {
+      "typescript": "npm:@typescript/typescript6@^6"
+    }
+  },
+  "typeCoverage": {
+    "atLeast": 100,
+    "detail": true,
+    "ignoreNested": true,
+    "strict": true
   }
 }

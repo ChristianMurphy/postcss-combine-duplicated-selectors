@@ -1,3 +1,58 @@
+/**
+ * @import {AtRule, Declaration, PluginCreator, Rule} from 'postcss'
+ * @import {Pseudo, Root, Selector} from 'postcss-selector-parser'
+ * @import {Node as ValueNode} from 'postcss-value-parser'
+ */
+
+/**
+ * How to remove duplicated declarations from each rule.
+ *
+ * - `true`: remove a declaration when a later declaration of the same
+ *   property has an equal value.
+ * - `'syntax'`: also remove it when the later value has the same units,
+ *   functions and keywords in the same positions. `margin: 10px` followed
+ *   by `margin: 5px` is removed, but stays when followed by
+ *   `margin: 1rem`. This follows stylelint's same-syntax rule for
+ *   duplicated properties.
+ *
+ * In every mode, an `!important` declaration stays when the later
+ * declaration does not have the flag.
+ *
+ * @typedef {true | 'syntax'} DuplicatedValuesMode
+ */
+
+/**
+ * Options for postcss-combine-duplicated-selectors. Set at most one of
+ * `removeDuplicatedProperties` and `removeDuplicatedValues`.
+ *
+ * @typedef {KeepDuplicatedOptions | RemoveDuplicatedPropertiesOptions | RemoveDuplicatedValuesOptions} Options
+ */
+
+/**
+ * @typedef KeepDuplicatedOptions
+ * @property {false} [removeDuplicatedProperties] Keep every duplicated
+ *   declaration.
+ * @property {false} [removeDuplicatedValues] Keep every duplicated
+ *   declaration.
+ */
+
+/**
+ * @typedef RemoveDuplicatedPropertiesOptions
+ * @property {true} removeDuplicatedProperties Keep only the last declaration
+ *   of each property, or the last `!important` one when an earlier
+ *   declaration has the flag.
+ * @property {false} [removeDuplicatedValues] Off, because only one of the
+ *   two options can be set.
+ */
+
+/**
+ * @typedef RemoveDuplicatedValuesOptions
+ * @property {false} [removeDuplicatedProperties] Off, because only one of
+ *   the two options can be set.
+ * @property {DuplicatedValuesMode} removeDuplicatedValues Remove duplicated
+ *   declarations; see {@link DuplicatedValuesMode}.
+ */
+
 import parser from 'postcss-selector-parser';
 import valueParser from 'postcss-value-parser';
 import packageJson from '../package.json' with { type: 'json' };
@@ -6,10 +61,11 @@ const { name } = packageJson;
 
 /**
  * Ensure that attributes with different quotes match.
- * @param {Object} selector - postcss selector node
+ * @param {Root} selectors - parsed selector list
+ * @return {undefined}
  */
-function normalizeAttributes(selector) {
-  selector.walkAttributes((node) => {
+function normalizeAttributes(selectors) {
+  selectors.walkAttributes((node) => {
     if (node.value) {
       node.quoteMark = '"';
     }
@@ -19,39 +75,53 @@ function normalizeAttributes(selector) {
 // Each of these starts with its own delimiter, so sorted runs of them cannot
 // read as a different selector. A type selector moved after a class could:
 // div.a would read as .adiv
+/** @type {ReadonlySet<Selector['nodes'][number]['type']>} */
 const sortableTypes = new Set(['class', 'id', 'attribute', 'pseudo']);
 
 /**
- * Sort the classes, ids, attributes and pseudo-classes in each compound of a
- * selector alphabetically, leaving other nodes in place.
- * @param {Object} selector - postcss selector node for one complex selector
+ * Sort the classes, ids, attributes and pseudo-classes of one compound
+ * alphabetically, leaving other nodes in place.
+ * @param {Selector['nodes']} compound - nodes between two combinators
+ * @return {Selector['nodes']} the same nodes, sorted
+ */
+function sortCompound(compound) {
+  // Most compounds hold a single simple selector, which needs no sorting
+  if (compound.length < 2) return compound;
+  // Pseudo-classes after a pseudo-element apply to it, so keep the order
+  const end = compound.findIndex((node) => parser.isPseudoElement(node));
+  const head = end === -1 ? compound : compound.slice(0, end);
+  const sortable = new Set(head.filter((node) => sortableTypes.has(node.type)));
+  if (sortable.size < 2) return compound;
+  const sorted = [...sortable].sort((a, b) => (String(a) < String(b) ? -1 : 1));
+  return compound.flatMap((node) =>
+    sortable.has(node) ? sorted.splice(0, 1) : [node],
+  );
+}
+
+/**
+ * Sort each compound of a selector with sortCompound.
+ * @param {Selector} selector - one complex selector
+ * @return {undefined}
  */
 function sortCompounds(selector) {
-  const nodes = selector.nodes;
-  let slots = [];
-  let isAfterPseudoElement = false;
-  for (let index = 0; index <= nodes.length; index++) {
-    const node = nodes[index];
-    if (node === undefined || node.type === 'combinator') {
-      const sorted = slots
-        .map((slot) => nodes[slot])
-        .sort((a, b) => (String(a) < String(b) ? -1 : 1));
-      for (const [position, slot] of slots.entries()) {
-        nodes[slot] = sorted[position];
-      }
-      slots = [];
-      isAfterPseudoElement = false;
-    } else if (parser.isPseudoElement(node)) {
-      // Pseudo-classes after a pseudo-element apply to it, so keep the order
-      isAfterPseudoElement = true;
-    } else if (!isAfterPseudoElement && sortableTypes.has(node.type)) {
-      slots.push(index);
+  /** @type {Selector['nodes']} */
+  const nodes = [];
+  /** @type {Selector['nodes']} */
+  let compound = [];
+  for (const node of selector.nodes) {
+    if (node.type === 'combinator') {
+      nodes.push(...sortCompound(compound), node);
+      compound = [];
+    } else {
+      compound.push(node);
     }
   }
+  selector.nodes = [...nodes, ...sortCompound(compound)];
 }
 
 // Pseudo-classes whose argument is a selector list where order and repeats do
 // not change what matches
+/** @type {ReadonlySet<string>} */
 const listPseudos = new Set([
   ':is',
   ':where',
@@ -65,9 +135,11 @@ const listPseudos = new Set([
 /**
  * Lowercase pseudo-class and pseudo-element names, which CSS treats as
  * case-insensitive, and normalize the selector lists inside their arguments.
- * @param {Object} selectors - postcss selector root
+ * @param {Root} selectors - parsed selector list
+ * @return {undefined}
  */
 function normalizePseudos(selectors) {
+  /** @type {Array<Pseudo>} */
   const pseudos = [];
   selectors.walkPseudos((pseudo) => {
     // Sass interpolation such as :#{$State} stays case-sensitive
@@ -80,7 +152,9 @@ function normalizePseudos(selectors) {
   for (const pseudo of pseudos.reverse()) {
     pseudo.each(sortCompounds);
     const unique = new Map(pseudo.nodes.map((node) => [String(node), node]));
-    pseudo.nodes = [...unique.keys()].sort().map((key) => unique.get(key));
+    pseudo.nodes = [...unique]
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([, node]) => node);
   }
 }
 
@@ -99,71 +173,77 @@ function getWordShape(word) {
 }
 
 /**
- * Compare value nodes by kind, unit and name, ignoring numbers, spaces and
+ * Describe value nodes by kind, unit and name, ignoring numbers, spaces and
  * comments, the way stylelint compares value syntaxes.
- * @param {Object[]} first - postcss-value-parser nodes
- * @param {Object[]} second - postcss-value-parser nodes
- * @return {boolean} whether both lists have the same syntax
+ * @param {Array<ValueNode>} nodes - postcss-value-parser nodes
+ * @return {string} the same shape for values with the same syntax
  */
-function isSameSyntax(first, second) {
-  const isSignificant = ({ type }) => type !== 'space' && type !== 'comment';
-  const firstNodes = first.filter(isSignificant);
-  const secondNodes = second.filter(isSignificant);
-  return (
-    firstNodes.length === secondNodes.length &&
-    firstNodes.every((node, index) => {
-      const other = secondNodes[index];
-      if (node.type !== other.type) return false;
-      if (node.type === 'word') {
-        return getWordShape(node.value) === getWordShape(other.value);
+function getValueShape(nodes) {
+  const significant = nodes.filter(
+    (node) => node.type !== 'space' && node.type !== 'comment',
+  );
+  return JSON.stringify(
+    significant.map((node, index) => {
+      switch (node.type) {
+        case 'word': {
+          return getWordShape(node.value);
+        }
+        case 'function': {
+          return JSON.stringify([
+            'function',
+            node.value.toLowerCase(),
+            getValueShape(node.nodes),
+          ]);
+        }
+        case 'div': {
+          return `div ${node.value}`;
+        }
+        case 'string': {
+          // A Less escape such as ~"calc(1px)" holds value text, so use that
+          return significant[index - 1]?.value === '~'
+            ? JSON.stringify([
+                'escape',
+                getValueShape(valueParser(node.value).nodes),
+              ])
+            : 'string';
+        }
+        default: {
+          return node.type;
+        }
       }
-      if (node.type === 'function') {
-        return (
-          node.value.toLowerCase() === other.value.toLowerCase() &&
-          isSameSyntax(node.nodes, other.nodes)
-        );
-      }
-      if (node.type === 'div') return node.value === other.value;
-      // A Less escape such as ~"calc(1px)" holds value text, so compare that
-      if (node.type === 'string' && firstNodes[index - 1]?.value === '~') {
-        return isSameSyntax(
-          valueParser(node.value).nodes,
-          valueParser(other.value).nodes,
-        );
-      }
-      return true;
-    })
+    }),
   );
 }
 
 /**
  * Remove declarations that a later declaration of the same property overrides.
- * @param {Object} rule - postcss rule node
- * @param {false|true|'syntax'} mode - false removes any earlier declaration,
- * true only one with an equal value, 'syntax' also one with the same syntax
+ * @param {Rule} rule - rule to clean up
+ * @param {'property' | 'value' | 'syntax'} removal - remove any earlier
+ *   declaration of the property, one with an equal value, or one with an
+ *   equal value or the same syntax
+ * @return {undefined}
  */
-function removeDupProperties(rule, mode) {
+function removeDupProperties(rule, removal) {
+  /** @type {Array<Declaration>} */
   const kept = [];
-  for (const declaration of rule.nodes.filter(({ type }) => type === 'decl')) {
-    const index = kept.findIndex(
-      (earlier) =>
-        earlier.prop === declaration.prop &&
-        (!mode ||
-          earlier.value === declaration.value ||
-          (mode === 'syntax' &&
-            isSameSyntax(
-              valueParser(earlier.value).nodes,
-              valueParser(declaration.value).nodes,
-            ))),
+  for (const declaration of rule.nodes.filter((node) => node.type === 'decl')) {
+    const earlier = kept.find(
+      (candidate) =>
+        candidate.prop === declaration.prop &&
+        (removal === 'property' ||
+          candidate.value === declaration.value ||
+          (removal === 'syntax' &&
+            getValueShape(valueParser(candidate.value).nodes) ===
+              getValueShape(valueParser(declaration.value).nodes))),
     );
-    if (index === -1) {
+    if (earlier === undefined) {
       kept.push(declaration);
-    } else if (kept[index].important && !declaration.important) {
+    } else if (earlier.important && !declaration.important) {
       // An !important declaration wins over a later one without it
       declaration.remove();
     } else {
-      kept[index].remove();
-      kept[index] = declaration;
+      earlier.remove();
+      kept[kept.indexOf(earlier)] = declaration;
     }
   }
 }
@@ -193,9 +273,12 @@ function joinSelectorKeys(keys) {
  * @return {string} selector list without the repeated selectors
  */
 function removeDuplicateSelectors(selector, keys) {
+  const repeated = new Set(
+    keys.flatMap((key, index) => (keys.indexOf(key) < index ? [index] : [])),
+  );
   return parser((selectors) => {
     for (const [index, node] of [...selectors.nodes].entries()) {
-      if (keys.indexOf(keys[index]) < index) node.remove();
+      if (repeated.has(index)) node.remove();
     }
   }).processSync(selector);
 }
@@ -215,7 +298,14 @@ function normalizeParams(params) {
         valueParser.stringify(node.nodes),
         { lossless: false },
       );
-      node.nodes = [{ type: 'word', value: joinSelectorKeys(keys) }];
+      node.nodes = [
+        {
+          type: 'word',
+          value: joinSelectorKeys(keys),
+          sourceIndex: node.sourceIndex,
+          sourceEndIndex: node.sourceEndIndex,
+        },
+      ];
       node.before = '';
       node.after = '';
       return false;
@@ -234,6 +324,7 @@ function normalizeParams(params) {
 // they can merge. Other at-rules, such as @keyframes, Sass control flow and
 // mixins, can replace or depend on earlier blocks, so rules merge only within
 // one block
+/** @type {ReadonlySet<string>} */
 const mergeableAtRules = new Set([
   'media',
   'supports',
@@ -248,7 +339,7 @@ let lastBlockId = 0;
 
 /**
  * Describe one at-rule ancestor for the context key.
- * @param {Object} atRule - postcss at-rule node
+ * @param {AtRule} atRule - at-rule ancestor
  * @return {string} the same step for blocks whose rules may merge
  */
 function getAtRuleStep(atRule) {
@@ -259,47 +350,73 @@ function getAtRuleStep(atRule) {
 
 /**
  * Describe every ancestor of a rule, from the root down, as one string.
- * @param {Object} rule - postcss rule node
- * @param {WeakMap<Object, string>} stepCache - steps already computed per node
+ * @param {Rule} rule - rule to describe the context of
+ * @param {WeakMap<AtRule | Rule, string>} stepCache - steps already computed
  * @return {string} key shared by rules in the same nesting context
  */
 function getContextKey(rule, stepCache) {
+  /** @type {Array<string>} */
   const steps = [];
-  for (let node = rule.parent; node.type !== 'root'; node = node.parent) {
-    // Re-parsing ancestor selectors for every nested rule tripled run time
-    if (!stepCache.has(node)) {
-      stepCache.set(
-        node,
+  let node = rule.parent;
+  while (node?.type === 'atrule' || node?.type === 'rule') {
+    // Many rules share ancestors, so each ancestor's step is computed once
+    let step = stepCache.get(node);
+    if (step === undefined) {
+      step =
         node.type === 'atrule'
           ? getAtRuleStep(node)
           : joinSelectorKeys(
               getSelectorKeys.transformSync(node.selector, { lossless: false }),
-            ),
-      );
+            );
+      stepCache.set(node, step);
     }
-    steps.unshift(stepCache.get(node));
+    steps.unshift(step);
+    node = node.parent;
   }
   return JSON.stringify(steps);
 }
 
-const defaultOptions = {
-  removeDuplicatedProperties: false,
-};
-
-const valueModes = new Set([undefined, null, false, true, 'syntax']);
-
-const plugin = (options) => {
-  options = Object.assign({}, defaultOptions, options);
-  if (!valueModes.has(options.removeDuplicatedValues)) {
+/**
+ * Read which duplicated declarations to remove. Plain JavaScript callers can
+ * pass any value, so this checks removeDuplicatedValues at run time.
+ * @param {Options | undefined} options - options passed to the plugin
+ * @return {'property' | 'value' | 'syntax' | undefined} which earlier
+ *   declarations removeDupProperties removes; undefined keeps every one
+ */
+function getDuplicateRemoval(options) {
+  /** @type {unknown} */
+  const values = options?.removeDuplicatedValues;
+  if (values === 'syntax') return 'syntax';
+  if (values === true) return 'value';
+  if (values !== undefined && values !== null && values !== false) {
     throw new TypeError(
-      `${name}: removeDuplicatedValues must be false, true or 'syntax', not ${JSON.stringify(options.removeDuplicatedValues)}`,
+      `${name}: removeDuplicatedValues must be false, true or 'syntax', not ${JSON.stringify(values)}`,
     );
   }
+  return options?.removeDuplicatedProperties ? 'property' : undefined;
+}
+
+/**
+ * Combine rules with equivalent selectors in the same context, and optionally
+ * remove duplicated declarations.
+ *
+ * @example
+ *   import postcss from 'postcss';
+ *   import combineSelectors from 'postcss-combine-duplicated-selectors';
+ *
+ *   postcss([combineSelectors({ removeDuplicatedValues: true })]);
+ *
+ * @type {PluginCreator<Options>}
+ */
+const plugin = (options) => {
+  const removal = getDuplicateRemoval(options);
   return {
     postcssPlugin: name,
     prepare() {
       // Map each nesting context to the rules seen in it
+      /** @type {Map<string, Map<string, Rule>>} */
       const mapTable = new Map();
+      /** @type {WeakMap<AtRule | Rule, string>} */
       const stepCache = new WeakMap();
 
       return {
@@ -309,12 +426,9 @@ const plugin = (options) => {
           });
           // postcss-selector-parser cannot read the // comments that
           // postcss-scss keeps in raws.selector.scss, so leave those lists
-          if (
-            new Set(keys).size < keys.length &&
-            rule.raws.selector?.scss === undefined
-          ) {
+          const raws = rule.raws.selector;
+          if (new Set(keys).size < keys.length && !(raws && 'scss' in raws)) {
             // PostCSS keeps a selector's comments only in raws.selector.raw
-            const raws = rule.raws.selector;
             const raw =
               raws?.value === rule.selector
                 ? removeDuplicateSelectors(raws.raw, keys)
@@ -327,23 +441,22 @@ const plugin = (options) => {
 
           // Rules only combine when every ancestor at-rule and rule matches
           const context = getContextKey(rule, stepCache);
-          const map = mapTable.has(context)
-            ? mapTable.get(context)
-            : mapTable.set(context, new Map()).get(context);
+          let map = mapTable.get(context);
+          if (map === undefined) {
+            map = new Map();
+            mapTable.set(context, map);
+          }
 
           const selector = joinSelectorKeys(keys);
+          // The first rule seen with this selector, which later ones merge into
+          const destination = map.get(selector);
 
-          if (map.has(selector)) {
-            // store original rule as destination
-            const destination = map.get(selector);
-
+          if (destination) {
             // check if node has already been processed
             if (destination === rule) return;
 
             // move declarations to original rule
-            while (rule.nodes.length > 0) {
-              destination.append(rule.nodes[0]);
-            }
+            destination.append(...rule.nodes);
 
             // store the original rule parent before removal in case it or
             // its ancestors become empty as a result of the removal
@@ -354,25 +467,18 @@ const plugin = (options) => {
 
             // Moving the rule can leave its wrappers empty, such as a second
             // @media block or a nesting parent. Remove each one, walking up.
-            while (emptied.type !== 'root' && emptied.nodes.length === 0) {
+            while (
+              (emptied?.type === 'atrule' || emptied?.type === 'rule') &&
+              emptied.nodes.length === 0
+            ) {
               const parent = emptied.parent;
               emptied.remove();
               emptied = parent;
             }
 
-            if (
-              options.removeDuplicatedProperties ||
-              options.removeDuplicatedValues
-            ) {
-              removeDupProperties(destination, options.removeDuplicatedValues);
-            }
+            if (removal) removeDupProperties(destination, removal);
           } else {
-            if (
-              options.removeDuplicatedProperties ||
-              options.removeDuplicatedValues
-            ) {
-              removeDupProperties(rule, options.removeDuplicatedValues);
-            }
+            if (removal) removeDupProperties(rule, removal);
             // add new selector to symbol table
             map.set(selector, rule);
           }

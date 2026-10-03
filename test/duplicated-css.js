@@ -14,8 +14,8 @@ import plugin from '../src/index.js';
  * @param {TemplateStringsArray} strings - template literal parts
  * @return {string} string without newlines and tabs
  */
-function minify([string]) {
-  return string.replace(/\s+/gm, ' ');
+function minify(strings) {
+  return strings.join('').replace(/\s+/gm, ' ');
 }
 
 const css = testFactory([plugin]);

@@ -14,8 +14,8 @@ import plugin from '../src/index.js';
  * @param {TemplateStringsArray} strings - template literal parts
  * @return {string} string without newlines and tabs
  */
-function minify([string]) {
-  return string.replace(/\s+/gm, ' ');
+function minify(strings) {
+  return strings.join('').replace(/\s+/gm, ' ');
 }
 
 // Duplicated properties should be removed
@@ -194,7 +194,10 @@ describe('Duplicated Properties - Remove Exact Duplicates', () => {
 
 describe('Duplicated Properties - Options', () => {
   it('accepts null and rejects an unknown removeDuplicatedValues mode', () => {
+    // Plain JavaScript callers can pass values the types reject
+    // @ts-expect-error null is not a mode
     assert.doesNotThrow(() => plugin({ removeDuplicatedValues: null }));
+    // @ts-expect-error 'units' is not a mode
     assert.throws(() => plugin({ removeDuplicatedValues: 'units' }), {
       name: 'TypeError',
       message:
@@ -281,6 +284,11 @@ describe('Duplicated Properties - Remove Same Syntax', () => {
       label: 'remove a Less escape before one with the same unit',
       input: '.a {width: ~"calc(1px)"; width: ~"calc(2px)"}',
       expected: '.a { width: ~"calc(2px)"}',
+    },
+    {
+      label: 'remove a declaration with a unicode range',
+      input: '.a {unicode-range: U+0025-00FF; unicode-range: U+0100}',
+      expected: '.a { unicode-range: U+0100}',
     },
     {
       label: 'keep values with different separators',
