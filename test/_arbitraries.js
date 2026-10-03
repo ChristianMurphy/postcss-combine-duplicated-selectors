@@ -26,15 +26,21 @@ import { Document, Element } from 'domhandler';
 // each test file
 const isFuzzing = process.env['npm_lifecycle_event'] === 'fuzz';
 
+// Replays a fuzz failure, for example `FUZZ_SEED=-1776895203 npm run fuzz`
+const fuzzSeed = process.env['FUZZ_SEED'];
+
 /**
  * A fixed seed keeps `npm test` reproducible. Fuzzing uses a random seed, which
- * fast-check prints on failure.
+ * fast-check prints on failure, unless FUZZ_SEED sets one.
  *
  * @param {number} numRuns - runs in `npm test`
  * @return {Parameters<unknown>} fast-check parameters
  */
 export function getParameters(numRuns) {
-  return isFuzzing ? { numRuns: numRuns * 100 } : { numRuns, seed: 1 };
+  if (!isFuzzing) return { numRuns, seed: 1 };
+  return fuzzSeed === undefined
+    ? { numRuns: numRuns * 100 }
+    : { numRuns: numRuns * 100, seed: Number(fuzzSeed) };
 }
 
 // Every spelling in a row matches the same elements in HTML, where attribute
