@@ -1,4 +1,6 @@
 import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import postcss from 'postcss';
 import testFactory from './_test-factory.js';
 import plugin from '../src/index.js';
 
@@ -264,4 +266,13 @@ describe('Unique CSS Tests', () => {
       css(input, expected);
     });
   }
+
+  it('selectors in separate roots of a document', async () => {
+    const document = postcss.document();
+    document.append(postcss.parse('.a{x:1}'), postcss.parse('.a{y:2}'));
+    const { root } = await postcss([plugin]).process(document, {
+      from: undefined,
+    });
+    assert.equal(root.toString(), '.a{x:1}.a{y:2}');
+  });
 });

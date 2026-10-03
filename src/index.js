@@ -1,6 +1,6 @@
 /**
- * @import {AtRule, Declaration, PluginCreator, Rule} from 'postcss'
- * @import {Pseudo, Root, Selector} from 'postcss-selector-parser'
+ * @import {AtRule, ChildNode, Container, Declaration, PluginCreator, Root, Rule} from 'postcss'
+ * @import {Pseudo, Root as SelectorRoot, Selector} from 'postcss-selector-parser'
  * @import {Node as ValueNode} from 'postcss-value-parser'
  */
 
@@ -61,7 +61,7 @@ const { name } = packageJson;
 
 /**
  * Ensure that attributes with different quotes match.
- * @param {Root} selectors - parsed selector list
+ * @param {SelectorRoot} selectors - parsed selector list
  * @return {undefined}
  */
 function normalizeAttributes(selectors) {
@@ -93,8 +93,12 @@ function sortCompound(compound) {
   const sortable = new Set(head.filter((node) => sortableTypes.has(node.type)));
   if (sortable.size < 2) return compound;
   const sorted = [...sortable].sort((a, b) => (String(a) < String(b) ? -1 : 1));
-  return compound.flatMap((node) =>
-    sortable.has(node) ? sorted.splice(0, 1) : [node],
+  let next = 0;
+  // sorted holds one node per sortable node
+  return compound.map((node) =>
+    sortable.has(node)
+      ? /** @type {Selector['nodes'][number]} */ (sorted[next++])
+      : node,
   );
 }
 
@@ -104,19 +108,16 @@ function sortCompound(compound) {
  * @return {undefined}
  */
 function sortCompounds(selector) {
-  /** @type {Selector['nodes']} */
-  const nodes = [];
-  /** @type {Selector['nodes']} */
-  let compound = [];
+  /** @type {Array<Selector['nodes']>} */
+  const parts = [[]];
   for (const node of selector.nodes) {
     if (node.type === 'combinator') {
-      nodes.push(...sortCompound(compound), node);
-      compound = [];
+      parts.push([node], []);
     } else {
-      compound.push(node);
+      parts.at(-1)?.push(node);
     }
   }
-  selector.nodes = [...nodes, ...sortCompound(compound)];
+  selector.nodes = parts.flatMap(sortCompound);
 }
 
 // Pseudo-classes whose argument is a selector list where order and repeats do
@@ -135,7 +136,7 @@ const listPseudos = new Set([
 /**
  * Lowercase pseudo-class and pseudo-element names, which CSS treats as
  * case-insensitive, and normalize the selector lists inside their arguments.
- * @param {Root} selectors - parsed selector list
+ * @param {SelectorRoot} selectors - parsed selector list
  * @return {undefined}
  */
 function normalizePseudos(selectors) {
@@ -143,7 +144,17 @@ function normalizePseudos(selectors) {
   const pseudos = [];
   selectors.walkPseudos((pseudo) => {
     // Sass interpolation such as :#{$State} stays case-sensitive
-    if (/^::?[a-z-]+$/i.test(pseudo.value)) {
+    const name = pseudo.value.slice(pseudo.value.startsWith('::') ? 2 : 1);
+    if (
+      pseudo.value.startsWith(':') &&
+      name.length > 0 &&
+      [...name].every(
+        (char) =>
+          char === '-' ||
+          (char >= 'a' && char <= 'z') ||
+          (char >= 'A' && char <= 'Z'),
+      )
+    ) {
       pseudo.value = pseudo.value.toLowerCase();
     }
     if (listPseudos.has(pseudo.value)) pseudos.push(pseudo);
@@ -167,84 +178,135 @@ function normalizePseudos(selectors) {
 function getWordShape(word) {
   const dimension = valueParser.unit(word);
   if (dimension) return `number ${dimension.unit}`;
-  if (/^#[\da-f]+$/i.test(word)) return 'hash';
+  const digits = Array.from(word.slice(1));
+  if (
+    word.startsWith('#') &&
+    digits.length > 0 &&
+    digits.every((digit) => !Number.isNaN(Number.parseInt(digit, 16)))
+  ) {
+    return 'hash';
+  }
   if (word.startsWith('--')) return 'custom property';
   return `identifier ${word.toLowerCase()}`;
 }
 
 /**
+ * A description of each value node, with nested arrays for function arguments
+ * @typedef {string | Array<ValueShape>} ValueShape
+ */
+
+/**
  * Describe value nodes by kind, unit and name, ignoring numbers, spaces and
  * comments, the way stylelint compares value syntaxes.
  * @param {Array<ValueNode>} nodes - postcss-value-parser nodes
- * @return {string} the same shape for values with the same syntax
+ * @return {Array<ValueShape>} the same shape for values with the same syntax
  */
 function getValueShape(nodes) {
   const significant = nodes.filter(
     (node) => node.type !== 'space' && node.type !== 'comment',
   );
-  return JSON.stringify(
-    significant.map((node, index) => {
-      switch (node.type) {
-        case 'word': {
-          return getWordShape(node.value);
-        }
-        case 'function': {
-          return JSON.stringify([
-            'function',
-            node.value.toLowerCase(),
-            getValueShape(node.nodes),
-          ]);
-        }
-        case 'div': {
-          return `div ${node.value}`;
-        }
-        case 'string': {
-          // A Less escape such as ~"calc(1px)" holds value text, so use that
-          return significant[index - 1]?.value === '~'
-            ? JSON.stringify([
-                'escape',
-                getValueShape(valueParser(node.value).nodes),
-              ])
-            : 'string';
-        }
-        default: {
-          return node.type;
-        }
+  return significant.map((node, index) => {
+    switch (node.type) {
+      case 'word': {
+        return getWordShape(node.value);
       }
-    }),
-  );
+      case 'function': {
+        return [
+          'function',
+          node.value.toLowerCase(),
+          getValueShape(node.nodes),
+        ];
+      }
+      case 'div': {
+        return `div ${node.value}`;
+      }
+      case 'string': {
+        // A Less escape such as ~"calc(1px)" holds value text, so use that
+        return significant[index - 1]?.value === '~'
+          ? ['escape', getValueShape(valueParser(node.value).nodes)]
+          : 'string';
+      }
+      default: {
+        return node.type;
+      }
+    }
+  });
 }
 
 /**
- * Remove declarations that a later declaration of the same property overrides.
- * @param {Rule} rule - rule to clean up
- * @param {'property' | 'value' | 'syntax'} removal - remove any earlier
- *   declaration of the property, one with an equal value, or one with an
- *   equal value or the same syntax
+ * Keep one item per key. When a key repeats, `merge` receives the kept item
+ * and the new one and returns the one to keep; the other one is dropped.
+ * @template T
+ * @param {Iterable<[T, string]>} entries - items with their keys, in order
+ * @param {(kept: T, item: T) => T} merge - choose the item to keep
+ * @return {Array<T>} the dropped items
+ */
+function dedupe(entries, merge) {
+  /** @type {Map<string, T>} */
+  const kept = new Map();
+  /** @type {Array<T>} */
+  const dropped = [];
+  for (const [item, key] of entries) {
+    const earlier = kept.get(key);
+    if (earlier === undefined) {
+      kept.set(key, item);
+    } else {
+      const winner = merge(earlier, item);
+      kept.set(key, winner);
+      dropped.push(winner === item ? earlier : item);
+    }
+  }
+  return dropped;
+}
+
+/**
+ * Read a value from a per-run cache, computing it on the first request.
+ * @template K, V
+ * @param {Map<K, V>} cache - values computed so far in this run
+ * @param {K} key - what the value is computed from
+ * @param {(key: K) => V} compute - compute the value from the key
+ * @return {V} the cached value
+ */
+function getCached(cache, key, compute) {
+  let value = cache.get(key);
+  if (value === undefined) {
+    value = compute(key);
+    cache.set(key, value);
+  }
+  return value;
+}
+
+/**
+ * A container that holds the removed nodes, so its children are defined.
+ * @typedef {Container & {nodes: Array<ChildNode>}} Parent
+ */
+
+/**
+ * Remove nodes with one rebuild per parent. At-rules and rules left empty are
+ * removed too, walking up.
+ * @param {Array<ChildNode>} nodes - nodes to remove; emptied wrappers are
+ *   appended to it
  * @return {undefined}
  */
-function removeDupProperties(rule, removal) {
-  /** @type {Array<Declaration>} */
-  const kept = [];
-  for (const declaration of rule.nodes.filter((node) => node.type === 'decl')) {
-    const earlier = kept.find(
-      (candidate) =>
-        candidate.prop === declaration.prop &&
-        (removal === 'property' ||
-          candidate.value === declaration.value ||
-          (removal === 'syntax' &&
-            getValueShape(valueParser(candidate.value).nodes) ===
-              getValueShape(valueParser(declaration.value).nodes))),
-    );
-    if (earlier === undefined) {
-      kept.push(declaration);
-    } else if (earlier.important && !declaration.important) {
-      // An !important declaration wins over a later one without it
-      declaration.remove();
-    } else {
-      earlier.remove();
-      kept[kept.indexOf(earlier)] = declaration;
+function removeNodes(nodes) {
+  /** @type {Map<Parent, Set<ChildNode>>} */
+  const removedByParent = new Map();
+  // The loop visits wrappers pushed while it runs
+  for (const node of nodes) {
+    const parent = /** @type {Parent} */ (node.parent);
+    const removed = getCached(removedByParent, parent, () => new Set());
+    removed.add(node);
+    if (
+      (parent.type === 'atrule' || parent.type === 'rule') &&
+      removed.size === parent.nodes.length
+    ) {
+      nodes.push(/** @type {AtRule | Rule} */ (parent));
     }
+  }
+  for (const [parent, removed] of removedByParent) {
+    const kept = parent.nodes.filter((node) => !removed.has(node));
+    parent.removeAll();
+    parent.append(kept);
   }
 }
 
@@ -267,20 +329,46 @@ function joinSelectorKeys(keys) {
 }
 
 /**
- * Remove each selector whose key matches an earlier one in the list.
+ * Remove the selectors at the given positions of a list.
  * @param {string} selector - selector list, kept with its original spacing
- * @param {string[]} keys - normalized selectors from getSelectorKeys
+ * @param {Set<number>} repeated - positions of the selectors to remove
  * @return {string} selector list without the repeated selectors
  */
-function removeDuplicateSelectors(selector, keys) {
-  const repeated = new Set(
-    keys.flatMap((key, index) => (keys.indexOf(key) < index ? [index] : [])),
-  );
+function removeDuplicateSelectors(selector, repeated) {
   return parser((selectors) => {
-    for (const [index, node] of [...selectors.nodes].entries()) {
-      if (repeated.has(index)) node.remove();
-    }
+    selectors.nodes = selectors.nodes.filter(
+      (_, index) => !repeated.has(index),
+    );
   }).processSync(selector);
+}
+
+/**
+ * Remove each selector whose key matches an earlier one in the rule's list.
+ * @param {Rule} rule - rule to clean up
+ * @param {string[]} keys - normalized selectors from getSelectorKeys
+ * @return {undefined}
+ */
+function removeRepeatedSelectors(rule, keys) {
+  // postcss-selector-parser cannot read the // comments that postcss-scss
+  // keeps in raws.selector.scss, so leave those lists
+  const raws = rule.raws.selector;
+  if (raws && 'scss' in raws) return;
+  const repeated = new Set(
+    dedupe(
+      keys.map((key, index) => [index, key]),
+      (first) => first,
+    ),
+  );
+  if (repeated.size === 0) return;
+  // PostCSS keeps a selector's comments only in raws.selector.raw
+  const raw =
+    raws?.value === rule.selector
+      ? removeDuplicateSelectors(raws.raw, repeated)
+      : undefined;
+  rule.selector = removeDuplicateSelectors(rule.selector, repeated);
+  if (raw !== undefined) {
+    rule.raws.selector = { value: rule.selector, raw };
+  }
 }
 
 /**
@@ -334,54 +422,12 @@ const mergeableAtRules = new Set([
   'starting-style',
 ]);
 
-// Gives each block of an at-rule outside mergeableAtRules its own context
-let lastBlockId = 0;
-
-/**
- * Describe one at-rule ancestor for the context key.
- * @param {AtRule} atRule - at-rule ancestor
- * @return {string} the same step for blocks whose rules may merge
- */
-function getAtRuleStep(atRule) {
-  const name = atRule.name.toLowerCase();
-  const step = `@${name} ${normalizeParams(atRule.params)}`;
-  return mergeableAtRules.has(name) ? step : `${step} #${++lastBlockId}`;
-}
-
-/**
- * Describe every ancestor of a rule, from the root down, as one string.
- * @param {Rule} rule - rule to describe the context of
- * @param {WeakMap<AtRule | Rule, string>} stepCache - steps already computed
- * @return {string} key shared by rules in the same nesting context
- */
-function getContextKey(rule, stepCache) {
-  /** @type {Array<string>} */
-  const steps = [];
-  let node = rule.parent;
-  while (node?.type === 'atrule' || node?.type === 'rule') {
-    // Many rules share ancestors, so each ancestor's step is computed once
-    let step = stepCache.get(node);
-    if (step === undefined) {
-      step =
-        node.type === 'atrule'
-          ? getAtRuleStep(node)
-          : joinSelectorKeys(
-              getSelectorKeys.transformSync(node.selector, { lossless: false }),
-            );
-      stepCache.set(node, step);
-    }
-    steps.unshift(step);
-    node = node.parent;
-  }
-  return JSON.stringify(steps);
-}
-
 /**
  * Read which duplicated declarations to remove. Plain JavaScript callers can
  * pass any value, so this checks removeDuplicatedValues at run time.
  * @param {Options | undefined} options - options passed to the plugin
  * @return {'property' | 'value' | 'syntax' | undefined} which earlier
- *   declarations removeDupProperties removes; undefined keeps every one
+ *   declarations to remove; undefined keeps every one
  */
 function getDuplicateRemoval(options) {
   /** @type {unknown} */
@@ -412,78 +458,126 @@ const plugin = (options) => {
   const removal = getDuplicateRemoval(options);
   return {
     postcssPlugin: name,
-    prepare() {
-      // Map each nesting context to the rules seen in it
-      /** @type {Map<string, Map<string, Rule>>} */
-      const mapTable = new Map();
-      /** @type {WeakMap<AtRule | Rule, string>} */
-      const stepCache = new WeakMap();
+    OnceExit(proxy) {
+      // A PostCSS proxy's children are not the nodes their parents point to
+      const root = /** @type {{proxyOf: Root}} */ (
+        /** @type {unknown} */ (proxy)
+      ).proxyOf;
+      /** @type {Map<string, Array<string>>} */
+      const selectorCache = new Map();
+      /** @type {Map<string, string>} */
+      const paramsCache = new Map();
+      /** @type {Map<string, string>} */
+      const shapeCache = new Map();
+      let blockId = 0;
 
-      return {
-        Rule: (rule) => {
-          const keys = getSelectorKeys.transformSync(rule.selector, {
-            lossless: false,
-          });
-          // postcss-selector-parser cannot read the // comments that
-          // postcss-scss keeps in raws.selector.scss, so leave those lists
-          const raws = rule.raws.selector;
-          if (new Set(keys).size < keys.length && !(raws && 'scss' in raws)) {
-            // PostCSS keeps a selector's comments only in raws.selector.raw
-            const raw =
-              raws?.value === rule.selector
-                ? removeDuplicateSelectors(raws.raw, keys)
-                : undefined;
-            rule.selector = removeDuplicateSelectors(rule.selector, keys);
-            if (raw !== undefined) {
-              rule.raws.selector = { value: rule.selector, raw };
-            }
+      // A rule's key is its context's number plus its normalized selector
+      /** @type {Map<Rule, string>} */
+      const ruleKeys = new Map();
+      /** @type {Map<string, number>} */
+      const contextIds = new Map();
+      /**
+       * @param {number} context - number of the parent context
+       * @param {string} step - normalized selector or at-rule
+       * @return {string} the key of the step within its context
+       */
+      const getKey = (context, step) => `${context}${JSON.stringify(step)}`;
+      /**
+       * @param {string} key - key from getKey
+       * @return {number} the number of the context the key opens
+       */
+      const getContextId = (key) =>
+        getCached(contextIds, key, () => contextIds.size + 1);
+      // A stack, not recursion, so deep nesting cannot overflow; children go
+      // on reversed to come off in document order
+      /** @type {Array<[Rule | AtRule, number]>} */
+      const pending = [];
+      /**
+       * @param {Array<ChildNode>} nodes - children to visit
+       * @param {number} context - number of their context
+       * @return {undefined}
+       */
+      const visit = (nodes, context) => {
+        for (const node of nodes.toReversed()) {
+          if (node.type === 'rule' || node.type === 'atrule') {
+            pending.push([node, context]);
           }
-
-          // Rules only combine when every ancestor at-rule and rule matches
-          const context = getContextKey(rule, stepCache);
-          let map = mapTable.get(context);
-          if (map === undefined) {
-            map = new Map();
-            mapTable.set(context, map);
-          }
-
-          const selector = joinSelectorKeys(keys);
-          // The first rule seen with this selector, which later ones merge into
-          const destination = map.get(selector);
-
-          if (destination) {
-            // check if node has already been processed
-            if (destination === rule) return;
-
-            // move declarations to original rule
-            destination.append(...rule.nodes);
-
-            // store the original rule parent before removal in case it or
-            // its ancestors become empty as a result of the removal
-            let emptied = rule.parent;
-
-            // remove duplicated rule
-            rule.remove();
-
-            // Moving the rule can leave its wrappers empty, such as a second
-            // @media block or a nesting parent. Remove each one, walking up.
-            while (
-              (emptied?.type === 'atrule' || emptied?.type === 'rule') &&
-              emptied.nodes.length === 0
-            ) {
-              const parent = emptied.parent;
-              emptied.remove();
-              emptied = parent;
-            }
-
-            if (removal) removeDupProperties(destination, removal);
-          } else {
-            if (removal) removeDupProperties(rule, removal);
-            // add new selector to symbol table
-            map.set(selector, rule);
-          }
-        },
+        }
       };
+      visit(root.nodes, 0);
+      for (let entry = pending.pop(); entry; entry = pending.pop()) {
+        const [node, context] = entry;
+        if (node.type === 'rule') {
+          const keys = getCached(selectorCache, node.selector, (selector) =>
+            getSelectorKeys.transformSync(selector, { lossless: false }),
+          );
+          removeRepeatedSelectors(node, keys);
+          const key = getKey(context, joinSelectorKeys(keys));
+          ruleKeys.set(node, key);
+          visit(node.nodes, getContextId(key));
+        } else if (node.nodes) {
+          const atName = node.name.toLowerCase();
+          const params = getCached(paramsCache, node.params, normalizeParams);
+          const step = `@${atName} ${params}`;
+          const blockStep = mergeableAtRules.has(atName)
+            ? step
+            : `${step} #${++blockId}`;
+          visit(node.nodes, getContextId(getKey(context, blockStep)));
+        }
+      }
+
+      /** @type {Array<ChildNode>} */
+      const dropped = dedupe(ruleKeys, (first, rule) => {
+        const children = rule.nodes;
+        rule.removeAll();
+        first.append(children);
+        return first;
+      });
+
+      if (removal) {
+        /**
+         * @param {Declaration} declaration - declaration to describe
+         * @return {string} the same key for declarations that duplicate
+         *   each other
+         */
+        const getDeclarationKey = ({ prop, value }) => {
+          if (removal === 'property') return prop;
+          return JSON.stringify([
+            prop,
+            removal === 'value'
+              ? value
+              : getCached(shapeCache, value, (text) =>
+                  JSON.stringify(getValueShape(valueParser(text).nodes)),
+                ),
+          ]);
+        };
+        for (const rule of ruleKeys.keys()) {
+          /** @type {Array<Declaration>} */
+          const declarations = [];
+          /** @type {Map<string, number>} */
+          const counts = new Map();
+          for (const node of rule.nodes) {
+            if (node.type !== 'decl') continue;
+            declarations.push(node);
+            counts.set(node.prop, (counts.get(node.prop) ?? 0) + 1);
+          }
+          // Only a repeated property can be a duplicate
+          const duplicates = dedupe(
+            declarations.flatMap((node) =>
+              counts.get(node.prop) === 1
+                ? []
+                : [[node, getDeclarationKey(node)]],
+            ),
+            (earlier, declaration) =>
+              earlier.important && !declaration.important
+                ? earlier
+                : declaration,
+          );
+          for (const duplicate of duplicates) dropped.push(duplicate);
+        }
+      }
+
+      removeNodes(dropped);
     },
   };
 };
