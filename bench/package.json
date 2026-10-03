@@ -1,0 +1,14 @@
+{
+  "name": "postcss-combine-duplicated-selectors-bench",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@mantine/core": "9.6.3",
+    "@radix-ui/themes": "3.3.0",
+    "bootstrap": "5.3.8",
+    "bulma": "1.0.4",
+    "daisyui": "5.7.47",
+    "open-props": "1.7.23",
+    "tailwindcss": "4.3.3"
+  }
+}
