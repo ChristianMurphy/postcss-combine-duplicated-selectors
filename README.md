@@ -275,3 +275,9 @@ becomes
 ```
 
 An element with both classes was green and is now blue. Check the output when your CSS depends on rule order.
+
+### Plugin order
+
+The plugin combines rules once, after every plugin's node visitors have run. Rules from other plugins, such as the rules _postcss-nested_ unwraps, combine too. A plugin listed later that runs on `OnceExit` gets the combined rules.
+
+A PostCSS document with more than one root, such as the `<style>` elements that _postcss-html_ reads, combines rules within each root, not across them.
