@@ -8,15 +8,14 @@ import postcss from 'postcss';
 import plugin from '../src/index.js';
 
 /**
- * These tests check that run time grows in proportion to the input. Each case
- * runs at a size and at four times that size. Linear work takes about four
- * times as long, while squared work would take about sixteen times as long.
- * The runs alternate between sizes, so a busy machine slows both alike.
+ * These tests check that run time grows in proportion to the input.
  */
 
 const size = 8000;
 const scale = 4;
 const maximumRatio = 12;
+const warmUpRounds = 1;
+const measuredRounds = 3;
 
 /**
  * @param {number} count - how many strings to build
@@ -36,13 +35,13 @@ function getRunTimeRatio(build, options) {
   const processor = postcss([plugin(options)]);
   const inputs = [build(size), build(size * scale)];
   const fastest = [Infinity, Infinity];
-  // The first round compiles the code paths these inputs take
-  for (let round = 0; round < 4; round++) {
+  for (let round = 0; round < warmUpRounds + measuredRounds; round++) {
     for (const [index, css] of inputs.entries()) {
       const start = performance.now();
       processor.process(css, { from: undefined }).toString();
       const time = performance.now() - start;
-      if (round > 0) fastest[index] = Math.min(fastest[index] ?? time, time);
+      if (round >= warmUpRounds)
+        fastest[index] = Math.min(fastest[index] ?? time, time);
     }
   }
   const [small = 0, large = 0] = fastest;
@@ -56,7 +55,6 @@ const values = { removeDuplicatedValues: true };
 /** @type {Options} */
 const syntax = { removeDuplicatedValues: 'syntax' };
 
-// Each case lists the options whose code paths differ for its input
 /** @type {Array<{label: string, build: (size: number) => string, modes: Array<Options>}>} */
 const cases = [
   {
@@ -82,7 +80,6 @@ const cases = [
   },
   {
     label: 'rules nested in at-rules and rules',
-    // Each level adds two nodes, so a shallower tree keeps the stack small
     build: (size) => {
       const depth = size / 8;
       return `${'@media (width: 1px){.a{'.repeat(depth)}x:1${'}}'.repeat(depth)}`;
@@ -91,8 +88,6 @@ const cases = [
   },
   {
     label: 'a selector list repeating one selector',
-    // Removing one selector is cheap, so squared growth shows only in a
-    // longer list
     build: (size) => `${repeat(size * 2, (index) => (index ? ',.a' : '.a'))}{}`,
     modes: [{}],
   },
@@ -103,8 +98,6 @@ describe('Scaling', () => {
     for (const options of modes) {
       it(`${label} with ${JSON.stringify(options)}`, () => {
         let ratio = getRunTimeRatio(build, options);
-        // A busy machine can slow one measurement, but squared growth fails
-        // every time
         if (ratio >= maximumRatio) ratio = getRunTimeRatio(build, options);
         assert.ok(
           ratio < maximumRatio,

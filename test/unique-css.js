@@ -267,7 +267,6 @@ describe('Unique CSS Tests', () => {
     });
   }
 
-  // postcss-html gives each <style> element its own root in one document
   it('selectors in separate roots of a document', async () => {
     const document = postcss.document();
     document.append(postcss.parse('.a{x:1}'), postcss.parse('.a{y:2}'));

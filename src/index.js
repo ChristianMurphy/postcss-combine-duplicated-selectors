@@ -94,7 +94,7 @@ function sortCompound(compound) {
   if (sortable.size < 2) return compound;
   const sorted = [...sortable].sort((a, b) => (String(a) < String(b) ? -1 : 1));
   let next = 0;
-  // Each sortable node takes the next sorted one, so the index stays in range
+  // sorted holds one node per sortable node
   return compound.map((node) =>
     sortable.has(node)
       ? /** @type {Selector['nodes'][number]} */ (sorted[next++])
@@ -282,9 +282,8 @@ function getCached(cache, key, compute) {
  */
 
 /**
- * Remove nodes with one rebuild per parent. Removing a node one at a time
- * searches and shifts its siblings, so many removals would take squared time.
- * At-rules and rules left empty are removed too, walking up.
+ * Remove nodes with one rebuild per parent. At-rules and rules left empty are
+ * removed too, walking up.
  * @param {Array<ChildNode>} nodes - nodes to remove; emptied wrappers are
  *   appended to it
  * @return {undefined}
@@ -460,8 +459,7 @@ const plugin = (options) => {
   return {
     postcssPlugin: name,
     OnceExit(proxy) {
-      // PostCSS may pass a proxy whose nodes getter copies the array on each
-      // read and whose children differ in identity from their parent pointers
+      // A PostCSS proxy's children are not the nodes their parents point to
       const root = /** @type {{proxyOf: Root}} */ (
         /** @type {unknown} */ (proxy)
       ).proxyOf;
@@ -473,9 +471,7 @@ const plugin = (options) => {
       const shapeCache = new Map();
       let blockId = 0;
 
-      // Each rule's key: the number of its context and its own normalized
-      // selector. Equal contexts share a number, so rules merge when every
-      // ancestor at-rule and rule matches, and keys stay short at any depth.
+      // A rule's key is its context's number plus its normalized selector
       /** @type {Map<Rule, string>} */
       const ruleKeys = new Map();
       /** @type {Map<string, number>} */
@@ -492,8 +488,8 @@ const plugin = (options) => {
        */
       const getContextId = (key) =>
         getCached(contextIds, key, () => contextIds.size + 1);
-      // A work list instead of recursion, so deep nesting cannot overflow the
-      // stack. Children go on in reverse, so rules come off in document order.
+      // A stack, not recursion, so deep nesting cannot overflow; children go
+      // on reversed to come off in document order
       /** @type {Array<[Rule | AtRule, number]>} */
       const pending = [];
       /**
@@ -530,7 +526,6 @@ const plugin = (options) => {
         }
       }
 
-      // Move the children of each repeated rule into the first one
       /** @type {Array<ChildNode>} */
       const dropped = dedupe(ruleKeys, (first, rule) => {
         const children = rule.nodes;
@@ -566,15 +561,13 @@ const plugin = (options) => {
             declarations.push(node);
             counts.set(node.prop, (counts.get(node.prop) ?? 0) + 1);
           }
-          // Only a repeated property can be a duplicate, so most declarations
-          // skip building a key
+          // Only a repeated property can be a duplicate
           const duplicates = dedupe(
             declarations.flatMap((node) =>
               counts.get(node.prop) === 1
                 ? []
                 : [[node, getDeclarationKey(node)]],
             ),
-            // An !important declaration wins over a later one without it
             (earlier, declaration) =>
               earlier.important && !declaration.important
                 ? earlier
