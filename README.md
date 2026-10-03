@@ -101,6 +101,8 @@ Within one rule, a selector that repeats an earlier selector in the list is remo
 
 Both options default to `false`. Set at most one of these options. The TypeScript types reject both together. If both are set, the plugin uses `removeDuplicatedValues`.
 
+The package includes TypeScript types. Import the options type with `import type { Options } from 'postcss-combine-duplicated-selectors'`.
+
 ### Duplicated Properties
 
 Duplicated properties can optionally be combined.

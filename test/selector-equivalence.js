@@ -51,11 +51,18 @@ describe('Selector equivalence', () => {
       .map(({ text }, index) => `${text}{i:${index}}`)
       .join('');
     const { root } = postcss([plugin]).process(input, { from: undefined });
-    const actual = root.nodes.map((rule) =>
-      rule.nodes.map((declaration) => selectors[declaration.value].reference),
+    const references = new Map(
+      selectors.map(({ reference }, index) => [String(index), reference]),
     );
-    const groups = Object.groupBy(selectors, ({ reference }) => reference);
-    const expected = Object.values(groups).map((group) =>
+    const actual = root.nodes
+      .filter((node) => node.type === 'rule')
+      .map((rule) =>
+        rule.nodes
+          .filter((node) => node.type === 'decl')
+          .map((declaration) => references.get(declaration.value)),
+      );
+    const groups = Map.groupBy(selectors, ({ reference }) => reference);
+    const expected = [...groups.values()].map((group) =>
       group.map(({ reference }) => reference),
     );
     assert.deepEqual(actual, expected);
@@ -64,10 +71,12 @@ describe('Selector equivalence', () => {
   it('keeps the first of each group of equivalent selectors in a list', () => {
     const input = `${selectors.map(({ text }) => text).join(', ')} {}`;
     const { root } = postcss([plugin]).process(input, { from: undefined });
+    /** @type {Set<string>} */
     const seen = new Set();
     const expected = selectors
       .filter(({ reference }) => !seen.has(reference) && seen.add(reference))
       .map(({ text }) => text);
-    assert.deepEqual(root.first.selectors, expected);
+    const [rule] = root.nodes.filter((node) => node.type === 'rule');
+    assert.deepEqual(rule?.selectors, expected);
   });
 });

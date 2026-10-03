@@ -5,27 +5,28 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
+      "types": "./src/index.d.ts",
       "default": "./src/index.js"
     },
     "./package.json": "./package.json"
   },
-  "types": "./types/index.d.ts",
+  "types": "./src/index.d.ts",
   "files": [
-    "src",
-    "types/index.d.ts"
+    "src"
   ],
   "scripts": {
     "commit": "commit",
     "format": "oxfmt",
+    "build": "tsc --build --clean && tsc --build && type-coverage",
+    "prepack": "npm run build",
     "test": "run-s test:*",
-    "test:unit": "node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100",
+    "test:unit": "node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 \"test/**/*.js\"",
     "test:lint-js": "oxlint",
     "test:format": "oxfmt --check",
     "test:lint-md": "remark *.md -q --no-stdout",
-    "test:types": "tsc -p types",
     "commitlint": "commitlint --from HEAD~1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:types": "npm run build"
   },
   "keywords": [
     "postcss-plugin",
@@ -56,6 +57,7 @@
     "@commitlint/cli": "21.2.3",
     "@commitlint/config-conventional": "21.2.3",
     "@commitlint/prompt-cli": "21.2.3",
+    "@types/node": "24.19.1",
     "husky": "9.1.7",
     "npm-run-all2": "9.0.3",
     "oxfmt": "0.71.0",
@@ -67,6 +69,7 @@
     "remark-preset-lint-consistent": "6.0.1",
     "remark-preset-lint-recommended": "7.0.1",
     "remark-validate-links": "13.1.0",
+    "type-coverage": "2.30.2",
     "typescript": "7.0.2"
   },
   "engines": {
@@ -97,5 +100,16 @@
     },
     "semanticPrefix": "chore:",
     "semanticCommitScope": ""
+  },
+  "overrides": {
+    "type-coverage-core": {
+      "typescript": "npm:@typescript/typescript6@^6"
+    }
+  },
+  "typeCoverage": {
+    "atLeast": 100,
+    "detail": true,
+    "ignoreNested": true,
+    "strict": true
   }
 }
