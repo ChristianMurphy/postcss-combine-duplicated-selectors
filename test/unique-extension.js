@@ -29,6 +29,27 @@ describe('Unique Extension Tests', () => {
     });
   }
 
+  it('selectors in if blocks around a variable change', () => {
+    scssWithoutNesting(
+      '$b: true; @if $b {.y{a:1}} $b: false; @if $b {.y{b:2}}',
+      '$b: true; @if $b {.y{a:1}} $b: false; @if $b {.y{b:2}}',
+    );
+  });
+
+  it('interpolated values with different units in syntax mode', () => {
+    testFactory([plugin({ removeDuplicatedValues: 'syntax' })], postcssScss)(
+      '.a{width:#{$a}px;width:#{$b}rem;color:#fff;color:#{$c}}',
+      '.a{width:#{$a}px;width:#{$b}rem;color:#fff;color:#{$c}}',
+    );
+  });
+
+  it('pseudo classes built from variables with different case', () => {
+    scssWithoutNesting(
+      '.a:#{$State}{x:1} .a:#{$state}{y:2}',
+      '.a:#{$State}{x:1} .a:#{$state}{y:2}',
+    );
+  });
+
   it('repeated selectors in a group with an inline comment', () => {
     scssWithoutNesting('.a, // c\n.b, .a{x:1}', '.a, // c\n.b, .a{x:1}');
   });

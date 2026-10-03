@@ -94,12 +94,12 @@ Within one rule, a selector that repeats an earlier selector in the list is remo
 
 ### Options
 
-| Option                       | Default | Effect                                                                     |
-| ---------------------------- | ------- | -------------------------------------------------------------------------- |
-| `removeDuplicatedProperties` | `false` | Keep only the last declaration of each property in a combined rule         |
-| `removeDuplicatedValues`     | `false` | Remove a declaration only when a later one has the same property and value |
+| Option                       | Values                      | Effect                                                                                                                                                                         |
+| ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `removeDuplicatedProperties` | `false`, `true`             | `true` keeps only the last declaration of each property in a combined rule                                                                                                     |
+| `removeDuplicatedValues`     | `false`, `true`, `'syntax'` | `true` removes a declaration only when a later one has the same property and value. `'syntax'` also removes it when the later value has the same units, functions and keywords |
 
-Set at most one of these options. The TypeScript types reject both together. If both are `true`, the plugin uses `removeDuplicatedValues`.
+Both options default to `false`. Set at most one of these options. The TypeScript types reject both together. If both are set, the plugin uses `removeDuplicatedValues`.
 
 ### Duplicated Properties
 
@@ -167,6 +167,29 @@ into
 }
 ```
 
+Set `removeDuplicatedValues` to `'syntax'` to also remove a declaration that a later one overrides with the same kind of value. Two values match when they have the same units, functions and keywords in the same positions. The numbers can differ. A fallback with a different unit, a different function, or a different keyword stays. This follows the same-syntax rule of stylelint's [`declaration-block-no-duplicate-properties`](https://stylelint.io/user-guide/rules/declaration-block-no-duplicate-properties).
+
+```css
+.a {
+  margin: 10px;
+  margin: 5px;
+  width: 10px;
+  width: calc(100% - 1rem);
+}
+```
+
+becomes
+
+```css
+.a {
+  margin: 5px;
+  width: 10px;
+  width: calc(100% - 1rem);
+}
+```
+
+In every mode, an `!important` declaration stays when a later declaration of the same property does not have the flag.
+
 ### Media Queries
 
 For CSS with media queries, first combine the queries with [_postcss-combine-media-query_](https://github.com/SassNinja/postcss-combine-media-query) or [_postcss-merge-queries_](https://github.com/n19htz/postcss-merge-queries). Then run _postcss-combine-duplicated-selectors_ for the best results.
@@ -218,6 +241,8 @@ becomes
   }
 }
 ```
+
+Separate blocks combine only for `@media`, `@supports`, `@layer`, `@container`, `@scope` and `@starting-style`. Inside any other at-rule, such as `@keyframes`, Sass `@if` or `@mixin`, selectors combine only within the same block. A later block of those at-rules can replace an earlier one, or depend on what comes between them.
 
 ### Rule order
 

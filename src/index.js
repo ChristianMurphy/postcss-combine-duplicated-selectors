@@ -63,13 +63,18 @@ const listPseudos = new Set([
 ]);
 
 /**
- * Normalize the selector lists inside pseudo-class arguments.
+ * Lowercase pseudo-class and pseudo-element names, which CSS treats as
+ * case-insensitive, and normalize the selector lists inside their arguments.
  * @param {Object} selectors - postcss selector root
  */
-function sortPseudoArguments(selectors) {
+function normalizePseudos(selectors) {
   const pseudos = [];
   selectors.walkPseudos((pseudo) => {
-    if (listPseudos.has(pseudo.value.toLowerCase())) pseudos.push(pseudo);
+    // Sass interpolation such as :#{$State} stays case-sensitive
+    if (/^::?[a-z-]+$/i.test(pseudo.value)) {
+      pseudo.value = pseudo.value.toLowerCase();
+    }
+    if (listPseudos.has(pseudo.value)) pseudos.push(pseudo);
   });
   // The walk lists outer pseudo-classes first; inner ones must sort first
   for (const pseudo of pseudos.reverse()) {
@@ -80,24 +85,85 @@ function sortPseudoArguments(selectors) {
 }
 
 /**
- * Remove duplicated properties
- * @param {Object} selector - postcss selector node
- * @param {Boolean} exact
+ * Describe a word node by its kind: a number with its unit, a hash, a custom
+ * property name, or another identifier with its lowercased name.
+ * @param {string} word - word node value
+ * @return {string} the same shape for words of the same kind
  */
-function removeDupProperties(selector, exact) {
-  // Remove duplicated properties from bottom to top ()
-  for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
-    for (let befIndex = actIndex - 1; befIndex >= 0; befIndex--) {
-      if (selector.nodes[actIndex].prop === selector.nodes[befIndex].prop) {
-        if (
-          !exact ||
-          (exact &&
-            selector.nodes[actIndex].value === selector.nodes[befIndex].value)
-        ) {
-          selector.nodes[befIndex].remove();
-          actIndex--;
-        }
+function getWordShape(word) {
+  const dimension = valueParser.unit(word);
+  if (dimension) return `number ${dimension.unit}`;
+  if (/^#[\da-f]+$/i.test(word)) return 'hash';
+  if (word.startsWith('--')) return 'custom property';
+  return `identifier ${word.toLowerCase()}`;
+}
+
+/**
+ * Compare value nodes by kind, unit and name, ignoring numbers, spaces and
+ * comments, the way stylelint compares value syntaxes.
+ * @param {Object[]} first - postcss-value-parser nodes
+ * @param {Object[]} second - postcss-value-parser nodes
+ * @return {boolean} whether both lists have the same syntax
+ */
+function isSameSyntax(first, second) {
+  const isSignificant = ({ type }) => type !== 'space' && type !== 'comment';
+  const firstNodes = first.filter(isSignificant);
+  const secondNodes = second.filter(isSignificant);
+  return (
+    firstNodes.length === secondNodes.length &&
+    firstNodes.every((node, index) => {
+      const other = secondNodes[index];
+      if (node.type !== other.type) return false;
+      if (node.type === 'word') {
+        return getWordShape(node.value) === getWordShape(other.value);
       }
+      if (node.type === 'function') {
+        return (
+          node.value.toLowerCase() === other.value.toLowerCase() &&
+          isSameSyntax(node.nodes, other.nodes)
+        );
+      }
+      if (node.type === 'div') return node.value === other.value;
+      // A Less escape such as ~"calc(1px)" holds value text, so compare that
+      if (node.type === 'string' && firstNodes[index - 1]?.value === '~') {
+        return isSameSyntax(
+          valueParser(node.value).nodes,
+          valueParser(other.value).nodes,
+        );
+      }
+      return true;
+    })
+  );
+}
+
+/**
+ * Remove declarations that a later declaration of the same property overrides.
+ * @param {Object} rule - postcss rule node
+ * @param {false|true|'syntax'} mode - false removes any earlier declaration,
+ * true only one with an equal value, 'syntax' also one with the same syntax
+ */
+function removeDupProperties(rule, mode) {
+  const kept = [];
+  for (const declaration of rule.nodes.filter(({ type }) => type === 'decl')) {
+    const index = kept.findIndex(
+      (earlier) =>
+        earlier.prop === declaration.prop &&
+        (!mode ||
+          earlier.value === declaration.value ||
+          (mode === 'syntax' &&
+            isSameSyntax(
+              valueParser(earlier.value).nodes,
+              valueParser(declaration.value).nodes,
+            ))),
+    );
+    if (index === -1) {
+      kept.push(declaration);
+    } else if (kept[index].important && !declaration.important) {
+      // An !important declaration wins over a later one without it
+      declaration.remove();
+    } else {
+      kept[index].remove();
+      kept[index] = declaration;
     }
   }
 }
@@ -106,7 +172,7 @@ function removeDupProperties(selector, exact) {
 // elements read the same
 const getSelectorKeys = parser((selectors) => {
   normalizeAttributes(selectors);
-  sortPseudoArguments(selectors);
+  normalizePseudos(selectors);
   selectors.each(sortCompounds);
   return selectors.map(String);
 });
@@ -164,6 +230,33 @@ function normalizeParams(params) {
   return parsed.toString();
 }
 
+// Rules in separate blocks of these at-rules apply under the same condition, so
+// they can merge. Other at-rules, such as @keyframes, Sass control flow and
+// mixins, can replace or depend on earlier blocks, so rules merge only within
+// one block
+const mergeableAtRules = new Set([
+  'media',
+  'supports',
+  'layer',
+  'container',
+  'scope',
+  'starting-style',
+]);
+
+// Gives each block of an at-rule outside mergeableAtRules its own context
+let lastBlockId = 0;
+
+/**
+ * Describe one at-rule ancestor for the context key.
+ * @param {Object} atRule - postcss at-rule node
+ * @return {string} the same step for blocks whose rules may merge
+ */
+function getAtRuleStep(atRule) {
+  const name = atRule.name.toLowerCase();
+  const step = `@${name} ${normalizeParams(atRule.params)}`;
+  return mergeableAtRules.has(name) ? step : `${step} #${++lastBlockId}`;
+}
+
 /**
  * Describe every ancestor of a rule, from the root down, as one string.
  * @param {Object} rule - postcss rule node
@@ -178,7 +271,7 @@ function getContextKey(rule, stepCache) {
       stepCache.set(
         node,
         node.type === 'atrule'
-          ? `@${node.name.toLowerCase()} ${normalizeParams(node.params)}`
+          ? getAtRuleStep(node)
           : joinSelectorKeys(
               getSelectorKeys.transformSync(node.selector, { lossless: false }),
             ),
@@ -193,8 +286,15 @@ const defaultOptions = {
   removeDuplicatedProperties: false,
 };
 
+const valueModes = new Set([undefined, null, false, true, 'syntax']);
+
 const plugin = (options) => {
   options = Object.assign({}, defaultOptions, options);
+  if (!valueModes.has(options.removeDuplicatedValues)) {
+    throw new TypeError(
+      `${name}: removeDuplicatedValues must be false, true or 'syntax', not ${JSON.stringify(options.removeDuplicatedValues)}`,
+    );
+  }
   return {
     postcssPlugin: name,
     prepare() {
@@ -252,10 +352,8 @@ const plugin = (options) => {
             // remove duplicated rule
             rule.remove();
 
-            // on removal of the node, the parent atrule could have no
-            // declarations associated. This is an issue for @keyframes that
-            // interpret @keyframes <name> {} as overwriting existing keyframe
-            // transitions. Nested wrappers can empty in turn, so walk up.
+            // Moving the rule can leave its wrappers empty, such as a second
+            // @media block or a nesting parent. Remove each one, walking up.
             while (emptied.type !== 'root' && emptied.nodes.length === 0) {
               const parent = emptied.parent;
               emptied.remove();

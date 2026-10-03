@@ -279,6 +279,16 @@ const cases = [
     expected: ':not(:is(.b.a), :is(.a.b)) {x:1;y:2}',
   },
   {
+    label: 'pseudo classes with different case',
+    input: ':NOT(.a) {x:1} :not(.a) {y:2} a:HOVER {z:3} a:hover {w:4}',
+    expected: ':NOT(.a) {x:1;y:2} a:HOVER {z:3;w:4}',
+  },
+  {
+    label: 'selectors within :IS() with different class order',
+    input: ':IS(.b.a) {x:1} :is(.a.b) {y:2}',
+    expected: ':IS(.b.a) {x:1;y:2}',
+  },
+  {
     label: 'selectors within :is() in a group',
     input: ':is(.b.a), :is(.a.b) {}',
     expected: ':is(.b.a) {}',
@@ -322,30 +332,27 @@ const cases = [
     expected: '@keyframes a {0% { color: blue; background: green; }}',
   },
   {
-    label: 'keyframe selectors with duplicate animation properties',
-    input: minify`
-@keyframes ping {
-  75%,
-  to {
-      transform: scale(2);
-  }
-}
-@keyframes ping {
-  75%,
-  to {
-      opacity: 0;
-  }
-}
-`,
-    expected: minify`
-@keyframes ping {
-    75%,
-    to {
-      transform: scale(2);
-      opacity: 0;
-    }
-  }
-`,
+    label: 'keyframe selector lists repeated within one keyframes block',
+    input:
+      '@keyframes ping {75%, to {transform: scale(2)} 75%, to {opacity: 0}}',
+    expected: '@keyframes ping {75%, to {transform: scale(2);opacity: 0}}',
+  },
+  {
+    label: 'selectors within container queries in separate blocks',
+    input:
+      '@container (width > 1px) {.a{x:1}} @container (width > 1px) {.a{y:2}}',
+    expected: '@container (width > 1px) {.a{x:1;y:2}}',
+  },
+  {
+    label: 'selectors within scope and starting-style in separate blocks',
+    input:
+      '@scope (.c) {.a{x:1}} @scope (.c) {.a{y:2}} @starting-style {.b{x:1}} @starting-style {.b{y:2}}',
+    expected: '@scope (.c) {.a{x:1;y:2}} @starting-style {.b{x:1;y:2}}',
+  },
+  {
+    label: 'selectors within one block of an at-rule that merges only in place',
+    input: '@if $b {.a{x:1} .a{y:2}}',
+    expected: '@if $b {.a{x:1;y:2}}',
   },
   {
     label: 'multiple print media queries with different case',
