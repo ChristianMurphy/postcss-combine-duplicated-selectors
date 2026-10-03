@@ -169,6 +169,33 @@ function normalizeParams(params) {
   return parsed.toString();
 }
 
+// Rules in separate blocks of these at-rules apply under the same condition, so
+// they can merge. Other at-rules, such as @keyframes, Sass control flow and
+// mixins, can replace or depend on earlier blocks, so rules merge only within
+// one block
+const mergeableAtRules = new Set([
+  'media',
+  'supports',
+  'layer',
+  'container',
+  'scope',
+  'starting-style',
+]);
+
+// Gives each block of an at-rule outside mergeableAtRules its own context
+let lastBlockId = 0;
+
+/**
+ * Describe one at-rule ancestor for the context key.
+ * @param {Object} atRule - postcss at-rule node
+ * @return {string} the same step for blocks whose rules may merge
+ */
+function getAtRuleStep(atRule) {
+  const name = atRule.name.toLowerCase();
+  const step = `@${name} ${normalizeParams(atRule.params)}`;
+  return mergeableAtRules.has(name) ? step : `${step} #${++lastBlockId}`;
+}
+
 /**
  * Describe every ancestor of a rule, from the root down, as one string.
  * @param {Object} rule - postcss rule node
@@ -183,7 +210,7 @@ function getContextKey(rule, stepCache) {
       stepCache.set(
         node,
         node.type === 'atrule'
-          ? `@${node.name.toLowerCase()} ${normalizeParams(node.params)}`
+          ? getAtRuleStep(node)
           : joinSelectorKeys(
               getSelectorKeys.transformSync(node.selector, { lossless: false }),
             ),
@@ -257,10 +284,8 @@ const plugin = (options) => {
             // remove duplicated rule
             rule.remove();
 
-            // on removal of the node, the parent atrule could have no
-            // declarations associated. This is an issue for @keyframes that
-            // interpret @keyframes <name> {} as overwriting existing keyframe
-            // transitions. Nested wrappers can empty in turn, so walk up.
+            // Moving the rule can leave its wrappers empty, such as a second
+            // @media block or a nesting parent. Remove each one, walking up.
             while (emptied.type !== 'root' && emptied.nodes.length === 0) {
               const parent = emptied.parent;
               emptied.remove();

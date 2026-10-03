@@ -29,6 +29,13 @@ describe('Unique Extension Tests', () => {
     });
   }
 
+  it('selectors in if blocks around a variable change', () => {
+    scssWithoutNesting(
+      '$b: true; @if $b {.y{a:1}} $b: false; @if $b {.y{b:2}}',
+      '$b: true; @if $b {.y{a:1}} $b: false; @if $b {.y{b:2}}',
+    );
+  });
+
   it('pseudo classes built from variables with different case', () => {
     scssWithoutNesting(
       '.a:#{$State}{x:1} .a:#{$state}{y:2}',

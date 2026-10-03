@@ -231,6 +231,27 @@ const cases = [
       '@supports (content:"a b"){x{a:1}}@supports (content:"ab"){x{b:2}}',
   },
   {
+    label: 'keyframes with the same name in separate blocks',
+    input: '@keyframes k {0%{color:red}} @keyframes k {0%{opacity:0}}',
+    expected: '@keyframes k {0%{color:red}} @keyframes k {0%{opacity:0}}',
+  },
+  {
+    label: 'selectors in repeated if and else blocks',
+    input: '@if $b {.y{a:1}} @else {.w{a:1}} @if $b {.y{b:2}} @else {.z{c:3}}',
+    expected:
+      '@if $b {.y{a:1}} @else {.w{a:1}} @if $b {.y{b:2}} @else {.z{c:3}}',
+  },
+  {
+    label: 'selectors in mixins with the same name',
+    input: '@mixin m {.a{x:1}} @mixin m {.a{y:2}}',
+    expected: '@mixin m {.a{x:1}} @mixin m {.a{y:2}}',
+  },
+  {
+    label: 'selectors in unknown at-rules with the same params',
+    input: '@custom x {.a{x:1}} @custom x {.a{y:2}}',
+    expected: '@custom x {.a{x:1}} @custom x {.a{y:2}}',
+  },
+  {
     label: 'selectors in different control flow at-rules',
     input: '@if $x {.a{a:1}} @else {.a{b:2}}',
     expected: '@if $x {.a{a:1}} @else {.a{b:2}}',

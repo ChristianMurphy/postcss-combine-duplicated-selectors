@@ -219,6 +219,8 @@ becomes
 }
 ```
 
+Separate blocks combine only for `@media`, `@supports`, `@layer`, `@container`, `@scope` and `@starting-style`. Inside any other at-rule, such as `@keyframes`, Sass `@if` or `@mixin`, selectors combine only within the same block. A later block of those at-rules can replace an earlier one, or depend on what comes between them.
+
 ### Rule order
 
 The plugin moves the declarations of a later rule into the first rule with the same selector. When a different rule sits between them, the moved declarations come before it. That can change which declaration wins for elements that match both rules.
