@@ -69,7 +69,7 @@
     "remark-preset-lint-consistent": "6.0.1",
     "remark-preset-lint-recommended": "7.0.1",
     "remark-validate-links": "13.1.0",
-    "type-coverage": "2.30.2",
+    "type-coverage": "2.30.3",
     "typescript": "7.0.2"
   },
   "engines": {
