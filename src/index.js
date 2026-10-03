@@ -85,17 +85,76 @@ function normalizePseudos(selectors) {
 }
 
 /**
+ * Describe a word node by its kind: a number with its unit, a hash, a custom
+ * property name, or another identifier with its lowercased name.
+ * @param {string} word - word node value
+ * @return {string} the same shape for words of the same kind
+ */
+function getWordShape(word) {
+  const dimension = valueParser.unit(word);
+  if (dimension) return `number ${dimension.unit}`;
+  if (/^#[\da-f]+$/i.test(word)) return 'hash';
+  if (word.startsWith('--')) return 'custom property';
+  return `identifier ${word.toLowerCase()}`;
+}
+
+/**
+ * Compare value nodes by kind, unit and name, ignoring numbers, spaces and
+ * comments, the way stylelint compares value syntaxes.
+ * @param {Object[]} first - postcss-value-parser nodes
+ * @param {Object[]} second - postcss-value-parser nodes
+ * @return {boolean} whether both lists have the same syntax
+ */
+function isSameSyntax(first, second) {
+  const isSignificant = ({ type }) => type !== 'space' && type !== 'comment';
+  const firstNodes = first.filter(isSignificant);
+  const secondNodes = second.filter(isSignificant);
+  return (
+    firstNodes.length === secondNodes.length &&
+    firstNodes.every((node, index) => {
+      const other = secondNodes[index];
+      if (node.type !== other.type) return false;
+      if (node.type === 'word') {
+        return getWordShape(node.value) === getWordShape(other.value);
+      }
+      if (node.type === 'function') {
+        return (
+          node.value.toLowerCase() === other.value.toLowerCase() &&
+          isSameSyntax(node.nodes, other.nodes)
+        );
+      }
+      if (node.type === 'div') return node.value === other.value;
+      // A Less escape such as ~"calc(1px)" holds value text, so compare that
+      if (node.type === 'string' && firstNodes[index - 1]?.value === '~') {
+        return isSameSyntax(
+          valueParser(node.value).nodes,
+          valueParser(other.value).nodes,
+        );
+      }
+      return true;
+    })
+  );
+}
+
+/**
  * Remove declarations that a later declaration of the same property overrides.
  * @param {Object} rule - postcss rule node
- * @param {Boolean} exact - only remove when the values match
+ * @param {false|true|'syntax'} mode - false removes any earlier declaration,
+ * true only one with an equal value, 'syntax' also one with the same syntax
  */
-function removeDupProperties(rule, exact) {
+function removeDupProperties(rule, mode) {
   const kept = [];
   for (const declaration of rule.nodes.filter(({ type }) => type === 'decl')) {
     const index = kept.findIndex(
       (earlier) =>
         earlier.prop === declaration.prop &&
-        (!exact || earlier.value === declaration.value),
+        (!mode ||
+          earlier.value === declaration.value ||
+          (mode === 'syntax' &&
+            isSameSyntax(
+              valueParser(earlier.value).nodes,
+              valueParser(declaration.value).nodes,
+            ))),
     );
     if (index === -1) {
       kept.push(declaration);
@@ -227,8 +286,15 @@ const defaultOptions = {
   removeDuplicatedProperties: false,
 };
 
+const valueModes = new Set([undefined, null, false, true, 'syntax']);
+
 const plugin = (options) => {
   options = Object.assign({}, defaultOptions, options);
+  if (!valueModes.has(options.removeDuplicatedValues)) {
+    throw new TypeError(
+      `${name}: removeDuplicatedValues must be false, true or 'syntax', not ${JSON.stringify(options.removeDuplicatedValues)}`,
+    );
+  }
   return {
     postcssPlugin: name,
     prepare() {

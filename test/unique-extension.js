@@ -36,6 +36,13 @@ describe('Unique Extension Tests', () => {
     );
   });
 
+  it('interpolated values with different units in syntax mode', () => {
+    testFactory([plugin({ removeDuplicatedValues: 'syntax' })], postcssScss)(
+      '.a{width:#{$a}px;width:#{$b}rem;color:#fff;color:#{$c}}',
+      '.a{width:#{$a}px;width:#{$b}rem;color:#fff;color:#{$c}}',
+    );
+  });
+
   it('pseudo classes built from variables with different case', () => {
     scssWithoutNesting(
       '.a:#{$State}{x:1} .a:#{$state}{y:2}',
