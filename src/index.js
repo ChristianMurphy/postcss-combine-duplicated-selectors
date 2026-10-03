@@ -85,24 +85,26 @@ function normalizePseudos(selectors) {
 }
 
 /**
- * Remove duplicated properties
- * @param {Object} selector - postcss selector node
- * @param {Boolean} exact
+ * Remove declarations that a later declaration of the same property overrides.
+ * @param {Object} rule - postcss rule node
+ * @param {Boolean} exact - only remove when the values match
  */
-function removeDupProperties(selector, exact) {
-  // Remove duplicated properties from bottom to top ()
-  for (let actIndex = selector.nodes.length - 1; actIndex >= 1; actIndex--) {
-    for (let befIndex = actIndex - 1; befIndex >= 0; befIndex--) {
-      if (selector.nodes[actIndex].prop === selector.nodes[befIndex].prop) {
-        if (
-          !exact ||
-          (exact &&
-            selector.nodes[actIndex].value === selector.nodes[befIndex].value)
-        ) {
-          selector.nodes[befIndex].remove();
-          actIndex--;
-        }
-      }
+function removeDupProperties(rule, exact) {
+  const kept = [];
+  for (const declaration of rule.nodes.filter(({ type }) => type === 'decl')) {
+    const index = kept.findIndex(
+      (earlier) =>
+        earlier.prop === declaration.prop &&
+        (!exact || earlier.value === declaration.value),
+    );
+    if (index === -1) {
+      kept.push(declaration);
+    } else if (kept[index].important && !declaration.important) {
+      // An !important declaration wins over a later one without it
+      declaration.remove();
+    } else {
+      kept[index].remove();
+      kept[index] = declaration;
     }
   }
 }

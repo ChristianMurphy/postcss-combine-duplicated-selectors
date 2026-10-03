@@ -45,6 +45,31 @@ describe('Duplicated Properties - Removed', () => {
 }
 `,
     },
+    {
+      label: 'keep an !important declaration over a later one',
+      input: '.a {color: red !important; color: blue}',
+      expected: '.a {color: red !important}',
+    },
+    {
+      label: 'keep a later !important declaration',
+      input: '.a {color: red; color: blue !important}',
+      expected: '.a { color: blue !important}',
+    },
+    {
+      label: 'keep the last of several !important declarations',
+      input: '.a {color: red !important; color: blue; color: green !important}',
+      expected: '.a { color: green !important}',
+    },
+    {
+      label: 'keep comments between duplicated properties',
+      input: '.a {/* one */color: red;/* two */color: blue}',
+      expected: '.a {/* one *//* two */color: blue}',
+    },
+    {
+      label: 'keep nested rules',
+      input: '.a {&:hover {x: 1} &:focus {x: 2}}',
+      expected: '.a {&:hover {x: 1} &:focus {x: 2}}',
+    },
   ];
 
   for (const { label, input, expected } of cases) {
@@ -141,6 +166,21 @@ describe('Duplicated Properties - Remove Exact Duplicates', () => {
   height: var(--linkHeight);
 }
 `,
+    },
+    {
+      label: 'keep an !important declaration over a later equal one',
+      input: '.a {color: red !important; color: red}',
+      expected: '.a {color: red !important}',
+    },
+    {
+      label: 'keep a later !important declaration with an equal value',
+      input: '.a {color: red; color: red !important}',
+      expected: '.a { color: red !important}',
+    },
+    {
+      label: 'keep comments and nested rules with matching values',
+      input: '.a {/* c */ x: 1; /* c */ x: 1; &:hover {y: 2} &:focus {y: 2}}',
+      expected: '.a {/* c */ /* c */ x: 1; &:hover {y: 2} &:focus {y: 2}}',
     },
   ];
 
