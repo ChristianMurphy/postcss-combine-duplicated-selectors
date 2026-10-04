@@ -96,7 +96,7 @@ Within one rule, a selector that repeats an earlier selector in the list is remo
 
 | Option                       | Values                      | Effect                                                                                                                                                                         |
 | ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `removeDuplicatedProperties` | `false`, `true`             | `true` keeps only the last declaration of each property in a combined rule                                                                                                     |
+| `removeDuplicatedProperties` | `false`, `true`             | `true` keeps only the last declaration of each property in each rule                                                                                                           |
 | `removeDuplicatedValues`     | `false`, `true`, `'syntax'` | `true` removes a declaration only when a later one has the same property and value. `'syntax'` also removes it when the later value has the same units, functions and keywords |
 
 Both options default to `false`. Set at most one of these options. The TypeScript types reject both together. If both are set, the plugin uses `removeDuplicatedValues`.
@@ -275,3 +275,9 @@ becomes
 ```
 
 An element with both classes was green and is now blue. Check the output when your CSS depends on rule order.
+
+### Plugin order
+
+The plugin combines rules once, after every plugin's node visitors have run. Rules from other plugins, such as the rules _postcss-nested_ unwraps, combine too. A plugin listed later that runs on `OnceExit` gets the combined rules.
+
+A PostCSS document with more than one root, such as the `<style>` elements that _postcss-html_ reads, combines rules within each root, not across them.
