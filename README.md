@@ -96,7 +96,7 @@ Within one rule, a selector that repeats an earlier selector in the list is remo
 
 | Option                       | Values                      | Effect                                                                                                                                                                         |
 | ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `removeDuplicatedProperties` | `false`, `true`             | `true` keeps only the last declaration of each property in a combined rule                                                                                                     |
+| `removeDuplicatedProperties` | `false`, `true`             | `true` keeps only the last declaration of each property in each rule                                                                                                           |
 | `removeDuplicatedValues`     | `false`, `true`, `'syntax'` | `true` removes a declaration only when a later one has the same property and value. `'syntax'` also removes it when the later value has the same units, functions and keywords |
 
 Both options default to `false`. Set at most one of these options. The TypeScript types reject both together. If both are set, the plugin uses `removeDuplicatedValues`.
