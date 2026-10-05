@@ -54,6 +54,8 @@ const properties = { removeDuplicatedProperties: true };
 const values = { removeDuplicatedValues: true };
 /** @type {Options} */
 const syntax = { removeDuplicatedValues: 'syntax' };
+/** @type {Options} */
+const cascade = { keepCascade: true };
 
 /** @type {Array<{label: string, build: (size: number) => string, modes: Array<Options>}>} */
 const cases = [
@@ -70,7 +72,7 @@ const cases = [
   {
     label: 'rules with the same selector',
     build: (size) => repeat(size, (index) => `.a{p${index}:1}`),
-    modes: [{}, properties],
+    modes: [{}, properties, cascade],
   },
   {
     label: 'rules with the same selector in the same at-rule',
@@ -85,6 +87,41 @@ const cases = [
       return `${'@media (width: 1px){.a{'.repeat(depth)}x:1${'}}'.repeat(depth)}`;
     },
     modes: [{}],
+  },
+  {
+    label: 'rules that combine around rules setting other properties',
+    build: (size) => repeat(size, (index) => `.a{p${index}:1}.b{q:1}`),
+    modes: [cascade],
+  },
+  {
+    label: 'rules kept apart by rules setting the same property',
+    build: (size) => repeat(size, () => '.a{p:1}.b{p:2}'),
+    modes: [cascade],
+  },
+  {
+    label: 'rules with distinct selectors and properties',
+    build: (size) => repeat(size, (index) => `.a${index}{p${index}:1}`),
+    modes: [cascade],
+  },
+  {
+    label: 'rules with distinct selectors that set the same properties',
+    build: (size) =>
+      repeat(
+        size / 8,
+        (index) => `.a${index}{a:1;b:1;c:1;d:1;e:1;f:1;g:1;h:1}`,
+      ),
+    modes: [cascade],
+  },
+  {
+    label: 'rules that combine around rules setting custom properties',
+    build: (size) =>
+      repeat(size, (index) => `.a{--p${index}:1}.b{--q${index}:1}`),
+    modes: [cascade],
+  },
+  {
+    label: 'rules that hold declarations after nested rules',
+    build: (size) => repeat(size, (index) => `.a${index}{&{p:1} q:1;&{r:1}}`),
+    modes: [cascade],
   },
   {
     label: 'a selector list repeating one selector',

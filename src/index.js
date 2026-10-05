@@ -25,7 +25,14 @@
  * Options for postcss-combine-duplicated-selectors. Set at most one of
  * `removeDuplicatedProperties` and `removeDuplicatedValues`.
  *
- * @typedef {KeepDuplicatedOptions | RemoveDuplicatedPropertiesOptions | RemoveDuplicatedValuesOptions} Options
+ * @typedef {(KeepDuplicatedOptions | RemoveDuplicatedPropertiesOptions | RemoveDuplicatedValuesOptions) & KeepCascadeOptions} Options
+ */
+
+/**
+ * @typedef KeepCascadeOptions
+ * @property {boolean} [keepCascade] Combine a rule into an earlier one only
+ *   when no rule between them sets a property it moves. A rule that holds
+ *   nested rules or at-rules, or that sets `all`, stays in place.
  */
 
 /**
@@ -422,6 +429,86 @@ const mergeableAtRules = new Set([
   'starting-style',
 ]);
 
+// Shorthands and longhands that do not share their first name segment
+/** @type {ReadonlyMap<string, string>} */
+const propertyGroupAliases = new Map([
+  ['top', 'inset'],
+  ['right', 'inset'],
+  ['bottom', 'inset'],
+  ['left', 'inset'],
+  ['line', 'font'],
+  ['gap', 'grid'],
+  ['row', 'grid'],
+  ['column', 'grid'],
+  ['columns', 'grid'],
+  ['align', 'place'],
+  ['justify', 'place'],
+  ['width', 'size'],
+  ['height', 'size'],
+  ['inline', 'size'],
+  ['block', 'size'],
+  ['white', 'text'],
+  ['word', 'overflow'],
+  ['page', 'break'],
+  ['logical', 'size'],
+  ['vertical', 'baseline'],
+  ['alignment', 'baseline'],
+  ['rule', 'grid'],
+]);
+
+// Legacy aliases and shorthands that their first name segment cannot group
+/** @type {ReadonlyMap<string, string>} */
+const propertyNameGroups = new Map([
+  ['column-break-before', 'break'],
+  ['column-break-after', 'break'],
+  ['column-break-inside', 'break'],
+  ['color-adjust', 'print'],
+  ['line-clamp', 'clamp'],
+  ['max-lines', 'clamp'],
+  ['block-ellipsis', 'clamp'],
+  ['continue', 'clamp'],
+  ['glyph-orientation-vertical', 'text'],
+  ['box-flex', 'flex'],
+  ['box-orient', 'flex'],
+  ['box-direction', 'flex'],
+  ['box-ordinal-group', 'order'],
+  ['box-align', 'place'],
+  ['box-pack', 'place'],
+]);
+
+/**
+ * @param {string} property - property name
+ * @return {string} the same group for a shorthand and its longhands; a
+ *   custom property is its own group, and a name with an escape or an
+ *   interpolation is in the group of `all`
+ */
+function getPropertyGroup(property) {
+  if (/\\|[#@]\{/.test(property)) return 'all';
+  if (property.startsWith('--')) return property;
+  const unprefixed = property.toLowerCase().replace(/^-[a-z]+-/, '');
+  const end = unprefixed.indexOf('-');
+  const segment = end === -1 ? unprefixed : unprefixed.slice(0, end);
+  return (
+    propertyNameGroups.get(unprefixed) ??
+    propertyGroupAliases.get(segment) ??
+    segment
+  );
+}
+
+/**
+ * @param {Options | undefined} options - options passed to the plugin
+ * @return {boolean} whether to combine only rules whose move keeps the cascade
+ */
+function getKeepCascade(options) {
+  /** @type {unknown} */
+  const value = options?.keepCascade;
+  if (value === undefined || value === null || value === false) return false;
+  if (value === true) return true;
+  throw new TypeError(
+    `${name}: keepCascade must be false or true, not ${JSON.stringify(value)}`,
+  );
+}
+
 /**
  * Read which duplicated declarations to remove. Plain JavaScript callers can
  * pass any value, so this checks removeDuplicatedValues at run time.
@@ -456,6 +543,7 @@ function getDuplicateRemoval(options) {
  */
 const plugin = (options) => {
   const removal = getDuplicateRemoval(options);
+  const isKeepingCascade = getKeepCascade(options);
   return {
     postcssPlugin: name,
     OnceExit(proxy) {
@@ -470,6 +558,49 @@ const plugin = (options) => {
       /** @type {Map<string, string>} */
       const shapeCache = new Map();
       let blockId = 0;
+      // keepCascade: the position where each property group was last set
+      /** @type {Map<string, number>} */
+      const lastSetPositions = new Map();
+      /** @type {Map<string, string>} */
+      const groupCache = new Map();
+      // keepCascade: the rule that later rules with the same key combine into
+      /** @type {Map<string, {key: string, position: number}>} */
+      const hosts = new Map();
+      let position = 0;
+      let lastAllPosition = 0;
+      /**
+       * @param {Declaration} declaration - declaration to group
+       * @return {string} its property group
+       */
+      const getGroup = (declaration) =>
+        getCached(groupCache, declaration.prop, getPropertyGroup);
+      /**
+       * @param {Array<ChildNode>} nodes - children of a rule or at-rule
+       * @return {{groups: Array<string>, hasNested: boolean}} the property
+       *   groups its declarations set, and whether it holds rules or at-rules
+       */
+      const getDeclaredGroups = (nodes) => {
+        /** @type {Array<string>} */
+        const groups = [];
+        let hasNested = false;
+        for (const child of nodes) {
+          if (child.type === 'decl') {
+            groups.push(getGroup(child));
+          } else if (child.type !== 'comment') {
+            hasNested = true;
+          }
+        }
+        return { groups, hasNested };
+      };
+      /**
+       * @param {Array<string>} groups - property groups set
+       * @param {number} at - position that sets them
+       * @return {undefined}
+       */
+      const setPositions = (groups, at) => {
+        for (const group of groups) lastSetPositions.set(group, at);
+        if (groups.includes('all')) lastAllPosition = at;
+      };
 
       // A rule's key is its context's number plus its normalized selector
       /** @type {Map<Rule, string>} */
@@ -490,7 +621,8 @@ const plugin = (options) => {
         getCached(contextIds, key, () => contextIds.size + 1);
       // A stack, not recursion, so deep nesting cannot overflow; children go
       // on reversed to come off in document order
-      /** @type {Array<[Rule | AtRule, number]>} */
+      // An array holds the groups of declarations that follow a nested node
+      /** @type {Array<[Rule | AtRule | Array<string>, number]>} */
       const pending = [];
       /**
        * @param {Array<ChildNode>} nodes - children to visit
@@ -498,24 +630,74 @@ const plugin = (options) => {
        * @return {undefined}
        */
       const visit = (nodes, context) => {
-        for (const node of nodes.toReversed()) {
+        if (!isKeepingCascade) {
+          for (const node of nodes.toReversed()) {
+            if (node.type === 'rule' || node.type === 'atrule') {
+              pending.push([node, context]);
+            }
+          }
+          return;
+        }
+        /** @type {Array<[Rule | AtRule | Array<string>, number]>} */
+        const entries = [];
+        let hasNested = false;
+        /** @type {Array<string> | undefined} */
+        let following;
+        for (const node of nodes) {
           if (node.type === 'rule' || node.type === 'atrule') {
-            pending.push([node, context]);
+            entries.push([node, context]);
+            hasNested = true;
+            following = undefined;
+          } else if (node.type === 'decl' && hasNested) {
+            if (!following) {
+              following = [];
+              entries.push([following, context]);
+            }
+            following.push(getGroup(node));
           }
         }
+        for (const entry of entries.toReversed()) pending.push(entry);
       };
       visit(root.nodes, 0);
       for (let entry = pending.pop(); entry; entry = pending.pop()) {
         const [node, context] = entry;
-        if (node.type === 'rule') {
+        if (Array.isArray(node)) {
+          setPositions(node, ++position);
+        } else if (node.type === 'rule') {
           const keys = getCached(selectorCache, node.selector, (selector) =>
             getSelectorKeys.transformSync(selector, { lossless: false }),
           );
           removeRepeatedSelectors(node, keys);
-          const key = getKey(context, joinSelectorKeys(keys));
+          let key = getKey(context, joinSelectorKeys(keys));
+          if (isKeepingCascade) {
+            position++;
+            const { groups, hasNested } = getDeclaredGroups(node.nodes);
+            const host = hosts.get(key);
+            if (
+              host &&
+              !hasNested &&
+              !groups.includes('all') &&
+              lastAllPosition <= host.position &&
+              groups.every(
+                (group) => (lastSetPositions.get(group) ?? 0) <= host.position,
+              )
+            ) {
+              setPositions(groups, host.position);
+              key = host.key;
+            } else {
+              setPositions(groups, position);
+              const hostKey = `${key}#${position}`;
+              hosts.set(key, { key: hostKey, position });
+              key = hostKey;
+            }
+          }
           ruleKeys.set(node, key);
           visit(node.nodes, getContextId(key));
         } else if (node.nodes) {
+          if (isKeepingCascade) {
+            const { groups } = getDeclaredGroups(node.nodes);
+            if (groups.length > 0) setPositions(groups, ++position);
+          }
           const atName = node.name.toLowerCase();
           const params = getCached(paramsCache, node.params, normalizeParams);
           const step = `@${atName} ${params}`;
@@ -525,6 +707,9 @@ const plugin = (options) => {
               ? step
               : `${step} #${++blockId}`;
           visit(node.nodes, getContextId(getKey(context, blockStep)));
+        } else if (isKeepingCascade) {
+          // An at-rule without a block, such as @apply, can set any property
+          lastAllPosition = ++position;
         }
       }
 

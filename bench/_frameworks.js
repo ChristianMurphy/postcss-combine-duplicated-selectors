@@ -61,4 +61,5 @@ export const modes = {
   'removeDuplicatedValues: true': { removeDuplicatedValues: true },
   "removeDuplicatedValues: 'syntax'": { removeDuplicatedValues: 'syntax' },
   'removeDuplicatedProperties: true': { removeDuplicatedProperties: true },
+  'keepCascade: true': { keepCascade: true },
 };

@@ -27,4 +27,9 @@ export function checkOptionTypes() {
     // @ts-expect-error both options cannot be enabled together
     removeDuplicatedValues: 'syntax',
   });
+  plugin({ keepCascade: true });
+  plugin({ keepCascade: false, removeDuplicatedProperties: true });
+  plugin({ keepCascade: true, removeDuplicatedValues: 'syntax' });
+  // @ts-expect-error keepCascade is a boolean
+  plugin({ keepCascade: 'yes' });
 }
