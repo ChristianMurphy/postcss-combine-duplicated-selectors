@@ -244,7 +244,7 @@ becomes
 }
 ```
 
-Separate blocks combine only for `@media`, `@supports`, `@layer`, `@container`, `@scope` and `@starting-style`. Inside any other at-rule, such as `@keyframes`, Sass `@if` or `@mixin`, selectors combine only within the same block. A later block of those at-rules can replace an earlier one, or depend on what comes between them.
+Separate blocks combine only for `@media`, `@supports`, `@layer`, `@container`, `@scope` and `@starting-style`. Inside any other at-rule, such as `@keyframes`, Sass `@if` or `@mixin`, selectors combine only within the same block. A later block of those at-rules can replace an earlier one, or depend on what comes between them. Each `@layer` block without a name is a separate layer, so its selectors also combine only within the block.
 
 ### Rule order
 

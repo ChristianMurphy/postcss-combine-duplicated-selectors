@@ -233,6 +233,16 @@ const cases = [
       '@supports (content:"a b"){x{a:1}}@supports (content:"ab"){x{b:2}}',
   },
   {
+    label: 'selectors in separate layers without a name',
+    input: '@layer {.a{x:1}} @layer {.b{x:2}} @layer {.a{x:3}}',
+    expected: '@layer {.a{x:1}} @layer {.b{x:2}} @layer {.a{x:3}}',
+  },
+  {
+    label: 'selectors in layers without a name inside the same media query',
+    input: '@media screen{@layer{.a{x:1}}} @media screen{@layer{.a{y:2}}}',
+    expected: '@media screen{@layer{.a{x:1}}} @media screen{@layer{.a{y:2}}}',
+  },
+  {
     label: 'keyframes with the same name in separate blocks',
     input: '@keyframes k {0%{color:red}} @keyframes k {0%{opacity:0}}',
     expected: '@keyframes k {0%{color:red}} @keyframes k {0%{opacity:0}}',
