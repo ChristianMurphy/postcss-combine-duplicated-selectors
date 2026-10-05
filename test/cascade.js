@@ -293,4 +293,26 @@ describe('Cascade', () => {
       getParameters(300),
     );
   });
+
+  it('keeps the winning declarations of every stylesheet with keepCascade', () => {
+    fc.assert(
+      fc.property(
+        stylesheet,
+        elementShapes,
+        fc.constantFrom(...modes),
+        (css, shapes, options) => {
+          const document = buildDocument(shapes);
+          const output = postcss([
+            plugin({ ...options, keepCascade: true }),
+          ]).process(css, { from: undefined }).root;
+          const elements = selectAll('*', document);
+          assert.deepEqual(
+            getComparable(getStyles(output, document), elements),
+            getComparable(getStyles(postcss.parse(css), document), elements),
+          );
+        },
+      ),
+      getParameters(300),
+    );
+  });
 });

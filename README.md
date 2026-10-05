@@ -98,8 +98,9 @@ Within one rule, a selector that repeats an earlier selector in the list is remo
 | ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `removeDuplicatedProperties` | `false`, `true`             | `true` keeps only the last declaration of each property in each rule                                                                                                           |
 | `removeDuplicatedValues`     | `false`, `true`, `'syntax'` | `true` removes a declaration only when a later one has the same property and value. `'syntax'` also removes it when the later value has the same units, functions and keywords |
+| `keepCascade`                | `false`, `true`             | `true` combines a rule into an earlier one only when no rule between them sets a property it moves; see [rule order](#rule-order)                                              |
 
-Both options default to `false`. Set at most one of these options. The TypeScript types reject both together. If both are set, the plugin uses `removeDuplicatedValues`.
+Every option defaults to `false`. Set at most one of `removeDuplicatedProperties` and `removeDuplicatedValues`. The TypeScript types reject both together. If both are set, the plugin uses `removeDuplicatedValues`.
 
 The package includes TypeScript types. Import the options type with `import type { Options } from 'postcss-combine-duplicated-selectors'`.
 
@@ -274,7 +275,35 @@ becomes
 }
 ```
 
-An element with both classes was green and is now blue. Check the output when your CSS depends on rule order.
+An element with both classes was green and is now blue. Check the output when your CSS depends on rule order, or set `keepCascade`.
+
+With `keepCascade: true`, a rule combines into an earlier rule only when no rule between them sets a property it moves. The example above stays as it is, because `.b` sets `color`. The plugin treats properties that set the same value as one property, so `margin` does not move past `margin-top` or `margin-inline-start`. It takes shorthands, legacy aliases and logical properties from the CSS specifications, through [@webref/css](https://www.npmjs.com/package/@webref/css), plus a short list of browser aliases. A property it does not know joins the longest known property that its name extends. A rule that holds nested rules or at-rules, or that sets `all`, stays in place. An at-rule without a block, such as `@apply` or `@include`, counts as setting every property. When a rule cannot join the first rule with its selector, later rules join it instead.
+
+```css
+.a {
+  color: red;
+}
+.b {
+  width: 1px;
+}
+.a {
+  height: 2px;
+}
+```
+
+becomes
+
+```css
+.a {
+  color: red;
+  height: 2px;
+}
+.b {
+  width: 1px;
+}
+```
+
+The check compares property names, not selectors, layers or media queries. It keeps some rules apart that could combine safely.
 
 ### Plugin order
 
