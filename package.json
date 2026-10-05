@@ -71,7 +71,7 @@
     "husky": "9.1.7",
     "npm-run-all2": "9.0.3",
     "oxfmt": "0.72.0",
-    "oxlint": "1.86.0",
+    "oxlint": "1.87.0",
     "postcss": "8.5.29",
     "postcss-nested": "8.0.1",
     "postcss-scss": "4.0.9",
