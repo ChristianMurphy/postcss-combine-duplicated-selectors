@@ -2,10 +2,7 @@ import postcss from 'postcss';
 import plugin from '../src/index.js';
 import { frameworks, modes } from './_frameworks.js';
 
-/**
- * Reports what each mode removes from each framework. A faster run that
- * removes less is not a win, so compare this alongside `npm run bench`.
- */
+/** Rules and bytes each mode removes from each framework */
 
 /**
  * @param {string} css - stylesheet

@@ -21,15 +21,9 @@ import {
 } from './_arbitraries.js';
 
 /**
- * These tests compute which declaration wins for each element and property,
- * before and after the plugin. The model covers what the generated
- * stylesheets use: specificity, source order, `!important` and cascade layers
- * that do not nest. Every @media query applies.
- *
- * The plugin moves a later rule's declarations up to the first rule with the
- * same selector, ahead of the rules between them. The README warns that this
- * can change the cascade. So the check runs only when no rule in between sets
- * a moved property in the same layer as either rule.
+ * Compares the winning declaration per element and property before and after
+ * the plugin, skipping merges that jump a rule setting the same property in
+ * the same layer.
  */
 
 /** @type {Array<Options>} */
@@ -91,10 +85,8 @@ function getNodeSpecificity(node) {
 
 /**
  * @param {Root} root - stylesheet
- * @return {Array<Entry>} rules outside @keyframes in source order, with the
- *   layer each belongs to; '' for none, and a number for each block of a
- *   layer without a name. Layers rank by their first block, and rules in no
- *   layer rank above every layer.
+ * @return {Array<Entry>} rules outside @keyframes in source order, with
+ *   their layer and its rank
  */
 function getEntries(root) {
   /** @type {Array<Entry>} */
@@ -210,11 +202,9 @@ function isGreater(rank, current) {
 }
 
 /**
- * Record where each declaration starts, to find the moves the plugin makes.
  * @param {Array<Entry>} entries - rules of the input, before the plugin runs
- * @return {() => boolean} after the plugin runs on the same root, whether a
- *   moved declaration jumped over a rule that sets the same property in the
- *   layer it left or the layer it joined
+ * @return {() => boolean} whether a merge jumped a rule that sets a moved
+ *   property in either rule's layer
  */
 function watchMoves(entries) {
   /** @type {Map<Declaration, number>} */
