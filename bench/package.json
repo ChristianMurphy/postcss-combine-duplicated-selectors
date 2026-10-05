@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@mantine/core": "9.6.3",
+    "@mantine/core": "9.7.0",
     "@radix-ui/themes": "3.3.0",
     "@tabler/core": "1.6.1",
     "bootstrap": "5.3.8",
@@ -13,7 +13,7 @@
     "daisyui": "5.7.47",
     "lightningcss": "1.33.0",
     "open-props": "1.7.23",
-    "postcss-merge-rules": "9.1.1",
+    "postcss-merge-rules": "9.1.2",
     "tailwindcss": "4.3.3"
   }
 }
