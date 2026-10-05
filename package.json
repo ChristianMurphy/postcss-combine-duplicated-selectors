@@ -3,6 +3,7 @@
   "version": "11.0.0",
   "description": "automatically keep css selectors unique",
   "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
