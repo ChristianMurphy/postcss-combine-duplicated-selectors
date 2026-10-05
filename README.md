@@ -281,3 +281,10 @@ An element with both classes was green and is now blue. Check the output when yo
 The plugin combines rules once, after every plugin's node visitors have run. Rules from other plugins, such as the rules _postcss-nested_ unwraps, combine too. A plugin listed later that runs on `OnceExit` gets the combined rules.
 
 A PostCSS document with more than one root, such as the `<style>` elements that _postcss-html_ reads, combines rules within each root, not across them.
+
+## Alternatives
+
+CSS minifiers also reduce repeated rules:
+
+- [cssnano](https://cssnano.github.io/cssnano/) does it with [postcss-merge-rules](https://www.npmjs.com/package/postcss-merge-rules). It merges rules with the same selector when it can move one rule's declarations past the rules between them. It also moves a declaration that more than one rule sets into a new rule with a selector list.
+- [Lightning CSS](https://lightningcss.dev/) minifies the whole stylesheet. It rewrites values, merges adjacent rules and drops declarations that a later one overrides. Without browser targets, that includes fallbacks such as `display: flex` before `display: grid`.
