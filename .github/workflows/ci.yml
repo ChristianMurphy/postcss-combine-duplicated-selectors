@@ -50,3 +50,4 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix bench --omit=peer
       - run: node --experimental-bench --bench --bench-samples=1 --bench-warmup=0 bench/frameworks.js
+      - run: npm run bench:removed

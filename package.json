@@ -18,6 +18,7 @@
     "commit": "commit",
     "format": "oxfmt",
     "bench": "node --experimental-bench --bench bench/frameworks.js",
+    "bench:removed": "node bench/removed.js",
     "build": "node node_modules/typescript/bin/tsc --build --clean && node node_modules/typescript/bin/tsc --build && type-coverage",
     "fuzz": "node --test test/cascade.js test/properties.js test/selector-soundness.js",
     "prepack": "npm run build",
