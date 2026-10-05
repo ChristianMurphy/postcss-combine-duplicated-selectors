@@ -279,10 +279,22 @@ function getBlock(selectors, depth) {
       fc.array(getBlock(selectors, depth - 1), { minLength: 1, maxLength: 3 }),
     )
     .map(([query, blocks]) => `@media ${query} { ${blocks.join(' ')} }`);
+  // Layers, named or not; each block without a name is a new layer
+  const layer = fc
+    .tuple(
+      fc.constantFrom('', 'x', 'y'),
+      fc.array(getBlock(selectors, depth - 1), { minLength: 1, maxLength: 3 }),
+    )
+    .map(([name, blocks]) =>
+      name
+        ? `@layer ${name} { ${blocks.join(' ')} }`
+        : `@layer { ${blocks.join(' ')} }`,
+    );
   return fc.oneof(
     { arbitrary: rule, weight: 3 },
     { arbitrary: keyframes, weight: 1 },
     { arbitrary: media, weight: 1 },
+    { arbitrary: layer, weight: 1 },
   );
 }
 
@@ -296,6 +308,7 @@ export const stylesheet = fc
   .array(selectorPair, { minLength: 1, maxLength: 3 })
   .chain((pairs) =>
     fc.array(
+      // One level, so layers never nest, as test/cascade.js assumes
       getBlock(
         pairs.flatMap(({ first, second }) => [first, second]),
         1,
