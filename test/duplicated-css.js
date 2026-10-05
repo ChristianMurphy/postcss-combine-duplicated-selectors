@@ -350,6 +350,16 @@ const cases = [
     expected: '@scope (.c) {.a{x:1;y:2}} @starting-style {.b{x:1;y:2}}',
   },
   {
+    label: 'selectors within one layer without a name',
+    input: '@layer {.a{x:1} .b{x:2} .a{y:3}}',
+    expected: '@layer {.a{x:1;y:3} .b{x:2}}',
+  },
+  {
+    label: 'selectors within named layers in separate blocks',
+    input: '@layer x {.a{x:1}} @layer y {.a{x:2}} @layer x {.a{y:3}}',
+    expected: '@layer x {.a{x:1;y:3}} @layer y {.a{x:2}}',
+  },
+  {
     label: 'selectors within one block of an at-rule that merges only in place',
     input: '@if $b {.a{x:1} .a{y:2}}',
     expected: '@if $b {.a{x:1;y:2}}',

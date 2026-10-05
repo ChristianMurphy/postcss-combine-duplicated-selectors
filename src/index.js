@@ -519,9 +519,11 @@ const plugin = (options) => {
           const atName = node.name.toLowerCase();
           const params = getCached(paramsCache, node.params, normalizeParams);
           const step = `@${atName} ${params}`;
-          const blockStep = mergeableAtRules.has(atName)
-            ? step
-            : `${step} #${++blockId}`;
+          // Each @layer block without a name is a separate layer
+          const blockStep =
+            mergeableAtRules.has(atName) && (atName !== 'layer' || params)
+              ? step
+              : `${step} #${++blockId}`;
           visit(node.nodes, getContextId(getKey(context, blockStep)));
         }
       }
