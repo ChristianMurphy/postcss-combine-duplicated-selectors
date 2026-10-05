@@ -281,3 +281,28 @@ An element with both classes was green and is now blue. Check the output when yo
 The plugin combines rules once, after every plugin's node visitors have run. Rules from other plugins, such as the rules _postcss-nested_ unwraps, combine too. A plugin listed later that runs on `OnceExit` gets the combined rules.
 
 A PostCSS document with more than one root, such as the `<style>` elements that _postcss-html_ reads, combines rules within each root, not across them.
+
+## Alternatives
+
+CSS minifiers also reduce repeated rules:
+
+- [cssnano](https://cssnano.github.io/cssnano/) does it with [postcss-merge-rules](https://www.npmjs.com/package/postcss-merge-rules). It merges rules with the same selector when it can move one rule's declarations past the rules between them. It also moves a declaration that more than one rule sets into a new rule with a selector list.
+- [Lightning CSS](https://lightningcss.dev/) minifies the whole stylesheet. It rewrites values, merges adjacent rules and drops declarations that a later one overrides. Without browser targets, that includes fallbacks such as `display: flex` before `display: grid`.
+
+The table shows the share of bytes each tool removed from the stylesheets in `bench/`. The script strips comments and whitespace first, so formatting does not count. Each share cell gives plain bytes, then gzipped bytes, and a negative share means the output grew. The Lightning CSS column includes value minification, not only rule merging. The last two columns give how many more plain bytes each tool removed when this plugin ran first.
+
+| Stylesheet       | This plugin    | `removeDuplicatedProperties` | postcss-merge-rules | Lightning CSS | Bytes this plugin adds to postcss-merge-rules | Bytes this plugin adds to Lightning CSS |
+| ---------------- | -------------- | ---------------------------- | ------------------- | ------------- | --------------------------------------------- | --------------------------------------- |
+| tailwindcss      | 0.00% / 0.00%  | 0.00% / 0.00%                | 57.55% / -5.23%     | 0.90% / 0.10% | 0                                             | 0                                       |
+| bootstrap        | 0.09% / -0.09% | 0.30% / 0.02%                | 1.84% / -0.54%      | 2.43% / 1.28% | 50                                            | 165                                     |
+| daisyui          | 0.08% / 0.06%  | 0.17% / 0.16%                | 0.78% / -0.38%      | 0.00% / 0.00% | 816                                           | 952                                     |
+| @mantine/core    | 0.03% / 0.10%  | 0.03% / 0.10%                | 0.74% / -0.40%      | 2.33% / 2.23% | 13                                            | 60                                      |
+| @radix-ui/themes | 0.00% / 0.00%  | 0.11% / 0.12%                | 0.05% / -0.05%      | 2.09% / 0.85% | 0                                             | 0                                       |
+| bulma            | 0.05% / 0.00%  | 0.20% / 0.14%                | 3.25% / 0.50%       | 1.09% / 0.85% | 109                                           | 366                                     |
+| open-props       | 0.00% / 0.00%  | 0.00% / 0.00%                | 0.00% / 0.00%       | 1.79% / 1.40% | 0                                             | 0                                       |
+
+Measured on 2026-10-05 at commit `caebed5` with Node.js 24.20.0, postcss 8.5.28, @mantine/core 9.6.3, @radix-ui/themes 3.3.0, bootstrap 5.3.8, bulma 1.0.4, cssnano-preset-lite 6.0.8, daisyui 5.7.47, lightningcss 1.33.0, open-props 1.7.23, postcss-merge-rules 9.1.1, tailwindcss 4.3.3.
+
+postcss-merge-rules removes the most from Tailwind CSS by moving shared declarations into new rules. Each utility keeps its own rule and also appears in a shared selector list. gzip had already compressed the repeated declarations, and the gzipped output grows. daisyUI ships already minified CSS, so Lightning CSS removes nothing more from it.
+
+Run `npm run bench:compare` to measure again.

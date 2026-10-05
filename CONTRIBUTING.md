@@ -34,6 +34,7 @@ It needs Node.js 26.9 or later.
 2.  Run the benchmark: `npm run bench`
 3.  Save results as JSON to compare later: `node --experimental-bench --bench --bench-reporter=json bench/frameworks.js > before.ndjson`
 4.  Check how many rules and bytes each mode removes: `npm run bench:removed`. A faster run that removes less is not a win.
+5.  Compare with postcss-merge-rules and Lightning CSS: `npm run bench:compare`. It prints the table for the README's Alternatives section.
 
 ## Additional Resources
 
