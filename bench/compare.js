@@ -78,10 +78,13 @@ function formatPercent(before, after) {
 /**
  * @param {Size} before - size of the input
  * @param {Size} after - size of the output
- * @return {string} the share of bytes removed, plain and gzipped
+ * @return {Array<string>} the share of bytes removed, plain then gzipped
  */
-function getShare(before, after) {
-  return `${formatPercent(before.bytes, after.bytes)} / ${formatPercent(before.gzip, after.gzip)}`;
+function getShares(before, after) {
+  return [
+    formatPercent(before.bytes, after.bytes),
+    formatPercent(before.gzip, after.gzip),
+  ];
 }
 
 const combine = postcss([plugin()]);
@@ -90,28 +93,46 @@ const combineProperties = postcss([
 ]);
 const merge = postcss([mergeRules()]);
 
-const rows = [
-  '| Stylesheet | This plugin | `removeDuplicatedProperties` | postcss-merge-rules | Lightning CSS | Bytes this plugin adds to postcss-merge-rules | Bytes this plugin adds to Lightning CSS |',
-  '| --- | --- | --- | --- | --- | --- | --- |',
+const tools = [
+  'This plugin',
+  '`removeDuplicatedProperties`',
+  'postcss-merge-rules',
+  'Lightning CSS',
 ];
+const rows = [
+  `| Stylesheet | ${tools.flatMap((tool) => [`${tool}, minified`, `${tool}, gzipped`]).join(' | ')} |`,
+  `|${' --- |'.repeat(tools.length * 2 + 1)}`,
+];
+/** Most extra bytes each tool removed when this plugin ran first */
+const extra = {
+  merge: { bytes: 0, framework: '' },
+  minify: { bytes: 0, framework: '' },
+};
 for (const [framework, css] of Object.entries(frameworks)) {
   const input = getSize(css);
   const combined = combine.process(css, { from: undefined }).css;
   const merged = getSize(merge.process(css, { from: undefined }).css);
   const minified = getSize(minify(css));
   const cells = [
-    getShare(input, getSize(combined)),
-    getShare(
+    ...getShares(input, getSize(combined)),
+    ...getShares(
       input,
       getSize(combineProperties.process(css, { from: undefined }).css),
     ),
-    getShare(input, merged),
-    getShare(input, minified),
-    merged.bytes -
-      getSize(merge.process(combined, { from: undefined }).css).bytes,
-    minified.bytes - getSize(minify(combined)).bytes,
+    ...getShares(input, merged),
+    ...getShares(input, minified),
   ];
   rows.push(`| ${framework} | ${cells.join(' | ')} |`);
+  const afterMerge =
+    merged.bytes -
+    getSize(merge.process(combined, { from: undefined }).css).bytes;
+  const afterMinify = minified.bytes - getSize(minify(combined)).bytes;
+  if (afterMerge > extra.merge.bytes) {
+    extra.merge = { bytes: afterMerge, framework };
+  }
+  if (afterMinify > extra.minify.bytes) {
+    extra.minify = { bytes: afterMinify, framework };
+  }
 }
 
 /**
@@ -140,4 +161,7 @@ const commit = runGit(['rev-parse', '--short', 'HEAD']);
 const date = new Date().toISOString().slice(0, 10);
 
 console.log(rows.join('\n'));
+console.log(
+  `\nRunning this plugin before postcss-merge-rules removed at most ${extra.merge.bytes} more bytes, from ${extra.merge.framework}. Before Lightning CSS, it removed at most ${extra.minify.bytes} more, from ${extra.minify.framework}.`,
+);
 console.log(`\nMeasured on ${date} at commit \`${commit}\` with ${versions}.`);
