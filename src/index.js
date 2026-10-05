@@ -55,9 +55,9 @@
 
 import parser from 'postcss-selector-parser';
 import valueParser from 'postcss-value-parser';
-import packageJson from '../package.json' with { type: 'json' };
 
-const { name } = packageJson;
+// Not read from package.json, so bundles omit it
+const name = 'postcss-combine-duplicated-selectors';
 
 /**
  * Ensure that attributes with different quotes match.

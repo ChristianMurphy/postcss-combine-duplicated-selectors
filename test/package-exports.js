@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import plugin from '../src/index.js';
 // Importing by package name resolves through the "exports" map in package.json
 import pluginByName from 'postcss-combine-duplicated-selectors';
+import packageJson from '../package.json' with { type: 'json' };
 
 const require = createRequire(import.meta.url);
 
@@ -21,5 +22,11 @@ describe('package exports', () => {
         'default' in required,
     );
     assert.equal(required.default, plugin);
+  });
+
+  it('names the plugin after the package', () => {
+    const created = plugin();
+    assert.ok('postcssPlugin' in created);
+    assert.equal(created.postcssPlugin, packageJson.name);
   });
 });
