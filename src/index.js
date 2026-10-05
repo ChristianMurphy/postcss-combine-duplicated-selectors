@@ -56,7 +56,7 @@
 import parser from 'postcss-selector-parser';
 import valueParser from 'postcss-value-parser';
 
-// A literal, so bundles leave out package.json; test/package-exports.js checks it
+// Not read from package.json, so bundles omit it
 const name = 'postcss-combine-duplicated-selectors';
 
 /**
