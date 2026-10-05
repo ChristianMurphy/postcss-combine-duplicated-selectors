@@ -48,6 +48,11 @@ describe('Keep cascade - combined', () => {
       expected: '.a{x:1}.b{y:1;g:1}.a{g:2}',
     },
     {
+      label: 'rules around a property that only shares the start of its name',
+      input: '.a{x:1}.b{text-transform:none}.a{text-align:left}',
+      expected: '.a{x:1;text-align:left}.b{text-transform:none}',
+    },
+    {
       label: 'nested rules around a declaration of another property',
       input: '.p{&{x:1} color:red;&{width:1px}}',
       expected: '.p{&{x:1;width:1px} color:red}',
@@ -184,6 +189,14 @@ describe('Keep cascade - properties that set each other', () => {
     ['-webkit-box-align', 'align-items'],
     ['-webkit-box-pack', 'justify-content'],
     ['MARGIN-TOP', 'margin'],
+    ['margin-left', 'margin-inline-start'],
+    ['margin-block', 'margin'],
+    ['inset-inline-start', 'left'],
+    ['min-width', 'min-inline-size'],
+    ['border-image', 'border'],
+    ['text-decoration-future', 'text-decoration'],
+    ['-webkit-font-smoothing', 'font'],
+    ['future-a-b-c-d-e-f-g', 'future-x'],
     ['-moz-transition', 'transition-duration'],
   ];
 

@@ -124,6 +124,11 @@ const cases = [
     modes: [cascade],
   },
   {
+    label: 'a property name with many hyphens',
+    build: (size) => `.a{${'p-'.repeat(size * 64)}q:1}`,
+    modes: [cascade],
+  },
+  {
     label: 'a selector list repeating one selector',
     build: (size) => `${repeat(size * 2, (index) => (index ? ',.a' : '.a'))}{}`,
     modes: [{}],

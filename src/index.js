@@ -62,6 +62,7 @@
 
 import parser from 'postcss-selector-parser';
 import valueParser from 'postcss-value-parser';
+import { propertyGroups, propertyGroupSegments } from './property-groups.js';
 
 // Not read from package.json, so bundles omit it
 const name = 'postcss-combine-duplicated-selectors';
@@ -429,70 +430,35 @@ const mergeableAtRules = new Set([
   'starting-style',
 ]);
 
-// Shorthands and longhands that do not share their first name segment
-/** @type {ReadonlyMap<string, string>} */
-const propertyGroupAliases = new Map([
-  ['top', 'inset'],
-  ['right', 'inset'],
-  ['bottom', 'inset'],
-  ['left', 'inset'],
-  ['line', 'font'],
-  ['gap', 'grid'],
-  ['row', 'grid'],
-  ['column', 'grid'],
-  ['columns', 'grid'],
-  ['align', 'place'],
-  ['justify', 'place'],
-  ['width', 'size'],
-  ['height', 'size'],
-  ['inline', 'size'],
-  ['block', 'size'],
-  ['white', 'text'],
-  ['word', 'overflow'],
-  ['page', 'break'],
-  ['logical', 'size'],
-  ['vertical', 'baseline'],
-  ['alignment', 'baseline'],
-  ['rule', 'grid'],
-]);
-
-// Legacy aliases and shorthands that their first name segment cannot group
-/** @type {ReadonlyMap<string, string>} */
-const propertyNameGroups = new Map([
-  ['column-break-before', 'break'],
-  ['column-break-after', 'break'],
-  ['column-break-inside', 'break'],
-  ['color-adjust', 'print'],
-  ['line-clamp', 'clamp'],
-  ['max-lines', 'clamp'],
-  ['block-ellipsis', 'clamp'],
-  ['continue', 'clamp'],
-  ['glyph-orientation-vertical', 'text'],
-  ['box-flex', 'flex'],
-  ['box-orient', 'flex'],
-  ['box-direction', 'flex'],
-  ['box-ordinal-group', 'order'],
-  ['box-align', 'place'],
-  ['box-pack', 'place'],
-]);
-
 /**
  * @param {string} property - property name
- * @return {string} the same group for a shorthand and its longhands; a
- *   custom property is its own group, and a name with an escape or an
+ * @return {string} the same group for properties that set a value in common;
+ *   a custom property is its own group, and a name with an escape or an
  *   interpolation is in the group of `all`
  */
 function getPropertyGroup(property) {
   if (/\\|[#@]\{/.test(property)) return 'all';
   if (property.startsWith('--')) return property;
-  const unprefixed = property.toLowerCase().replace(/^-[a-z]+-/, '');
-  const end = unprefixed.indexOf('-');
-  const segment = end === -1 ? unprefixed : unprefixed.slice(0, end);
-  return (
-    propertyNameGroups.get(unprefixed) ??
-    propertyGroupAliases.get(segment) ??
-    segment
-  );
+  const name = property.toLowerCase();
+  const listed = propertyGroups.get(name);
+  if (listed !== undefined) return listed;
+  const unprefixed = name.replace(/^-[a-z]+-/, '');
+  // A longhand the map does not list joins the longest property it extends
+  /** @type {Array<number>} */
+  const ends = [];
+  for (
+    let end = unprefixed.indexOf('-');
+    end !== -1 && ends.length < propertyGroupSegments;
+    end = unprefixed.indexOf('-', end + 1)
+  ) {
+    ends.push(end);
+  }
+  if (ends.length < propertyGroupSegments) ends.push(unprefixed.length);
+  for (const end of ends.toReversed()) {
+    const group = propertyGroups.get(unprefixed.slice(0, end));
+    if (group !== undefined) return group;
+  }
+  return unprefixed.slice(0, ends[0]);
 }
 
 /**

@@ -277,7 +277,7 @@ becomes
 
 An element with both classes was green and is now blue. Check the output when your CSS depends on rule order, or set `keepCascade`.
 
-With `keepCascade: true`, a rule combines into an earlier rule only when no rule between them sets a property it moves. The example above stays as it is, because `.b` sets `color`. The plugin treats a shorthand and its longhands as one property, so `margin` does not move past `margin-top`. It knows them from the first part of the property name, plus a list of shorthands and legacy aliases with other names. A rule that holds nested rules or at-rules, or that sets `all`, stays in place. An at-rule without a block, such as `@apply` or `@include`, counts as setting every property. When a rule cannot join the first rule with its selector, later rules join it instead.
+With `keepCascade: true`, a rule combines into an earlier rule only when no rule between them sets a property it moves. The example above stays as it is, because `.b` sets `color`. The plugin treats properties that set the same value as one property, so `margin` does not move past `margin-top` or `margin-inline-start`. It takes shorthands, legacy aliases and logical properties from the CSS specifications, through [@webref/css](https://www.npmjs.com/package/@webref/css), plus a short list of browser aliases. A property it does not know joins the longest known property that its name extends. A rule that holds nested rules or at-rules, or that sets `all`, stays in place. An at-rule without a block, such as `@apply` or `@include`, counts as setting every property. When a rule cannot join the first rule with its selector, later rules join it instead.
 
 ```css
 .a {
