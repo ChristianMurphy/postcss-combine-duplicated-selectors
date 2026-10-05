@@ -49,6 +49,10 @@ export const frameworks = {
   bulma: readCss('bulma/css/bulma.css'),
   // #1064 reported a hang on this stylesheet with removeDuplicatedProperties
   'open-props': readCss('open-props/open-props.min.css'),
+  // Bootstrap's Sass compiled together with each project's own partials
+  '@tabler/core': readCss('@tabler/core/dist/css/tabler.css'),
+  'bootswatch/brite': readCss('bootswatch/dist/brite/bootstrap.css'),
+  'bootswatch/zephyr': readCss('bootswatch/dist/zephyr/bootstrap.css'),
 };
 
 /** Each way to configure the plugin, by a label */
