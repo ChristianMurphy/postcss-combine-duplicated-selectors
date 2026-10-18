@@ -60,9 +60,9 @@
     "postcss-value-parser": "^4.2.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "21.2.3",
-    "@commitlint/config-conventional": "21.2.3",
-    "@commitlint/prompt-cli": "21.2.3",
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "@commitlint/prompt-cli": "21.2.4",
     "@types/node": "24.19.2",
     "@webref/css": "8.7.6",
     "css-select": "7.0.0",
