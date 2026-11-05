@@ -63,7 +63,7 @@
     "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.4",
     "@commitlint/prompt-cli": "21.2.4",
-    "@types/node": "24.19.2",
+    "@types/node": "26.6.6",
     "@webref/css": "8.7.6",
     "css-select": "7.0.0",
     "domhandler": "6.0.1",
