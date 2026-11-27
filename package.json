@@ -72,7 +72,7 @@
     "npm-run-all2": "9.1.0",
     "oxfmt": "0.80.0",
     "oxlint": "1.95.0",
-    "postcss": "8.5.33",
+    "postcss": "8.5.34",
     "postcss-nested": "8.0.1",
     "postcss-scss": "4.0.9",
     "remark-cli": "12.0.1",
